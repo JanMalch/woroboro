@@ -1,14 +1,9 @@
 package io.github.janmalch.woroboro.business
 
-import android.content.Context
-import androidx.room.Room
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import io.github.janmalch.woroboro.data.AppDatabase
 import javax.inject.Singleton
 
 
@@ -19,5 +14,9 @@ interface BusinessModule {
     @Binds
     @Singleton
     fun bindsExerciseRepository(impl: ExerciseRepositoryImpl): ExerciseRepository
+
+    @Binds
+    @Singleton
+    fun bindsTagRepository(impl: TagRepositoryImpl): TagRepository
 
 }

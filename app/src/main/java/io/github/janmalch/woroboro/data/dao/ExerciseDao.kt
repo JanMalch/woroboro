@@ -1,13 +1,38 @@
 package io.github.janmalch.woroboro.data.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Upsert
 import io.github.janmalch.woroboro.data.model.ExerciseEntity
+import io.github.janmalch.woroboro.data.model.ExerciseWithTagsEntity
+import io.github.janmalch.woroboro.data.model.TagEntity
+import java.util.UUID
 
 @Dao
-interface ExerciseDao {
+abstract class ExerciseDao {
+
+    @Transaction
+    open suspend fun upsert(entity: ExerciseWithTagsEntity) {
+        insertExercise(entity.exercise)
+        upsertTags(entity.tags)
+    }
+
+    @Upsert
+    protected abstract suspend fun insertExercise(entity: ExerciseEntity)
+    @Upsert
+    protected abstract suspend fun upsertTags(tags: List<TagEntity>)
+
+    @Query("UPDATE exercise SET is_favorite = :isFavorite WHERE id = :id")
+    abstract suspend fun updateFavoriteStatus(id: UUID, isFavorite: Boolean)
+
+    @Query("DELETE FROM exercise WHERE id = :id")
+    abstract suspend fun delete(id: UUID)
+
+    @Transaction
     @Query("""
-        SELECT exercise.*
+        SELECT *
         FROM exercise
         JOIN exercise_fts as fts
         ON exercise.id = fts.id
@@ -15,5 +40,5 @@ interface ExerciseDao {
         OR fts.description MATCH :query
         ORDER BY fts.name ASC
     """)
-    suspend fun searchInNameOrDescription(query: String): List<ExerciseEntity>
+    abstract suspend fun searchInNameOrDescription(query: String): List<ExerciseWithTagsEntity>
 }

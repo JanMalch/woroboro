@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.janmalch.woroboro.data.dao.ExerciseDao
+import io.github.janmalch.woroboro.data.dao.TagDao
 import javax.inject.Singleton
 
 @Module
@@ -26,5 +27,8 @@ object DatabaseModule {
 
     @Provides
     fun providesExerciseDao(db: AppDatabase): ExerciseDao = db.exerciseDao()
+
+    @Provides
+    fun providesTagDao(db: AppDatabase): TagDao = db.tagDao()
 
 }

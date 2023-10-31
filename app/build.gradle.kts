@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.com.google.dagger.hilt.android)
     alias(libs.plugins.com.google.devtools.ksp)
     id("com.google.android.gms.oss-licenses-plugin")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -49,6 +50,7 @@ android {
             // Enable experimental Material3 and Foundation APIs
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
         )
     }
     buildFeatures {
