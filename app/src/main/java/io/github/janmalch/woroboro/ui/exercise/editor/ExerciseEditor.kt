@@ -3,18 +3,20 @@ package io.github.janmalch.woroboro.ui.exercise.editor
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.rounded.Favorite
@@ -23,6 +25,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -30,19 +33,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,8 +52,8 @@ import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.theme.LoveRed
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
 import kotlin.time.Duration
@@ -64,33 +65,77 @@ val DurationSaver = Saver<Duration?, String>(
 )
 
 @Composable
-fun ExerciseEditor(
-    availableTags: ImmutableMap<String, ImmutableSet<String>>,
+fun ExerciseEditorScreen(
+    availableTags: ImmutableMap<String, ImmutableList<String>>,
     exercise: Exercise?,
     onSave: (Exercise) -> Unit,
     onDelete: (UUID) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val id: UUID = rememberSaveable { exercise?.id ?: UUID.randomUUID() }
-    var name: String by rememberSaveable { mutableStateOf(exercise?.name ?: "") }
-    var description: String by rememberSaveable { mutableStateOf(exercise?.description ?: "") }
-    var tags: List<Tag> by rememberSaveable {
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Übung ${if (exercise == null) "erstellen" else "bearbeiten"}") },
+            )
+        }
+    ) { padding ->
+        ExerciseEditor(
+            availableTags = availableTags,
+            exercise = exercise,
+            onSave = onSave,
+            onDelete = onDelete,
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(padding),
+        )
+    }
+}
+
+@Composable
+fun ExerciseEditor(
+    availableTags: ImmutableMap<String, ImmutableList<String>>,
+    exercise: Exercise?,
+    onSave: (Exercise) -> Unit,
+    onDelete: (UUID) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val id: UUID = rememberSaveable(exercise) { exercise?.id ?: UUID.randomUUID() }
+    var name: String by rememberSaveable(exercise) { mutableStateOf(exercise?.name ?: "") }
+    var description: String by rememberSaveable(exercise) {
+        mutableStateOf(
+            exercise?.description ?: ""
+        )
+    }
+    var tags: List<Tag> by rememberSaveable(exercise) {
         mutableStateOf(
             ArrayList(exercise?.tags ?: listOf())
         )
     }
-    var sets: Int? by rememberSaveable { mutableStateOf(exercise?.sets ?: 3) }
-    var reps: Int? by rememberSaveable { mutableStateOf(exercise?.reps) }
-    var hold: Duration? by rememberSaveable(stateSaver = DurationSaver) { mutableStateOf(exercise?.hold) }
-    var pause: Duration? by rememberSaveable(stateSaver = DurationSaver) { mutableStateOf(exercise?.pause ?: 30.seconds) }
-    var isFavorite: Boolean by rememberSaveable { mutableStateOf(exercise?.isFavorite ?: false) }
+    var sets: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.sets ?: 3) }
+    var reps: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.reps) }
+    var hold: Duration? by rememberSaveable(exercise, stateSaver = DurationSaver) {
+        mutableStateOf(
+            exercise?.hold
+        )
+    }
+    var pause: Duration? by rememberSaveable(exercise, stateSaver = DurationSaver) {
+        mutableStateOf(
+            exercise?.pause ?: 30.seconds
+        )
+    }
+    var isFavorite: Boolean by rememberSaveable(exercise) {
+        mutableStateOf(
+            exercise?.isFavorite ?: false
+        )
+    }
 
     Column(modifier = modifier) {
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp)
+                .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
         ) {
 
             OutlinedTextField(
@@ -112,7 +157,9 @@ fun ExerciseEditor(
                 label = { Text(text = "Beschreibung") },
                 singleLine = false,
                 // isError = description.isBlank(),
-                modifier = Modifier.fillMaxWidth().heightIn(max = 192.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 192.dp),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                 ),
@@ -256,7 +303,7 @@ fun IsFavoriteCheckbox(
 
 @Composable
 fun TagSelectors(
-    availableTags: ImmutableMap<String, ImmutableSet<String>>,
+    availableTags: ImmutableMap<String, ImmutableList<String>>,
     value: List<Tag>,
     onValueChange: (List<Tag>) -> Unit,
 ) {
@@ -290,7 +337,7 @@ fun TagSelectors(
 @Composable
 fun TagTypeMultiDropdown(
     type: String,
-    availableLabels: ImmutableSet<String>,
+    availableLabels: ImmutableList<String>,
     value: List<String>,
     onValueChange: (List<String>) -> Unit,
 ) {

@@ -13,8 +13,8 @@ fun Exercise.asEntity(): ExerciseWithTagsEntity {
     return ExerciseWithTagsEntity(
         exercise = ExerciseEntity(
             id = id,
-            name = name,
-            description = description,
+            name = name.trim(),
+            description = description.trim(),
             sets = sets,
             reps = reps,
             hold = hold,
@@ -25,6 +25,6 @@ fun Exercise.asEntity(): ExerciseWithTagsEntity {
 }
 
 fun Tag.asEntity() = TagEntity(
-    label = label,
-    type = type,
+    label = label.trim(),
+    type = type.trim(),
 )

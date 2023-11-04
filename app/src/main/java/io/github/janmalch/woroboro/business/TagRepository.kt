@@ -7,6 +7,7 @@ import javax.inject.Inject
 interface TagRepository {
     suspend fun upsert(tag: Tag)
     suspend fun delete(label: String)
+    suspend fun findAllTags(): Map<String, List<String>>
 }
 
 class TagRepositoryImpl @Inject constructor(
@@ -19,6 +20,12 @@ class TagRepositoryImpl @Inject constructor(
 
     override suspend fun delete(label: String) {
         tagDao.delete(label)
+    }
+
+    override suspend fun findAllTags(): Map<String, List<String>> {
+        return tagDao.findAllTags()
+            .groupBy(keySelector = { it.type }, valueTransform = { it.label })
+            .mapValues { it.value.sorted() }
     }
 
 }
