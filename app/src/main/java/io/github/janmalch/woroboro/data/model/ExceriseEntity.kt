@@ -5,9 +5,7 @@ import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
 import io.github.janmalch.woroboro.models.Exercise
-import io.github.janmalch.woroboro.models.Tag
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import java.util.UUID
 import kotlin.time.Duration
 
