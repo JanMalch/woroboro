@@ -12,7 +12,13 @@ import javax.inject.Inject
 interface ExerciseRepository {
     suspend fun insert(exercise: Exercise): UUID
     suspend fun update(exercise: Exercise): UUID
-    fun find(id: UUID): Flow<Exercise?>
+    fun resolve(id: UUID): Flow<Exercise?>
+
+    /**
+     * Finds all exercises matched by the given [tags].
+     * Returns all exercises when [tags] is empty.
+     */
+    fun findByTags(tags: List<String>): Flow<List<Exercise>>
     suspend fun delete(id: UUID)
     suspend fun searchInNameOrDescription(query: String): List<Exercise>
 }
@@ -36,8 +42,14 @@ class ExerciseRepositoryImpl @Inject constructor(
         exerciseDao.delete(id)
     }
 
-    override fun find(id: UUID): Flow<Exercise?> {
-        return exerciseDao.find(id).map { it?.asModel() }
+    override fun resolve(id: UUID): Flow<Exercise?> {
+        return exerciseDao.resolve(id).map { it?.asModel() }
+    }
+
+    override fun findByTags(tags: List<String>): Flow<List<Exercise>> {
+        val flow = if (tags.isEmpty()) exerciseDao.resolveAll()
+        else exerciseDao.findByTags(tags)
+        return flow.map { list -> list.map(ExerciseWithTagsEntity::asModel) }
     }
 
     override suspend fun searchInNameOrDescription(query: String): List<Exercise> {

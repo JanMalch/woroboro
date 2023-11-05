@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
+    implementation(libs.ui.icons.extended)
     implementation(libs.splashscreen)
     implementation(libs.navigation)
     implementation(libs.material)

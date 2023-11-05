@@ -10,11 +10,13 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import java.util.UUID
 
 
-const val EXERCISE_EDITOR_ROUTE = "exercise-editor"
 private const val ARGUMENT = "exerciseId"
+const val EXERCISE_EDITOR_ROUTE = "$EXERCISES_GRAPH_ROUTE/exercise-editor"
+private const val EXERCISE_EDITOR_ROUTE_PATTERN = "$EXERCISE_EDITOR_ROUTE?$ARGUMENT={$ARGUMENT}"
 
 data class ExerciseEditorArgs(
     val exerciseId: UUID?
@@ -24,13 +26,22 @@ data class ExerciseEditorArgs(
     )
 }
 
-fun NavController.navigateToExerciseEditor(navOptions: NavOptions? = null) {
-    this.navigate(EXERCISE_EDITOR_ROUTE, navOptions)
+fun NavController.navigateToExerciseEditor(
+    exerciseId: UUID? = null,
+    navOptions: NavOptions? = null,
+) {
+    if (exerciseId != null) {
+        this.navigate("$EXERCISE_EDITOR_ROUTE?$ARGUMENT=$exerciseId", navOptions)
+    } else {
+        this.navigate(EXERCISE_EDITOR_ROUTE, navOptions)
+    }
 }
 
-fun NavGraphBuilder.exerciseEditorScreen() {
+fun NavGraphBuilder.exerciseEditorScreen(
+    onBackClick: () -> Unit,
+) {
     composable(
-        route = EXERCISE_EDITOR_ROUTE,
+        route = EXERCISE_EDITOR_ROUTE_PATTERN,
         arguments = listOf(
             navArgument(ARGUMENT) {
                 type = NavType.StringType
@@ -47,6 +58,7 @@ fun NavGraphBuilder.exerciseEditorScreen() {
             exercise = exercise,
             onSave = viewModel::save,
             onDelete = viewModel::delete,
+            onBackClick = onBackClick,
         )
     }
 }

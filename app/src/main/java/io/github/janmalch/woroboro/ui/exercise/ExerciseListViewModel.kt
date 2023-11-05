@@ -1,4 +1,4 @@
-package io.github.janmalch.woroboro.ui.exercise.editor
+package io.github.janmalch.woroboro.ui.exercise
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,34 +7,45 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.ExerciseRepository
 import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.Tag
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
+private const val SELECTED_TAGS_SSH_KEY = "selected_tags"
+
 @HiltViewModel
-class ExerciseEditorViewModel @Inject constructor(
+class ExerciseListViewModel @Inject constructor(
     private val exerciseRepository: ExerciseRepository,
     private val tagRepository: TagRepository,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val exerciseId = MutableStateFlow(ExerciseEditorArgs(savedStateHandle).exerciseId)
+    private val _selectedTagLabels =
+        savedStateHandle.getStateFlow(SELECTED_TAGS_SSH_KEY, emptyList<String>())
 
-    val exerciseToEdit = exerciseId.flatMapLatest { id ->
-        id?.let { exerciseRepository.resolve(it) } ?: flowOf(null)
+    val selectedTags = _selectedTagLabels.flatMapLatest {
+        tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = null,
+        initialValue = persistentListOf(),
+    )
+
+    val exercises = _selectedTagLabels.flatMapLatest { selectedTags ->
+        exerciseRepository.findByTags(selectedTags).map(List<Exercise>::toImmutableList)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = persistentListOf(),
     )
 
     val availableTags = flow {
@@ -47,20 +58,14 @@ class ExerciseEditorViewModel @Inject constructor(
         initialValue = persistentMapOf(),
     )
 
-    fun save(exercise: Exercise) {
+    fun toggleFavorite(exercise: Exercise) {
+        val isFavorite = exercise.isFavorite
         viewModelScope.launch {
-            exerciseId.value = if (exerciseId.value == null) {
-                exerciseRepository.insert(exercise)
-            } else {
-                exerciseRepository.update(exercise)
-            }
+            exerciseRepository.update(exercise.copy(isFavorite = !isFavorite))
         }
     }
 
-    fun delete(id: UUID) {
-        viewModelScope.launch {
-            exerciseRepository.delete(id)
-            exerciseId.value = null
-        }
+    fun changeSelectedTags(tags: List<Tag>) {
+        savedStateHandle[SELECTED_TAGS_SSH_KEY] = tags.map(Tag::label)
     }
 }

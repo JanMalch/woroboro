@@ -39,7 +39,22 @@ abstract class ExerciseDao {
     abstract suspend fun updateFavoriteStatus(id: UUID, isFavorite: Boolean)
 
     @Query("SELECT * FROM exercise WHERE id = :id")
-    abstract fun find(id: UUID): Flow<ExerciseWithTagsEntity?>
+    abstract fun resolve(id: UUID): Flow<ExerciseWithTagsEntity?>
+
+    @Query("SELECT * FROM exercise ORDER BY exercise.name ASC")
+    abstract fun resolveAll(): Flow<List<ExerciseWithTagsEntity>>
+
+    @Query(
+        """
+SELECT *
+FROM exercise
+JOIN exercise_tag_cross_ref as ref
+ON ref.exercise_id = exercise.id
+WHERE ref.tag_label IN (:selectedTags)
+ORDER BY exercise.name ASC
+    """
+    )
+    abstract fun findByTags(selectedTags: List<String>): Flow<List<ExerciseWithTagsEntity>>
 
     @Query("DELETE FROM exercise WHERE id = :id")
     abstract suspend fun delete(id: UUID)

@@ -1,10 +1,8 @@
 package io.github.janmalch.woroboro.ui.exercise.editor
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -17,20 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -38,20 +25,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
-import io.github.janmalch.woroboro.ui.theme.LoveRed
+import io.github.janmalch.woroboro.ui.components.common.BackIconButton
+import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
+import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
@@ -70,11 +56,13 @@ fun ExerciseEditorScreen(
     exercise: Exercise?,
     onSave: (Exercise) -> Unit,
     onDelete: (UUID) -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+                navigationIcon = { BackIconButton(onClick = onBackClick) },
                 title = { Text("Übung ${if (exercise == null) "erstellen" else "bearbeiten"}") },
             )
         }
@@ -221,11 +209,17 @@ fun ExerciseEditor(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TagSelectors(
-                availableTags = availableTags,
-                value = tags,
-                onValueChange = { tags = it }
-            )
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                TagSelectors(
+                    availableTags = availableTags,
+                    value = tags,
+                    isCounterVisible = true,
+                    onValueChange = { tags = it }
+                )
+            }
         }
 
         HorizontalDivider()
@@ -286,119 +280,14 @@ fun IsFavoriteCheckbox(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable { onValueChange(!value) }
     ) {
-        Crossfade(
-            targetState = value,
-            label = "Crossfade:Icon:IsFavoriteCheckbox",
-        ) {
-            Icon(
-                if (it) Icons.Rounded.Favorite
-                else Icons.Rounded.FavoriteBorder,
-                contentDescription = null,
-                tint = if (it) LoveRed else LocalContentColor.current,
-            )
-        }
+        FavoriteIcon(
+            isFavorite = value,
+            crossfadeLabel = "Crossfade:Icon:IsFavoriteCheckbox",
+        )
         Text(text = "Lieblingsübung")
     }
 }
 
-@Composable
-fun TagSelectors(
-    availableTags: ImmutableMap<String, ImmutableList<String>>,
-    value: List<Tag>,
-    onValueChange: (List<Tag>) -> Unit,
-) {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-
-        availableTags.forEach { (type, labels) ->
-            val valuesForType = remember(type, value) {
-                value.mapNotNull { it.takeIf { it.type == type }?.label }
-            }
-
-            TagTypeMultiDropdown(
-                type = type,
-                availableLabels = labels,
-                value = valuesForType,
-                onValueChange = { newValuesForType ->
-                    onValueChange(
-                        // remove old values for this type
-                        value.filter { it.type != type } +
-                                // and append new ones
-                                (newValuesForType.map { Tag(label = it, type = type) })
-                    )
-                }
-            )
-        }
-
-    }
-}
-
-@Composable
-fun TagTypeMultiDropdown(
-    type: String,
-    availableLabels: ImmutableList<String>,
-    value: List<String>,
-    onValueChange: (List<String>) -> Unit,
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    Box {
-        AssistChip(
-            onClick = { expanded = true },
-            label = { Text(text = type, softWrap = false) },
-            colors = if (value.isNotEmpty()) AssistChipDefaults.elevatedAssistChipColors() else AssistChipDefaults.assistChipColors(),
-            elevation = if (value.isNotEmpty()) AssistChipDefaults.assistChipElevation(
-                elevation = 12.dp,
-            ) else null,
-            leadingIcon = if (value.isNotEmpty()) {
-                {
-                    Badge {
-                        Text(text = value.size.toString())
-                    }
-                }
-            } else null,
-            trailingIcon = {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-            }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            availableLabels.forEach { availableLabel ->
-                var isSelected by remember { mutableStateOf(availableLabel in value) }
-                DropdownMenuItem(
-                    text = { Text(availableLabel) },
-                    onClick = {
-                        if (isSelected) {
-                            isSelected = false
-                            onValueChange(value - availableLabel)
-                        } else {
-                            isSelected = true
-                            onValueChange(value + availableLabel)
-                        }
-                    },
-                    leadingIcon = {
-                        Crossfade(
-                            targetState = isSelected,
-                            label = "Crossfade:Icon:$availableLabel",
-                        ) {
-                            Icon(
-                                painterResource(
-                                    id =
-                                    if (it) R.drawable.round_check_box_24
-                                    else R.drawable.round_check_box_outline_blank_24
-                                ),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun NumberTextField(
