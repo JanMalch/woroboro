@@ -2,6 +2,7 @@ package io.github.janmalch.woroboro.data.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.room.Upsert
 import io.github.janmalch.woroboro.data.model.ExerciseEntity
@@ -38,12 +39,16 @@ abstract class ExerciseDao {
     @Query("UPDATE exercise SET is_favorite = :isFavorite WHERE id = :id")
     abstract suspend fun updateFavoriteStatus(id: UUID, isFavorite: Boolean)
 
+    @Transaction
     @Query("SELECT * FROM exercise WHERE id = :id")
     abstract fun resolve(id: UUID): Flow<ExerciseWithTagsEntity?>
 
+    @Transaction
     @Query("SELECT * FROM exercise ORDER BY exercise.name ASC")
     abstract fun resolveAll(): Flow<List<ExerciseWithTagsEntity>>
 
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
 SELECT *

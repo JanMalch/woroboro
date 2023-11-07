@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "400bd71553a5988a85a2d91860e04e3f",
+    "identityHash": "fd14427ac4d6c1dee65be5451275d82f",
     "entities": [
       {
         "tableName": "exercise",
@@ -163,14 +163,24 @@
             "tag_label"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_exercise_tag_cross_ref_tag_label",
+            "unique": false,
+            "columnNames": [
+              "tag_label"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_exercise_tag_cross_ref_tag_label` ON `${TABLE_NAME}` (`tag_label`)"
+          }
+        ],
         "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '400bd71553a5988a85a2d91860e04e3f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fd14427ac4d6c1dee65be5451275d82f')"
     ]
   }
 }

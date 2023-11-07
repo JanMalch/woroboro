@@ -14,7 +14,7 @@ import java.util.UUID
 data class ExerciseTagCrossRefEntity(
     @ColumnInfo(name = "exercise_id")
     val exerciseId: UUID,
-    @ColumnInfo(name = "tag_label")
+    @ColumnInfo(name = "tag_label", index = true)
     val tagLabel: String,
 )
 
