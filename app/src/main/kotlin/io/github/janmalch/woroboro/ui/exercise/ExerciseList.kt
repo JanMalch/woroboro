@@ -11,17 +11,19 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -30,9 +32,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
@@ -140,7 +145,6 @@ fun ExerciseList(
                 onToggleFavorite = { onToggleFavorite(exercise) },
                 onClick = { onExerciseClick(exercise) }
             )
-            HorizontalDivider()
         }
     }
 }
@@ -153,15 +157,28 @@ fun ExerciseListItem(
     modifier: Modifier = Modifier,
 ) {
     ListItem(
+        leadingContent = {
+            AsyncImage(
+                model = exercise.media.firstOrNull()?.thumbnail,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(56.dp, 56.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(8.dp))
+            )
+        },
         headlineContent = {
             Text(text = exercise.name)
         },
         overlineContent = {
-            Text(
-                text = exercise.tags.joinToString { it.label },
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (exercise.tags.isNotEmpty()) {
+                Text(
+                    text = exercise.tags.joinToString { it.label },
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         },
         trailingContent = {
             IconButton(onClick = onToggleFavorite) {

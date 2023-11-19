@@ -1,17 +1,21 @@
 package io.github.janmalch.woroboro.business
 
+import android.util.Log
 import io.github.janmalch.woroboro.data.dao.ExerciseDao
-import io.github.janmalch.woroboro.data.model.ExerciseWithTagsEntity
+import io.github.janmalch.woroboro.data.model.ExerciseEntityWithMediaAndTags
+import io.github.janmalch.woroboro.data.model.MediaEntity
 import io.github.janmalch.woroboro.data.model.asModel
+import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.Media
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
 
 interface ExerciseRepository {
-    suspend fun insert(exercise: Exercise): UUID
-    suspend fun update(exercise: Exercise): UUID
+    suspend fun insert(exercise: EditedExercise): UUID
+    suspend fun update(exercise: EditedExercise): UUID
     fun resolve(id: UUID): Flow<Exercise?>
 
     /**
@@ -24,18 +28,49 @@ interface ExerciseRepository {
 }
 
 class ExerciseRepositoryImpl @Inject constructor(
+    private val mediaFileManager: MediaFileManager,
     private val exerciseDao: ExerciseDao,
 ) : ExerciseRepository {
 
-    override suspend fun insert(exercise: Exercise): UUID {
-        val uuid = UUID.randomUUID()
-        exerciseDao.upsert(exercise.copy(id = uuid).asEntity())
-        return uuid
+    override suspend fun insert(exercise: EditedExercise): UUID {
+        val exerciseId = UUID.randomUUID()
+        val addedMedia = mediaFileManager.add(exercise.addedMedia).map { it.asEntity(exerciseId) }
+        Log.d("ExerciseRepositoryImpl", "Optimized ${addedMedia.size} new media files: $addedMedia")
+        try {
+            exerciseDao.upsert(
+                exercise.exercise.copy(
+                    id = exerciseId,
+                ).asEntity().copy(
+                    media = addedMedia,
+                )
+            )
+        } catch (e: Exception) {
+            mediaFileManager.delete(addedMedia.map(MediaEntity::id))
+            throw e
+        }
+        return exerciseId
     }
 
-    override suspend fun update(exercise: Exercise): UUID {
-        exerciseDao.upsert(exercise.asEntity())
-        return exercise.id
+    override suspend fun update(exercise: EditedExercise): UUID {
+        val mediaToRemove = exerciseDao.mediaForExerciseOtherThan(
+            exercise.exercise.id,
+            exercise.exercise.media.map(Media::id)
+        )
+        val addedMedia =
+            mediaFileManager.add(exercise.addedMedia).map { it.asEntity(exercise.exercise.id) }
+        val exerciseEntity = exercise.exercise.asEntity()
+        try {
+            exerciseDao.upsert(
+                exerciseEntity.copy(
+                    media = addedMedia + exerciseEntity.media
+                )
+            )
+            mediaFileManager.delete(mediaToRemove)
+        } catch (e: Exception) {
+            mediaFileManager.delete(addedMedia.map(MediaEntity::id))
+            throw e
+        }
+        return exercise.exercise.id
     }
 
     override suspend fun delete(id: UUID) {
@@ -49,13 +84,13 @@ class ExerciseRepositoryImpl @Inject constructor(
     override fun findByTags(tags: List<String>): Flow<List<Exercise>> {
         val flow = if (tags.isEmpty()) exerciseDao.resolveAll()
         else exerciseDao.findByTags(tags)
-        return flow.map { list -> list.map(ExerciseWithTagsEntity::asModel) }
+        return flow.map { list -> list.map(ExerciseEntityWithMediaAndTags::asModel) }
     }
 
     override suspend fun searchInNameOrDescription(query: String): List<Exercise> {
         if (query.isBlank()) return emptyList()
         return exerciseDao.searchInNameOrDescription(query.trim())
-            .map(ExerciseWithTagsEntity::asModel)
+            .map(ExerciseEntityWithMediaAndTags::asModel)
     }
 
 }

@@ -19,4 +19,12 @@ interface BusinessModule {
     @Singleton
     fun bindsTagRepository(impl: TagRepositoryImpl): TagRepository
 
+    @Binds
+    @Singleton
+    fun bindsMediaFileManager(impl: MediaFileManagerImpl): MediaFileManager
+
+    @Binds
+    @Singleton
+    fun bindsMediaOptimizer(impl: OnDeviceMediaOptimizer): MediaOptimizer
+
 }

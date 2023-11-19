@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.ExerciseRepository
 import io.github.janmalch.woroboro.business.TagRepository
+import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
 import kotlinx.collections.immutable.persistentListOf
@@ -61,7 +62,12 @@ class ExerciseListViewModel @Inject constructor(
     fun toggleFavorite(exercise: Exercise) {
         val isFavorite = exercise.isFavorite
         viewModelScope.launch {
-            exerciseRepository.update(exercise.copy(isFavorite = !isFavorite))
+            exerciseRepository.update(
+                EditedExercise(
+                    exercise = exercise.copy(isFavorite = !isFavorite),
+                    addedMedia = emptySet(),
+                )
+            )
         }
     }
 

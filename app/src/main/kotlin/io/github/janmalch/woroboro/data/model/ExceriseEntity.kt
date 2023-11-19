@@ -1,10 +1,15 @@
 package io.github.janmalch.woroboro.data.model
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Fts4
+import androidx.room.Junction
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.Media
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
 import kotlin.time.Duration
@@ -31,7 +36,52 @@ data class ExerciseFtsEntity(
     val description: String,
 )
 
-fun ExerciseWithTagsEntity.asModel() = Exercise(
+@Entity(
+    tableName = "media",
+    foreignKeys = [ForeignKey(
+        entity = ExerciseEntity::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("exercise_id"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
+data class MediaEntity(
+    @PrimaryKey
+    val id: UUID,
+    @ColumnInfo(name = "exercise_id")
+    val exerciseId: UUID,
+    val thumbnail: String,
+    val source: String,
+    @ColumnInfo(name = "is_video")
+    val isVideo: Boolean,
+)
+
+data class ExerciseEntityWithMediaAndTags(
+    @Embedded val exercise: ExerciseEntity,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "exercise_id"
+    )
+    val media: List<MediaEntity>,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "label",
+        associateBy = Junction(
+            value = ExerciseTagCrossRefEntity::class,
+            parentColumn = "exercise_id",
+            entityColumn = "tag_label",
+        )
+    )
+    val tags: List<TagEntity>
+)
+
+fun MediaEntity.asModel(): Media = if (isVideo) {
+    Media.Video(id = id, source = source, thumbnail = thumbnail)
+} else {
+    Media.Image(id = id, source = source, thumbnail = thumbnail)
+}
+
+fun ExerciseEntityWithMediaAndTags.asModel() = Exercise(
     id = exercise.id,
     name = exercise.name,
     description = exercise.description,
@@ -41,4 +91,5 @@ fun ExerciseWithTagsEntity.asModel() = Exercise(
     pause = exercise.pause,
     isFavorite = exercise.isFavorite,
     tags = tags.map(TagEntity::asModel).toImmutableList(),
+    media = media.map(MediaEntity::asModel).toImmutableList(),
 )

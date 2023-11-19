@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.ui.icons.extended)
     implementation(libs.splashscreen)
     implementation(libs.navigation)
+    implementation(libs.coil.compose)
     implementation(libs.material)
     implementation(libs.material3)
     implementation(libs.material3.android)

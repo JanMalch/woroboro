@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -33,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import io.github.janmalch.woroboro.models.EditedExercise
+import io.github.janmalch.woroboro.models.EditedMedia
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.BackIconButton
@@ -40,7 +44,9 @@ import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -54,7 +60,7 @@ val DurationSaver = Saver<Duration?, String>(
 fun ExerciseEditorScreen(
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     exercise: Exercise?,
-    onSave: (Exercise) -> Unit,
+    onSave: (EditedExercise) -> Unit,
     onDelete: (UUID) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -84,7 +90,7 @@ fun ExerciseEditorScreen(
 fun ExerciseEditor(
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     exercise: Exercise?,
-    onSave: (Exercise) -> Unit,
+    onSave: (EditedExercise) -> Unit,
     onDelete: (UUID) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -98,6 +104,14 @@ fun ExerciseEditor(
     var tags: List<Tag> by rememberSaveable(exercise) {
         mutableStateOf(
             ArrayList(exercise?.tags ?: listOf())
+        )
+    }
+    var media by remember(exercise) {
+        mutableStateOf(
+            EditedMedia(
+                existing = exercise?.media?.toPersistentList() ?: persistentListOf(),
+                added = emptySet(),
+            )
         )
     }
     var sets: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.sets ?: 3) }
@@ -195,12 +209,24 @@ fun ExerciseEditor(
 
         HorizontalDivider()
 
+        MediaPicker(
+            value = media,
+            onValueChange = { media = it },
+            title = { Text(text = "Bilder und Videos") },
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp),
+            headerModifier = Modifier.padding(horizontal = 24.dp),
+        )
+
+        HorizontalDivider()
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp)
         ) {
-
 
             IsFavoriteCheckbox(
                 value = isFavorite,
@@ -208,7 +234,6 @@ fun ExerciseEditor(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
 
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -232,16 +257,20 @@ fun ExerciseEditor(
             Button(
                 onClick = {
                     sets?.let {
-                        val edited = Exercise(
-                            id = id,
-                            name = name.trim(),
-                            description = description.trim(),
-                            tags = tags.toImmutableList(),
-                            sets = it,
-                            reps = reps,
-                            hold = hold,
-                            pause = pause,
-                            isFavorite = isFavorite,
+                        val edited = EditedExercise(
+                            exercise = Exercise(
+                                id = id,
+                                name = name.trim(),
+                                description = description.trim(),
+                                tags = tags.toImmutableList(),
+                                sets = it,
+                                reps = reps,
+                                hold = hold,
+                                pause = pause,
+                                isFavorite = isFavorite,
+                                media = media.existing,
+                            ),
+                            addedMedia = media.added,
                         )
                         onSave(edited)
                     }

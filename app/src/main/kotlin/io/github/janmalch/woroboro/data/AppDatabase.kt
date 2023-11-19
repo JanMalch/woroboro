@@ -8,12 +8,14 @@ import io.github.janmalch.woroboro.data.dao.TagDao
 import io.github.janmalch.woroboro.data.model.ExerciseEntity
 import io.github.janmalch.woroboro.data.model.ExerciseFtsEntity
 import io.github.janmalch.woroboro.data.model.ExerciseTagCrossRefEntity
+import io.github.janmalch.woroboro.data.model.MediaEntity
 import io.github.janmalch.woroboro.data.model.TagEntity
 
 @Database(
     entities = [
         ExerciseEntity::class,
         ExerciseFtsEntity::class,
+        MediaEntity::class,
         TagEntity::class,
         ExerciseTagCrossRefEntity::class,
     ],

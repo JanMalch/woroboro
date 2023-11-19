@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.ExerciseRepository
 import io.github.janmalch.woroboro.business.TagRepository
-import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.EditedExercise
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
@@ -47,7 +47,7 @@ class ExerciseEditorViewModel @Inject constructor(
         initialValue = persistentMapOf(),
     )
 
-    fun save(exercise: Exercise) {
+    fun save(exercise: EditedExercise) {
         viewModelScope.launch {
             exerciseId.value = if (exerciseId.value == null) {
                 exerciseRepository.insert(exercise)

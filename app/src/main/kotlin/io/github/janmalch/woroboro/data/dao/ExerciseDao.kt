@@ -6,8 +6,9 @@ import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.room.Upsert
 import io.github.janmalch.woroboro.data.model.ExerciseEntity
+import io.github.janmalch.woroboro.data.model.ExerciseEntityWithMediaAndTags
 import io.github.janmalch.woroboro.data.model.ExerciseTagCrossRefEntity
-import io.github.janmalch.woroboro.data.model.ExerciseWithTagsEntity
+import io.github.janmalch.woroboro.data.model.MediaEntity
 import io.github.janmalch.woroboro.data.model.TagEntity
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
@@ -16,9 +17,12 @@ import java.util.UUID
 abstract class ExerciseDao {
 
     @Transaction
-    open suspend fun upsert(entity: ExerciseWithTagsEntity) {
+    open suspend fun upsert(entity: ExerciseEntityWithMediaAndTags) {
         insertExercise(entity.exercise)
+        deleteMediaOfExercise(entity.exercise.id)
+        upsertMedia(entity.media)
         upsertTags(entity.tags)
+        deleteTagRefsOfExercise(entity.exercise.id)
         upsertCrossRefs(entity.tags.map {
             ExerciseTagCrossRefEntity(
                 exerciseId = entity.exercise.id,
@@ -36,16 +40,25 @@ abstract class ExerciseDao {
     @Upsert
     protected abstract suspend fun upsertTags(tags: List<TagEntity>)
 
+    @Upsert
+    protected abstract suspend fun upsertMedia(media: List<MediaEntity>)
+
+    @Query("DELETE FROM exercise_tag_cross_ref WHERE exercise_id = :exerciseId")
+    protected abstract suspend fun deleteTagRefsOfExercise(exerciseId: UUID)
+
+    @Query("DELETE FROM media WHERE exercise_id = :exerciseId")
+    protected abstract suspend fun deleteMediaOfExercise(exerciseId: UUID)
+
     @Query("UPDATE exercise SET is_favorite = :isFavorite WHERE id = :id")
     abstract suspend fun updateFavoriteStatus(id: UUID, isFavorite: Boolean)
 
     @Transaction
     @Query("SELECT * FROM exercise WHERE id = :id")
-    abstract fun resolve(id: UUID): Flow<ExerciseWithTagsEntity?>
+    abstract fun resolve(id: UUID): Flow<ExerciseEntityWithMediaAndTags?>
 
     @Transaction
     @Query("SELECT * FROM exercise ORDER BY exercise.name ASC")
-    abstract fun resolveAll(): Flow<List<ExerciseWithTagsEntity>>
+    abstract fun resolveAll(): Flow<List<ExerciseEntityWithMediaAndTags>>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
@@ -59,10 +72,17 @@ WHERE ref.tag_label IN (:selectedTags)
 ORDER BY exercise.name ASC
     """
     )
-    abstract fun findByTags(selectedTags: List<String>): Flow<List<ExerciseWithTagsEntity>>
+    abstract fun findByTags(selectedTags: List<String>): Flow<List<ExerciseEntityWithMediaAndTags>>
 
     @Query("DELETE FROM exercise WHERE id = :id")
-    abstract suspend fun delete(id: UUID)
+    protected abstract suspend fun deleteExercise(id: UUID)
+
+    @Transaction
+    open suspend fun delete(id: UUID) {
+        deleteExercise(id)
+        deleteMediaOfExercise(id)
+        deleteTagRefsOfExercise(id)
+    }
 
     @Transaction
     @Query(
@@ -74,6 +94,20 @@ ORDER BY exercise.name ASC
         WHERE fts.name MATCH :query
         OR fts.description MATCH :query
         ORDER BY fts.name ASC
-    """)
-    abstract suspend fun searchInNameOrDescription(query: String): List<ExerciseWithTagsEntity>
+    """
+    )
+    abstract suspend fun searchInNameOrDescription(query: String): List<ExerciseEntityWithMediaAndTags>
+
+    @Query(
+        """
+        SELECT media.id
+        FROM media
+        WHERE exercise_id = :exerciseId
+        AND media.id NOT IN (:mediaIds)
+    """
+    )
+    abstract suspend fun mediaForExerciseOtherThan(
+        exerciseId: UUID,
+        mediaIds: List<UUID>
+    ): List<UUID>
 }
