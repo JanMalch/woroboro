@@ -21,8 +21,11 @@ interface ExerciseRepository {
     /**
      * Finds all exercises matched by the given [tags].
      * Returns all exercises when [tags] is empty.
+     *
+     * Also filters the list to only include favorites, if [onlyFavorites] is set to `true`.
+     * Otherwise returns both favorites and non-favorites.
      */
-    fun findByTags(tags: List<String>): Flow<List<Exercise>>
+    fun findByTags(tags: List<String>, onlyFavorites: Boolean): Flow<List<Exercise>>
     suspend fun delete(id: UUID)
     suspend fun searchInNameOrDescription(query: String): List<Exercise>
 }
@@ -81,9 +84,9 @@ class ExerciseRepositoryImpl @Inject constructor(
         return exerciseDao.resolve(id).map { it?.asModel() }
     }
 
-    override fun findByTags(tags: List<String>): Flow<List<Exercise>> {
-        val flow = if (tags.isEmpty()) exerciseDao.resolveAll()
-        else exerciseDao.findByTags(tags)
+    override fun findByTags(tags: List<String>, onlyFavorites: Boolean): Flow<List<Exercise>> {
+        val flow = if (tags.isEmpty()) exerciseDao.resolveAll(onlyFavorites = onlyFavorites)
+        else exerciseDao.findByTags(tags, onlyFavorites = onlyFavorites)
         return flow.map { list -> list.map(ExerciseEntityWithMediaAndTags::asModel) }
     }
 

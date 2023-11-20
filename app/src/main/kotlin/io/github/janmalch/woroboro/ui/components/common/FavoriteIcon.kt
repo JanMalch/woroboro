@@ -7,12 +7,14 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import io.github.janmalch.woroboro.ui.theme.LoveRed
 
 @Composable
 fun FavoriteIcon(
     isFavorite: Boolean,
-    crossfadeLabel: String = "Crossfade:Icon:IsFavorite"
+    modifier: Modifier = Modifier,
+    crossfadeLabel: String = "Crossfade:Icon:IsFavorite",
 ) {
     Crossfade(
         targetState = isFavorite,
@@ -23,6 +25,7 @@ fun FavoriteIcon(
             else Icons.Rounded.FavoriteBorder,
             contentDescription = null,
             tint = if (it) LoveRed else LocalContentColor.current,
+            modifier = modifier,
         )
     }
 }

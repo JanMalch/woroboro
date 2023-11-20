@@ -14,6 +14,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val SELECTED_TAGS_SSH_KEY = "selected_tags"
+private const val ONLY_FAVORITES_SSH_KEY = "only_favorites"
 
 @HiltViewModel
 class ExerciseListViewModel @Inject constructor(
@@ -33,6 +35,9 @@ class ExerciseListViewModel @Inject constructor(
     private val _selectedTagLabels =
         savedStateHandle.getStateFlow(SELECTED_TAGS_SSH_KEY, emptyList<String>())
 
+    val isOnlyFavorites =
+        savedStateHandle.getStateFlow(ONLY_FAVORITES_SSH_KEY, false)
+
     val selectedTags = _selectedTagLabels.flatMapLatest {
         tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
     }.stateIn(
@@ -41,8 +46,13 @@ class ExerciseListViewModel @Inject constructor(
         initialValue = persistentListOf(),
     )
 
-    val exercises = _selectedTagLabels.flatMapLatest { selectedTags ->
-        exerciseRepository.findByTags(selectedTags).map(List<Exercise>::toImmutableList)
+    val exercises = combine(
+        _selectedTagLabels,
+        isOnlyFavorites,
+        ::Pair
+    ).flatMapLatest { (selectedTags, isOnlyFavorites) ->
+        exerciseRepository.findByTags(selectedTags, onlyFavorites = isOnlyFavorites)
+            .map(List<Exercise>::toImmutableList)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -73,5 +83,9 @@ class ExerciseListViewModel @Inject constructor(
 
     fun changeSelectedTags(tags: List<Tag>) {
         savedStateHandle[SELECTED_TAGS_SSH_KEY] = tags.map(Tag::label)
+    }
+
+    fun setOnlyFavorites(onlyFavorites: Boolean) {
+        savedStateHandle[ONLY_FAVORITES_SSH_KEY] = onlyFavorites
     }
 }

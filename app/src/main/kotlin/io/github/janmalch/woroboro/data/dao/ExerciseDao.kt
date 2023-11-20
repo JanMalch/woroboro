@@ -57,22 +57,41 @@ abstract class ExerciseDao {
     abstract fun resolve(id: UUID): Flow<ExerciseEntityWithMediaAndTags?>
 
     @Transaction
-    @Query("SELECT * FROM exercise ORDER BY exercise.name ASC")
-    abstract fun resolveAll(): Flow<List<ExerciseEntityWithMediaAndTags>>
+    @Query(
+        """
+        SELECT * 
+        FROM exercise
+        WHERE
+            CASE WHEN :onlyFavorites
+            THEN is_favorite = 1
+            ELSE 1
+            END
+        ORDER BY exercise.name ASC
+        """
+    )
+    abstract fun resolveAll(onlyFavorites: Boolean): Flow<List<ExerciseEntityWithMediaAndTags>>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query(
         """
-SELECT *
-FROM exercise
-JOIN exercise_tag_cross_ref as ref
-ON ref.exercise_id = exercise.id
-WHERE ref.tag_label IN (:selectedTags)
-ORDER BY exercise.name ASC
+        SELECT *
+        FROM exercise
+        JOIN exercise_tag_cross_ref as ref
+        ON ref.exercise_id = exercise.id
+        WHERE ref.tag_label IN (:selectedTags)
+        AND
+            CASE WHEN :onlyFavorites
+            THEN is_favorite = 1
+            ELSE 1
+            END
+        ORDER BY exercise.name ASC
     """
     )
-    abstract fun findByTags(selectedTags: List<String>): Flow<List<ExerciseEntityWithMediaAndTags>>
+    abstract fun findByTags(
+        selectedTags: List<String>,
+        onlyFavorites: Boolean
+    ): Flow<List<ExerciseEntityWithMediaAndTags>>
 
     @Query("DELETE FROM exercise WHERE id = :id")
     protected abstract suspend fun deleteExercise(id: UUID)

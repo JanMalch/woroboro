@@ -26,11 +26,14 @@ fun NavGraphBuilder.exerciseListScreen(
         val exercises by viewModel.exercises.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
         val selectedTags by viewModel.selectedTags.collectAsState()
+        val isOnlyFavorites by viewModel.isOnlyFavorites.collectAsState()
 
         ExerciseListScreen(
             exercises = exercises,
             availableTags = availableTags,
             selectedTags = selectedTags,
+            isOnlyFavorites = isOnlyFavorites,
+            onOnlyFavoritesChange = viewModel::setOnlyFavorites,
             onSelectedTagsChange = viewModel::changeSelectedTags,
             onToggleFavorite = viewModel::toggleFavorite,
             onCreateExerciseClick = onCreateExerciseClick,

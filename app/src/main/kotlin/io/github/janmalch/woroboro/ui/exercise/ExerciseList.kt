@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -50,6 +51,8 @@ fun ExerciseListScreen(
     exercises: ImmutableList<Exercise>,
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     selectedTags: ImmutableList<Tag>,
+    isOnlyFavorites: Boolean,
+    onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
     onCreateExerciseClick: () -> Unit,
     onToggleFavorite: (Exercise) -> Unit,
@@ -89,6 +92,8 @@ fun ExerciseListScreen(
             availableTags = availableTags,
             selectedTags = selectedTags,
             isTopBarCollapsed = isTopBarCollapsed,
+            isOnlyFavorites = isOnlyFavorites,
+            onOnlyFavoritesChange = onOnlyFavoritesChange,
             onSelectedTagsChange = onSelectedTagsChange,
             onToggleFavorite = onToggleFavorite,
             onExerciseClick = onExerciseClick,
@@ -106,6 +111,8 @@ fun ExerciseList(
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     selectedTags: ImmutableList<Tag>,
     isTopBarCollapsed: Boolean,
+    isOnlyFavorites: Boolean,
+    onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
     onExerciseClick: (Exercise) -> Unit,
     onToggleFavorite: (Exercise) -> Unit,
@@ -130,6 +137,10 @@ fun ExerciseList(
                     .padding(vertical = 0.dp, horizontal = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                OnlyFavoritesChip(
+                    value = isOnlyFavorites,
+                    onValueChange = onOnlyFavoritesChange,
+                )
                 TagSelectors(
                     availableTags = availableTags,
                     value = selectedTags,
@@ -147,6 +158,19 @@ fun ExerciseList(
             )
         }
     }
+}
+
+@Composable
+fun OnlyFavoritesChip(
+    value: Boolean,
+    onValueChange: (Boolean) -> Unit,
+) {
+    FilterChip(
+        label = { Text(text = "Favoriten", softWrap = false) },
+        selected = value,
+        trailingIcon = { FavoriteIcon(isFavorite = value, modifier = Modifier.size(18.dp)) },
+        onClick = { onValueChange(!value) }
+    )
 }
 
 @Composable
