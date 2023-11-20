@@ -16,7 +16,6 @@ import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -59,10 +58,8 @@ class ExerciseListViewModel @Inject constructor(
         initialValue = persistentListOf(),
     )
 
-    val availableTags = flow {
-        val allTags = tagRepository.findAllGrouped()
-        val immutable = allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
-        emit(immutable)
+    val availableTags = tagRepository.findAllGrouped().map { allTags ->
+        allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,

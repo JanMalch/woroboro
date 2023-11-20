@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import io.github.janmalch.woroboro.ui.exercise.editor.navigateToExerciseEditor
 import io.github.janmalch.woroboro.ui.exercise.exercisesGraph
+import io.github.janmalch.woroboro.ui.exercise.tageditor.navigateToTagEditor
 
 @Composable
 fun AppNavHost(
@@ -30,6 +31,7 @@ fun AppNavHost(
         exercisesGraph(
             onCreateExerciseClick = navController::navigateToExerciseEditor,
             onExerciseClick = { navController.navigateToExerciseEditor(exerciseId = it.id) },
+            onNavigateToTagEditor = navController::navigateToTagEditor,
             onBackClick = navController::popBackStack,
         )
     }

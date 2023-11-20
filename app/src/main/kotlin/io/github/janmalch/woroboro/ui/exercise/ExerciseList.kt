@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -57,6 +58,7 @@ fun ExerciseListScreen(
     onCreateExerciseClick: () -> Unit,
     onToggleFavorite: (Exercise) -> Unit,
     onExerciseClick: (Exercise) -> Unit,
+    onNavigateToTagEditor: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -71,6 +73,11 @@ fun ExerciseListScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text("Übungen")
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToTagEditor) {
+                        Icon(Icons.AutoMirrored.Outlined.Label, contentDescription = null)
+                    }
                 },
                 scrollBehavior = scrollBehavior,
             )

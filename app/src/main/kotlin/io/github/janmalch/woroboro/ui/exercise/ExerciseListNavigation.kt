@@ -17,6 +17,7 @@ fun NavController.navigateToExerciseList(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.exerciseListScreen(
     onCreateExerciseClick: () -> Unit,
+    onNavigateToTagEditor: () -> Unit,
     onExerciseClick: (Exercise) -> Unit,
 ) {
     composable(
@@ -38,6 +39,7 @@ fun NavGraphBuilder.exerciseListScreen(
             onToggleFavorite = viewModel::toggleFavorite,
             onCreateExerciseClick = onCreateExerciseClick,
             onExerciseClick = onExerciseClick,
+            onNavigateToTagEditor = onNavigateToTagEditor,
         )
     }
 }
