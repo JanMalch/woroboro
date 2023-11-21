@@ -32,10 +32,10 @@ abstract class TagDao {
     @Query("DELETE FROM tag WHERE label = :label")
     abstract suspend fun delete(label: String)
 
-    @Query("SELECT * FROM tag ORDER BY type ASC")
+    @Query("SELECT * FROM tag ORDER BY type COLLATE NOCASE ASC")
     abstract fun findAll(): Flow<List<TagEntity>>
 
-    @Query("SELECT * FROM tag WHERE label in (:labels) ORDER BY type ASC")
+    @Query("SELECT * FROM tag WHERE label in (:labels) ORDER BY type COLLATE NOCASE ASC")
     abstract fun resolve(labels: List<String>): Flow<List<TagEntity>>
 
 }

@@ -66,7 +66,7 @@ abstract class ExerciseDao {
             THEN is_favorite = 1
             ELSE 1
             END
-        ORDER BY exercise.name ASC
+        ORDER BY exercise.name COLLATE NOCASE ASC
         """
     )
     abstract fun resolveAll(onlyFavorites: Boolean): Flow<List<ExerciseEntityWithMediaAndTags>>
@@ -85,7 +85,7 @@ abstract class ExerciseDao {
             THEN is_favorite = 1
             ELSE 1
             END
-        ORDER BY exercise.name ASC
+        ORDER BY exercise.name COLLATE NOCASE ASC
     """
     )
     abstract fun findByTags(
@@ -112,7 +112,7 @@ abstract class ExerciseDao {
         ON exercise.id = fts.id
         WHERE fts.name MATCH :query
         OR fts.description MATCH :query
-        ORDER BY fts.name ASC
+        ORDER BY fts.name COLLATE NOCASE ASC
     """
     )
     abstract suspend fun searchInNameOrDescription(query: String): List<ExerciseEntityWithMediaAndTags>
