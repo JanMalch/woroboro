@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import io.github.janmalch.woroboro.ui.exercise.editor.navigateToExerciseEditor
 import io.github.janmalch.woroboro.ui.exercise.exercisesGraph
 import io.github.janmalch.woroboro.ui.exercise.tageditor.navigateToTagEditor
+import io.github.janmalch.woroboro.ui.routine.routinesGraph
 
 @Composable
 fun AppNavHost(
@@ -32,6 +33,11 @@ fun AppNavHost(
             onCreateExerciseClick = navController::navigateToExerciseEditor,
             onExerciseClick = { navController.navigateToExerciseEditor(exerciseId = it.id) },
             onNavigateToTagEditor = navController::navigateToTagEditor,
+            onBackClick = navController::popBackStack,
+        )
+        routinesGraph(
+            onCreateRoutineClick = { /* TODO */ },
+            onRoutineClick = { /* TODO */ },
             onBackClick = navController::popBackStack,
         )
     }

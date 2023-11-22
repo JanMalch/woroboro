@@ -21,6 +21,10 @@ interface BusinessModule {
 
     @Binds
     @Singleton
+    fun bindsRoutineRepository(impl: RoutineRepositoryImpl): RoutineRepository
+
+    @Binds
+    @Singleton
     fun bindsMediaFileManager(impl: MediaFileManagerImpl): MediaFileManager
 
     @Binds

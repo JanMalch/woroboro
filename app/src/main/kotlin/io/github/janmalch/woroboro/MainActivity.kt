@@ -14,7 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.janmalch.woroboro.ui.AppContainer
-import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
+import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.theme.WoroboroTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             WoroboroTheme {
-                AppContainer(startDestination = EXERCISES_GRAPH_ROUTE)
+                AppContainer(startDestination = ROUTINE_GRAPH_ROUTE)
             }
         }
     }

@@ -26,6 +26,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.exercise.navigateToExercisesGraph
+import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
+import io.github.janmalch.woroboro.ui.routine.navigateToRoutineGraph
 
 @Composable
 fun AppContainer(startDestination: String) {
@@ -60,17 +62,19 @@ fun AppBottomBar(navController: NavHostController) {
     val currentBackStack by navController.currentBackStackEntryAsState()
     val isExerciseTabActive =
         currentBackStack?.destination?.route?.startsWith(EXERCISES_GRAPH_ROUTE) ?: false
+    val isRoutineTabActive =
+        currentBackStack?.destination?.route?.startsWith(ROUTINE_GRAPH_ROUTE) ?: false
 
     NavigationBar {
         NavigationBarItem(
-            selected = false,
-            onClick = { /*TODO*/ },
+            selected = isRoutineTabActive,
+            onClick = navController::navigateToRoutineGraph,
             icon = { Icon(Icons.Outlined.FitnessCenter, contentDescription = null) },
             label = { Text(text = "Routinen") },
         )
         NavigationBarItem(
             selected = isExerciseTabActive,
-            onClick = { navController.navigateToExercisesGraph() },
+            onClick = navController::navigateToExercisesGraph,
             icon = { Icon(Icons.Outlined.SportsGymnastics, contentDescription = null) },
             label = { Text(text = "Übungen") },
         )

@@ -89,8 +89,11 @@ fun MediaPicker(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(100.dp)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .clip(RoundedCornerShape(4.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .clip(RoundedCornerShape(8.dp))
                             .clickable {
                                 onValueChange(
                                     currentValue.copy(
@@ -112,8 +115,11 @@ fun MediaPicker(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(100.dp)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .clip(RoundedCornerShape(4.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .clip(RoundedCornerShape(8.dp))
                             .clickable {
                                 onValueChange(
                                     currentValue.copy(
