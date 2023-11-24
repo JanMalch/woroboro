@@ -5,6 +5,7 @@ import io.github.janmalch.woroboro.data.model.asModel
 import io.github.janmalch.woroboro.models.Routine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 import javax.inject.Inject
 
 interface RoutineRepository {
@@ -16,6 +17,8 @@ interface RoutineRepository {
      * Otherwise returns both favorites and non-favorites.
      */
     fun findAll(tags: List<String>, onlyFavorites: Boolean): Flow<List<Routine>>
+
+    fun findOne(id: UUID): Flow<Routine?>
 }
 
 class RoutineRepositoryImpl @Inject constructor(
@@ -30,5 +33,9 @@ class RoutineRepositoryImpl @Inject constructor(
                     it.asModel().takeIf(Routine::matchesAnyTag)
                 }
             }
+    }
+
+    override fun findOne(id: UUID): Flow<Routine?> {
+        return routineDao.findOne(id).map { it.entries.firstOrNull()?.asModel() }
     }
 }

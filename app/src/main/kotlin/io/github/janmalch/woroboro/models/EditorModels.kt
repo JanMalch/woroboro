@@ -12,5 +12,5 @@ fun EditedMedia.isEmpty(): Boolean = existing.isEmpty() && added.isEmpty()
 
 data class EditedExercise(
     val exercise: Exercise,
-    val addedMedia: Set<Uri>,
+    val addedMedia: Set<Uri> = emptySet(),
 )

@@ -4,12 +4,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import io.github.janmalch.woroboro.models.Routine
 
 const val ROUTINE_LIST_ROUTE = "$ROUTINE_GRAPH_ROUTE/routine-list"
+
+val NavDestination.isRoutineList: Boolean get() = route == ROUTINE_LIST_ROUTE
 
 fun NavController.navigateToRoutineList(navOptions: NavOptions? = null) {
     this.navigate(ROUTINE_LIST_ROUTE, navOptions)
