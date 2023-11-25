@@ -9,10 +9,10 @@ import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.Media
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
-import kotlin.time.Duration
 
 @Entity(tableName = "exercise")
 data class ExerciseEntity(
@@ -20,10 +20,8 @@ data class ExerciseEntity(
     val id: UUID,
     val name: String,
     val description: String,
-    val sets: Int,
-    val reps: Int?,
-    val hold: Duration?,
-    val pause: Duration?,
+    @Embedded
+    val execution: ExerciseExecution,
     @ColumnInfo(name = "is_favorite")
     val isFavorite: Boolean,
 )
@@ -85,10 +83,7 @@ fun ExerciseEntityWithMediaAndTags.asModel() = Exercise(
     id = exercise.id,
     name = exercise.name,
     description = exercise.description,
-    sets = exercise.sets,
-    reps = exercise.reps,
-    hold = exercise.hold,
-    pause = exercise.pause,
+    execution = exercise.execution,
     isFavorite = exercise.isFavorite,
     tags = tags.map(TagEntity::asModel).toImmutableList(),
     media = media.map(MediaEntity::asModel).toImmutableList(),

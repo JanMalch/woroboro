@@ -12,10 +12,7 @@ data class Exercise(
     val description: String,
     val tags: ImmutableList<Tag>,
     val media: ImmutableList<Media>,
-    val sets: Int,
-    val reps: Int?,
-    val hold: Duration?,
-    val pause: Duration?,
+    val execution: ExerciseExecution,
     val isFavorite: Boolean,
 )
 

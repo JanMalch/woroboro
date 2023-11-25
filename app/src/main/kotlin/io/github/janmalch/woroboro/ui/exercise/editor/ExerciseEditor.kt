@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.EditedMedia
 import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.BackIconButton
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
@@ -114,16 +115,16 @@ fun ExerciseEditor(
             )
         )
     }
-    var sets: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.sets ?: 3) }
-    var reps: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.reps) }
+    var sets: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.execution?.sets ?: 3) }
+    var reps: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.execution?.reps) }
     var hold: Duration? by rememberSaveable(exercise, stateSaver = DurationSaver) {
         mutableStateOf(
-            exercise?.hold
+            exercise?.execution?.hold
         )
     }
     var pause: Duration? by rememberSaveable(exercise, stateSaver = DurationSaver) {
         mutableStateOf(
-            exercise?.pause ?: 30.seconds
+            exercise?.execution?.pause ?: 30.seconds
         )
     }
     var isFavorite: Boolean by rememberSaveable(exercise) {
@@ -263,10 +264,12 @@ fun ExerciseEditor(
                                 name = name.trim(),
                                 description = description.trim(),
                                 tags = tags.toImmutableList(),
-                                sets = it,
-                                reps = reps,
-                                hold = hold,
-                                pause = pause,
+                                execution = ExerciseExecution(
+                                    sets = it,
+                                    reps = reps,
+                                    hold = hold,
+                                    pause = pause,
+                                ),
                                 isFavorite = isFavorite,
                                 media = media.existing,
                             ),

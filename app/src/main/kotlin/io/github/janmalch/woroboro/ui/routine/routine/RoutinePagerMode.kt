@@ -44,14 +44,14 @@ import androidx.compose.ui.util.lerp
 import coil.compose.AsyncImage
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Media
-import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.FullRoutine
 import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.absoluteValue
 
 
 @Composable
 fun RoutinePagerMode(
-    routine: Routine,
+    routine: FullRoutine,
 ) {
     var isPaused by remember {
         // TODO

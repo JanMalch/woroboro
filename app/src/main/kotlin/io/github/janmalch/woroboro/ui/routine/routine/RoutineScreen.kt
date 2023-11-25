@@ -13,14 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
 
 
 @Composable
 fun RoutineScreen(
     uiState: RoutineUiState,
-    onToggleFavorite: (Routine) -> Unit,
+    onToggleFavorite: (FullRoutine) -> Unit,
     onBackClick: () -> Unit,
 ) {
     when (uiState) {
@@ -49,8 +49,8 @@ fun RoutineScreen(
 
 @Composable
 fun RoutineSuccessScreen(
-    routine: Routine,
-    onToggleFavorite: (Routine) -> Unit,
+    routine: FullRoutine,
+    onToggleFavorite: (FullRoutine) -> Unit,
     onBackClick: () -> Unit,
 ) {
     Scaffold(

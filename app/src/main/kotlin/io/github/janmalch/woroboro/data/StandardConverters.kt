@@ -17,13 +17,13 @@ class StandardConverters {
     }
 
     @TypeConverter
-    fun fromUuid(value: String): UUID {
-        return UUID.fromString(value)
+    fun fromUuid(value: String?): UUID? {
+        return value?.let(UUID::fromString)
     }
 
     @TypeConverter
-    fun toUuid(uuid: UUID): String {
-        return uuid.toString()
+    fun toUuid(uuid: UUID?): String? {
+        return uuid?.toString()
     }
 
     @TypeConverter

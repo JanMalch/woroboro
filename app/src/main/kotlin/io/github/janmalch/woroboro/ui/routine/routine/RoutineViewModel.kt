@@ -5,11 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.RoutineRepository
-import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.FullRoutine
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -33,7 +34,7 @@ class RoutineViewModel @Inject constructor(
         )
 
 
-    fun toggleFavorite(routine: Routine) {
+    fun toggleFavorite(routine: FullRoutine) {
         val isFavorite = routine.isFavorite
         viewModelScope.launch {
             // FIXME
@@ -44,6 +45,6 @@ class RoutineViewModel @Inject constructor(
 
 sealed interface RoutineUiState {
     data object Loading : RoutineUiState
-    data class Success(val routine: Routine) : RoutineUiState
+    data class Success(val routine: FullRoutine) : RoutineUiState
     data object Failure : RoutineUiState
 }

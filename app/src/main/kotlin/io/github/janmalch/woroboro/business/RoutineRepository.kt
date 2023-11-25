@@ -1,7 +1,7 @@
 package io.github.janmalch.woroboro.business
 
 import io.github.janmalch.woroboro.data.dao.RoutineDao
-import io.github.janmalch.woroboro.data.model.asModel
+import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,24 +18,22 @@ interface RoutineRepository {
      */
     fun findAll(tags: List<String>, onlyFavorites: Boolean): Flow<List<Routine>>
 
-    fun findOne(id: UUID): Flow<Routine?>
+    fun findOne(id: UUID): Flow<FullRoutine?>
 }
 
 class RoutineRepositoryImpl @Inject constructor(
     private val routineDao: RoutineDao
 ) : RoutineRepository {
     override fun findAll(tags: List<String>, onlyFavorites: Boolean): Flow<List<Routine>> {
+        // TODO: improve this, because it reruns query on every tag change ...
         fun Routine.matchesAnyTag(): Boolean =
             tags.isEmpty() || this.tags.any { rTag -> rTag.label in tags }
-        return routineDao.findAll(onlyFavorites)
-            .map { list ->
-                list.mapNotNull {
-                    it.asModel().takeIf(Routine::matchesAnyTag)
-                }
-            }
+        return routineDao.findAll(onlyFavorites).map { list ->
+            list.filter(Routine::matchesAnyTag)
+        }
     }
 
-    override fun findOne(id: UUID): Flow<Routine?> {
-        return routineDao.findOne(id).map { it.entries.firstOrNull()?.asModel() }
+    override fun findOne(id: UUID): Flow<FullRoutine?> {
+        return routineDao.findOneFull(id)
     }
 }

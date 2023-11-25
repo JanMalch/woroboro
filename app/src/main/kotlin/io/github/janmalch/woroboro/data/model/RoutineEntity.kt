@@ -1,11 +1,14 @@
 package io.github.janmalch.woroboro.data.model
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.ExerciseExecution
+import io.github.janmalch.woroboro.models.FullRoutine
 import kotlinx.collections.immutable.toImmutableList
+import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.time.Duration
 
@@ -16,13 +19,15 @@ data class RoutineEntity(
     val name: String,
     @ColumnInfo(name = "is_favorite")
     val isFavorite: Boolean,
-    @ColumnInfo(name = "last_run")
-    val lastRun: Duration?,
+    @ColumnInfo(name = "last_run_duration")
+    val lastRunDuration: Duration?,
+    @ColumnInfo(name = "last_run_ended")
+    val lastRunEnded: LocalDateTime?,
 )
 
 @Entity(
-    tableName = "routine_exercise_cross_ref",
-    primaryKeys = ["routine_id", "exercise_id"],
+    tableName = "routine_step",
+    primaryKeys = ["routine_id", "sort_index"],
     foreignKeys = [
         ForeignKey(
             entity = RoutineEntity::class,
@@ -38,42 +43,16 @@ data class RoutineEntity(
         ),
     ]
 )
-data class RoutineExerciseCrossRefEntity(
+data class RoutineStepEntity(
     @ColumnInfo(name = "routine_id", index = true)
     val routineId: UUID,
+    @ColumnInfo(name = "sort_index", index = true)
+    val sortIndex: Int,
     @ColumnInfo(name = "exercise_id", index = true)
-    val exerciseId: UUID,
+    val exerciseId: UUID?,
+    @Embedded("custom_")
+    val execution: ExerciseExecution?,
+    @ColumnInfo(name = "pause_step")
+    val pauseStep: Duration?,
 )
 
-/*
-// TODO: make work if possible, instead of map
-data class RoutineEntityWithExercises(
-    @Embedded val routine: RoutineEntity,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "id",
-        associateBy = Junction(
-            RoutineExerciseCrossRefEntity::class,
-            parentColumn = "routine_id",
-            entityColumn = "exercise_id",
-        )
-    )
-    val exercises: List<ExerciseEntityWithMediaAndTags>
-)
-
-fun RoutineEntityWithExercises.asModel() = Routine(
-    id = routine.id,
-    name = routine.name,
-    exercises = exercises.map { it.asModel() }.toImmutableList(),
-    isFavorite = routine.isFavorite,
-    lastRun = routine.lastRun,
-)
-*/
-
-fun Map.Entry<RoutineEntity, List<ExerciseEntityWithMediaAndTags>>.asModel() = Routine(
-    id = key.id,
-    name = key.name,
-    exercises = value.map { it.asModel() }.toImmutableList(),
-    isFavorite = key.isFavorite,
-    lastRun = key.lastRun,
-)

@@ -187,9 +187,9 @@ fun RoutineListItem(
         },
         supportingContent = {
             Text(buildString {
-                append("${routine.exercises.size} Übungen")
-                if (routine.lastRun != null) {
-                    append(" · ${routine.lastRun.inWholeMinutes} Minuten")
+                append("${routine.exerciseCount} Übungen")
+                if (routine.lastRunDuration != null) {
+                    append(" · ${routine.lastRunDuration.inWholeMinutes} Minuten")
                 }
             })
         },
@@ -203,7 +203,6 @@ fun RoutineListItem(
             }
         },
         trailingContent = {
-
             IconButton(onClick = onToggleFavorite) {
                 FavoriteIcon(isFavorite = routine.isFavorite)
             }
@@ -238,7 +237,6 @@ fun RoutinePreview(
                 .clip(RoundedCornerShape(8.dp))
         )
     }
-
 
     LaunchedEffect(Unit) {
         while (currentMediaList.size > 1) {

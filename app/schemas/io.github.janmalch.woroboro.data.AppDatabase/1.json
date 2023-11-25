@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4a6d3a972ef8e04378ccfe76b8557fa4",
+    "identityHash": "fbdd37c0fd3b0462188d440d90bdc735",
     "entities": [
       {
         "tableName": "exercise",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `sets` INTEGER NOT NULL, `reps` INTEGER, `hold` TEXT, `pause` TEXT, `is_favorite` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `is_favorite` INTEGER NOT NULL, `sets` INTEGER NOT NULL, `reps` INTEGER, `hold` TEXT, `pause` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -27,34 +27,34 @@
             "notNull": true
           },
           {
-            "fieldPath": "sets",
+            "fieldPath": "isFavorite",
+            "columnName": "is_favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "execution.sets",
             "columnName": "sets",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "reps",
+            "fieldPath": "execution.reps",
             "columnName": "reps",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "hold",
+            "fieldPath": "execution.hold",
             "columnName": "hold",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "pause",
+            "fieldPath": "execution.pause",
             "columnName": "pause",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "isFavorite",
-            "columnName": "is_favorite",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -231,12 +231,170 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "routine",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `is_favorite` INTEGER NOT NULL, `last_run_duration` TEXT, `last_run_ended` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "is_favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastRunDuration",
+            "columnName": "last_run_duration",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastRunEnded",
+            "columnName": "last_run_ended",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "routine_step",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`routine_id` TEXT NOT NULL, `sort_index` INTEGER NOT NULL, `exercise_id` TEXT, `pause_step` TEXT, `custom_sets` INTEGER, `custom_reps` INTEGER, `custom_hold` TEXT, `custom_pause` TEXT, PRIMARY KEY(`routine_id`, `sort_index`), FOREIGN KEY(`routine_id`) REFERENCES `routine`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`exercise_id`) REFERENCES `exercise`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "routineId",
+            "columnName": "routine_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortIndex",
+            "columnName": "sort_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exerciseId",
+            "columnName": "exercise_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pauseStep",
+            "columnName": "pause_step",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "execution.sets",
+            "columnName": "custom_sets",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "execution.reps",
+            "columnName": "custom_reps",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "execution.hold",
+            "columnName": "custom_hold",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "execution.pause",
+            "columnName": "custom_pause",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "routine_id",
+            "sort_index"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_routine_step_routine_id",
+            "unique": false,
+            "columnNames": [
+              "routine_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_routine_step_routine_id` ON `${TABLE_NAME}` (`routine_id`)"
+          },
+          {
+            "name": "index_routine_step_sort_index",
+            "unique": false,
+            "columnNames": [
+              "sort_index"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_routine_step_sort_index` ON `${TABLE_NAME}` (`sort_index`)"
+          },
+          {
+            "name": "index_routine_step_exercise_id",
+            "unique": false,
+            "columnNames": [
+              "exercise_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_routine_step_exercise_id` ON `${TABLE_NAME}` (`exercise_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "routine",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "routine_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "exercise",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "exercise_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4a6d3a972ef8e04378ccfe76b8557fa4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fbdd37c0fd3b0462188d440d90bdc735')"
     ]
   }
 }

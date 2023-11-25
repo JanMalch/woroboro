@@ -48,9 +48,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.Media
-import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.FullRoutine
+import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.ui.theme.Success
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Angle
@@ -105,11 +106,15 @@ private val festiveParty = run {
 
 @Composable
 fun RoutineListMode(
-    routine: Routine
+    routine: FullRoutine
 ) {
     // FIXME: store in ViewModel!
-    val undoneExercises = remember { mutableStateListOf(*routine.exercises.toTypedArray()) }
-    val doneExercises = remember { mutableStateListOf<Exercise>() }
+    val undoneExercises = remember {
+        mutableStateListOf(
+            *routine.steps.filterIsInstance<RoutineStep.ExerciseStep>().toTypedArray()
+        )
+    }
+    val doneExercises = remember { mutableStateListOf<RoutineStep.ExerciseStep>() }
     val isCompletelyDone = undoneExercises.isEmpty()
     val doneHeadlineColor by animateColorAsState(
         targetValue = if (isCompletelyDone) Success else LocalContentColor.current,
@@ -121,9 +126,9 @@ fun RoutineListMode(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(undoneExercises, key = { it.id }) { exercise ->
-                RoutineListModeItem(
-                    exercise = exercise,
+            items(undoneExercises, key = { it.sortIndex }) { exercise ->
+                ExerciseStepListItem(
+                    step = exercise,
                     isDone = false,
                     onClick = {
                         undoneExercises.remove(exercise)
@@ -143,9 +148,9 @@ fun RoutineListMode(
                 )
             }
 
-            items(doneExercises, key = { it.id }) { exercise ->
-                RoutineListModeItem(
-                    exercise = exercise,
+            items(doneExercises, key = { it.sortIndex }) { exercise ->
+                ExerciseStepListItem(
+                    step = exercise,
                     isDone = true,
                     onClick = {
                         doneExercises.remove(exercise)
@@ -166,8 +171,8 @@ fun RoutineListMode(
 }
 
 @Composable
-fun RoutineListModeItem(
-    exercise: Exercise,
+fun ExerciseStepListItem(
+    step: RoutineStep.ExerciseStep,
     isDone: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -183,11 +188,11 @@ fun RoutineListModeItem(
     ) {
         ListItem(
             leadingContent = {
-                MediaWithDoneState(media = exercise.media.firstOrNull(), isDone = isDone)
+                MediaWithDoneState(media = step.exercise.media.firstOrNull(), isDone = isDone)
             },
-            headlineContent = { Text(text = exercise.name) },
+            headlineContent = { Text(text = step.exercise.name) },
             supportingContent = {
-                Text(text = exerciseExecution(exercise = exercise))
+                Text(text = exerciseExecution(execution = step.execution))
             },
             trailingContent = {
                 IconButton(onClick = { isExpanded = true }) {
@@ -202,9 +207,9 @@ fun RoutineListModeItem(
     if (isExpanded) {
         ModalBottomSheet(onDismissRequest = { isExpanded = false }, sheetState = sheetState) {
 
-            if (exercise.tags.isNotEmpty()) {
+            if (step.exercise.tags.isNotEmpty()) {
                 Text(
-                    text = exercise.tags.joinToString(separator = ", ") { it.label },
+                    text = step.exercise.tags.joinToString(separator = ", ") { it.label },
                     modifier = Modifier.padding(horizontal = 24.dp),
                     style = MaterialTheme.typography.labelSmall,
                 )
@@ -212,21 +217,21 @@ fun RoutineListModeItem(
 
 
             Text(
-                text = exercise.name,
+                text = step.exercise.name,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
             )
 
-            Text(text = exercise.description, modifier = Modifier.padding(horizontal = 24.dp))
+            Text(text = step.exercise.description, modifier = Modifier.padding(horizontal = 24.dp))
 
-            if (exercise.media.isNotEmpty()) {
+            if (step.exercise.media.isNotEmpty()) {
 
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.Start),
                     contentPadding = PaddingValues(24.dp),
                     modifier = Modifier.height(300.dp)
                 ) {
-                    items(exercise.media, key = { it.id }) {
+                    items(step.exercise.media, key = { it.id }) {
                         AsyncImage(
                             model = it.source,
                             contentDescription = null,
@@ -252,14 +257,14 @@ fun RoutineListModeItem(
 @Composable
 @ReadOnlyComposable
 fun exerciseExecution(
-    exercise: Exercise
+    execution: ExerciseExecution,
 ): String {
     val base = when {
-        exercise.reps != null -> "${exercise.sets} × ${exercise.reps}"
-        exercise.hold != null -> "${exercise.sets} × ${exercise.hold.inWholeSeconds}s"
-        else -> "${exercise.sets}"
+        execution.reps != null -> "${execution.sets} × ${execution.reps}"
+        execution.hold != null -> "${execution.sets} × ${execution.hold.inWholeSeconds}s"
+        else -> "${execution.sets}"
     }
-    return if (exercise.pause != null) "$base · ${exercise.pause.inWholeSeconds}s Pause"
+    return if (execution.pause != null) "$base · ${execution.pause.inWholeSeconds}s Pause"
     else base
 }
 
