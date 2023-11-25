@@ -20,12 +20,14 @@ import androidx.compose.ui.Modifier
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.ui.components.common.DoneCelebration
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
+import kotlin.time.Duration
 
 
 @Composable
 fun RoutineScreen(
     uiState: RoutineUiState,
     onToggleFavorite: (FullRoutine) -> Unit,
+    onRoutineDone: (FullRoutine, Duration) -> Unit,
     onBackClick: () -> Unit,
 ) {
     when (uiState) {
@@ -46,6 +48,7 @@ fun RoutineScreen(
         is RoutineUiState.Success -> RoutineSuccessScreen(
             routine = uiState.routine,
             onToggleFavorite = onToggleFavorite,
+            onRoutineDone = onRoutineDone,
             onBackClick = onBackClick,
         )
     }
@@ -56,6 +59,7 @@ fun RoutineScreen(
 fun RoutineSuccessScreen(
     routine: FullRoutine,
     onToggleFavorite: (FullRoutine) -> Unit,
+    onRoutineDone: (FullRoutine, Duration) -> Unit,
     onBackClick: () -> Unit,
 ) {
     var isCelebrationVisible by remember { mutableStateOf(false) }
@@ -84,7 +88,12 @@ fun RoutineSuccessScreen(
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                RoutineListMode(routine = routine, onDone = { isCelebrationVisible = it })
+                RoutineListMode(
+                    routine = routine,
+                    onDone = { done, totalTime ->
+                        isCelebrationVisible = done
+                        onRoutineDone(routine, totalTime)
+                    })
             }
         }
 

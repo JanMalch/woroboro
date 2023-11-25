@@ -7,6 +7,7 @@ junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 compose-material = "1.2.0-alpha08"
 compose-material-android = "1.2.0-alpha08"
+coroutines = "1.7.3"
 androidx-core-splashscreen = "1.0.1"
 espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.6.2"
@@ -23,6 +24,7 @@ navigation = "2.7.5"
 google-oss = "17.0.1"
 google-oss-plugin = "0.10.6"
 material = "1.10.0"
+turbine = "0.6.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -43,6 +45,8 @@ ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 konfetti = { group = "nl.dionsegijn", name = "konfetti-compose", version.ref = "konfetti" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "compose-material" }

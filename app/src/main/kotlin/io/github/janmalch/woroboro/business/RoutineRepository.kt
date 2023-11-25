@@ -19,6 +19,12 @@ interface RoutineRepository {
     fun findAll(tags: List<String>, onlyFavorites: Boolean): Flow<List<Routine>>
 
     fun findOne(id: UUID): Flow<FullRoutine?>
+
+    /**
+     * Updates the routine entity for the given routine.
+     * The derived fields [Routine.media], [Routine.tags], and [Routine.exerciseCount] are ignored.
+     */
+    suspend fun update(routine: Routine)
 }
 
 class RoutineRepositoryImpl @Inject constructor(
@@ -35,5 +41,9 @@ class RoutineRepositoryImpl @Inject constructor(
 
     override fun findOne(id: UUID): Flow<FullRoutine?> {
         return routineDao.findOneFull(id)
+    }
+
+    override suspend fun update(routine: Routine) {
+        routineDao.update(routine.asEntity())
     }
 }

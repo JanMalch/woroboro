@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Embedded
 import androidx.room.Query
+import androidx.room.Update
 import io.github.janmalch.woroboro.data.model.ExerciseEntityWithMediaAndTags
 import io.github.janmalch.woroboro.data.model.MediaEntity
 import io.github.janmalch.woroboro.data.model.RoutineEntity
@@ -136,6 +137,9 @@ abstract class RoutineDao {
             }
         }
     }
+
+    @Update
+    abstract suspend fun update(routineEntity: RoutineEntity)
 }
 
 data class RoutineQueryResult(

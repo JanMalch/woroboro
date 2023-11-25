@@ -30,6 +30,19 @@ data class FullRoutine(
         .toImmutableList()
 }
 
+fun FullRoutine.asRoutine(): Routine {
+    return Routine(
+        id = id,
+        name = name,
+        isFavorite = isFavorite,
+        lastRunDuration = lastRunDuration,
+        lastRunEnded = lastRunEnded,
+        exerciseCount = exercises.size,
+        media = exercises.flatMap { it.media }.distinct().toImmutableList(),
+        tags = exercises.flatMap { it.tags }.distinct().toImmutableList(),
+    )
+}
+
 sealed interface RoutineStep {
     /**
      * The index of this step within a routine.

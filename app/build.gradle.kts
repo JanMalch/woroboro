@@ -95,6 +95,8 @@ dependencies {
     implementation(libs.material3.android)
     implementation(libs.collections.immutable)
     testImplementation(libs.junit)
+    testImplementation(libs.turbine)
+    testImplementation(libs.coroutines.test)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))

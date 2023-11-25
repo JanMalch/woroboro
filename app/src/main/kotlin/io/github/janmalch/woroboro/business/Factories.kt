@@ -3,9 +3,11 @@ package io.github.janmalch.woroboro.business
 import io.github.janmalch.woroboro.data.model.ExerciseEntity
 import io.github.janmalch.woroboro.data.model.ExerciseEntityWithMediaAndTags
 import io.github.janmalch.woroboro.data.model.MediaEntity
+import io.github.janmalch.woroboro.data.model.RoutineEntity
 import io.github.janmalch.woroboro.data.model.TagEntity
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Media
+import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
 import java.util.UUID
 
@@ -39,4 +41,12 @@ fun Media.asEntity(
     thumbnail = thumbnail,
     source = source,
     isVideo = this is Media.Video,
+)
+
+fun Routine.asEntity() = RoutineEntity(
+    id = id,
+    name = name,
+    isFavorite = isFavorite,
+    lastRunDuration = lastRunDuration,
+    lastRunEnded = lastRunEnded,
 )

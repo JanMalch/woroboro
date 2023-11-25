@@ -70,6 +70,7 @@ fun NavGraphBuilder.routineScreen(
         RoutineScreen(
             uiState = uiState,
             onToggleFavorite = viewModel::toggleFavorite,
+            onRoutineDone = viewModel::saveAsLastRun,
             onBackClick = onBackClick,
         )
     }

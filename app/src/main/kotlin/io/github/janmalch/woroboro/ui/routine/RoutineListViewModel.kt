@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.business.TagRepository
-import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
 import kotlinx.collections.immutable.persistentListOf
@@ -68,8 +67,9 @@ class RoutineListViewModel @Inject constructor(
 
     fun toggleFavorite(routine: Routine) {
         val isFavorite = routine.isFavorite
+        val update = routine.copy(isFavorite = !isFavorite)
         viewModelScope.launch {
-            // TODO
+            routineRepository.update(update)
         }
     }
 
