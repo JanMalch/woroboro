@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.business.TagRepository
+import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
 import kotlinx.collections.immutable.persistentListOf
@@ -22,6 +23,7 @@ import javax.inject.Inject
 
 private const val SELECTED_TAGS_SSH_KEY = "selected_tags"
 private const val ONLY_FAVORITES_SSH_KEY = "only_favorites"
+private const val DURATION_FILTER_SSH_KEY = "duration_filter"
 
 @HiltViewModel
 class RoutineListViewModel @Inject constructor(
@@ -36,6 +38,9 @@ class RoutineListViewModel @Inject constructor(
     val isOnlyFavorites =
         savedStateHandle.getStateFlow(ONLY_FAVORITES_SSH_KEY, false)
 
+    val durationFilter =
+        savedStateHandle.getStateFlow(DURATION_FILTER_SSH_KEY, DurationFilter.Any)
+
     val selectedTags = _selectedTagLabels.flatMapLatest {
         tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
     }.stateIn(
@@ -47,9 +52,14 @@ class RoutineListViewModel @Inject constructor(
     val routines = combine(
         _selectedTagLabels,
         isOnlyFavorites,
-        ::Pair
-    ).flatMapLatest { (selectedTags, isOnlyFavorites) ->
-        routineRepository.findAll(selectedTags, onlyFavorites = isOnlyFavorites)
+        durationFilter,
+        ::Triple
+    ).flatMapLatest { (selectedTags, isOnlyFavorites, durationFilter) ->
+        routineRepository.findAll(
+            selectedTags,
+            onlyFavorites = isOnlyFavorites,
+            durationFilter = durationFilter
+        )
             .map(List<Routine>::toImmutableList)
     }.stateIn(
         scope = viewModelScope,
@@ -79,5 +89,9 @@ class RoutineListViewModel @Inject constructor(
 
     fun setOnlyFavorites(onlyFavorites: Boolean) {
         savedStateHandle[ONLY_FAVORITES_SSH_KEY] = onlyFavorites
+    }
+
+    fun setDurationFilter(durationFilter: DurationFilter) {
+        savedStateHandle[DURATION_FILTER_SSH_KEY] = durationFilter
     }
 }

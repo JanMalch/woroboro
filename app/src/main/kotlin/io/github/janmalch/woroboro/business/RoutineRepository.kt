@@ -1,6 +1,7 @@
 package io.github.janmalch.woroboro.business
 
 import io.github.janmalch.woroboro.data.dao.RoutineDao
+import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,11 @@ interface RoutineRepository {
      * Also filters the list to only include favorites, if [onlyFavorites] is set to `true`.
      * Otherwise returns both favorites and non-favorites.
      */
-    fun findAll(tags: List<String>, onlyFavorites: Boolean): Flow<List<Routine>>
+    fun findAll(
+        tags: List<String>,
+        onlyFavorites: Boolean,
+        durationFilter: DurationFilter
+    ): Flow<List<Routine>>
 
     fun findOne(id: UUID): Flow<FullRoutine?>
 
@@ -34,12 +39,24 @@ interface RoutineRepository {
 class RoutineRepositoryImpl @Inject constructor(
     private val routineDao: RoutineDao
 ) : RoutineRepository {
-    override fun findAll(tags: List<String>, onlyFavorites: Boolean): Flow<List<Routine>> {
+    override fun findAll(
+        tags: List<String>,
+        onlyFavorites: Boolean,
+        durationFilter: DurationFilter
+    ): Flow<List<Routine>> {
         // TODO: improve this, because it reruns query on every tag change ...
         fun Routine.matchesAnyTag(): Boolean =
             tags.isEmpty() || this.tags.any { rTag -> rTag.label in tags }
+
+        fun Routine.isWithinDurationFilter(): Boolean =
+            durationFilter == DurationFilter.Any || (lastRunDuration?.let { it <= durationFilter.duration }
+                ?: true)
+
         return routineDao.findAll(onlyFavorites).map { list ->
-            list.filter(Routine::matchesAnyTag)
+            list.asSequence()
+                .filter(Routine::matchesAnyTag)
+                .filter(Routine::isWithinDurationFilter)
+                .toList()
         }
     }
 

@@ -4,6 +4,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.rounded.CheckBox
+import androidx.compose.material.icons.rounded.CheckBoxOutlineBlank
 import androidx.compose.material3.Badge
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -16,8 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
-import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Tag
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -64,7 +64,7 @@ fun TagTypeMultiDropdown(
     Box {
         FilterChip(
             onClick = { expanded = true },
-            label = { Text(text = type, softWrap = false) },
+            label = { Text(text = type, maxLines = 1) },
             selected = value.isNotEmpty(),
             leadingIcon = if (isCounterVisible && value.isNotEmpty()) {
                 {
@@ -101,11 +101,8 @@ fun TagTypeMultiDropdown(
                             label = "Crossfade:Icon:$availableLabel",
                         ) {
                             Icon(
-                                painterResource(
-                                    id =
-                                    if (it) R.drawable.round_check_box_24
-                                    else R.drawable.round_check_box_outline_blank_24
-                                ),
+                                if (it) Icons.Rounded.CheckBox
+                                else Icons.Rounded.CheckBoxOutlineBlank,
                                 contentDescription = null
                             )
                         }

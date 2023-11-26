@@ -45,6 +45,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
@@ -61,6 +62,8 @@ fun RoutineListScreen(
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     selectedTags: ImmutableList<Tag>,
     isOnlyFavorites: Boolean,
+    durationFilter: DurationFilter,
+    onDurationFilterChange: (DurationFilter) -> Unit,
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
     onCreateRoutineClick: () -> Unit,
@@ -102,6 +105,8 @@ fun RoutineListScreen(
             selectedTags = selectedTags,
             isTopBarCollapsed = isTopBarCollapsed,
             isOnlyFavorites = isOnlyFavorites,
+            durationFilter = durationFilter,
+            onDurationFilterChange = onDurationFilterChange,
             onOnlyFavoritesChange = onOnlyFavoritesChange,
             onSelectedTagsChange = onSelectedTagsChange,
             onToggleFavorite = onToggleFavorite,
@@ -121,6 +126,8 @@ fun RoutineList(
     selectedTags: ImmutableList<Tag>,
     isTopBarCollapsed: Boolean,
     isOnlyFavorites: Boolean,
+    durationFilter: DurationFilter,
+    onDurationFilterChange: (DurationFilter) -> Unit,
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
     onRoutineClick: (Routine) -> Unit,
@@ -149,6 +156,10 @@ fun RoutineList(
                 OnlyFavoritesChip(
                     value = isOnlyFavorites,
                     onValueChange = onOnlyFavoritesChange,
+                )
+                DurationFilterChip(
+                    value = durationFilter,
+                    onValueChange = onDurationFilterChange,
                 )
                 TagSelectors(
                     availableTags = availableTags,
@@ -197,7 +208,7 @@ fun RoutineListItem(
             if (routine.tags.isNotEmpty()) {
                 Text(
                     text = routine.tags.joinToString { it.label },
-                    softWrap = false,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

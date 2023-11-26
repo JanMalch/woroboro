@@ -8,7 +8,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 
 const val ROUTINE_LIST_ROUTE = "$ROUTINE_GRAPH_ROUTE/routine-list"
@@ -30,6 +29,7 @@ fun NavGraphBuilder.routineListScreen(
         val routines by viewModel.routines.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
         val selectedTags by viewModel.selectedTags.collectAsState()
+        val durationFilter by viewModel.durationFilter.collectAsState()
         val isOnlyFavorites by viewModel.isOnlyFavorites.collectAsState()
 
         RoutineListScreen(
@@ -37,6 +37,8 @@ fun NavGraphBuilder.routineListScreen(
             availableTags = availableTags,
             selectedTags = selectedTags,
             isOnlyFavorites = isOnlyFavorites,
+            durationFilter = durationFilter,
+            onDurationFilterChange = viewModel::setDurationFilter,
             onOnlyFavoritesChange = viewModel::setOnlyFavorites,
             onSelectedTagsChange = viewModel::changeSelectedTags,
             onToggleFavorite = viewModel::toggleFavorite,
