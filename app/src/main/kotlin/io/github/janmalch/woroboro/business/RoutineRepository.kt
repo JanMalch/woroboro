@@ -25,6 +25,10 @@ interface RoutineRepository {
      * The derived fields [Routine.media], [Routine.tags], and [Routine.exerciseCount] are ignored.
      */
     suspend fun update(routine: Routine)
+
+    suspend fun insert(routine: FullRoutine): UUID
+    suspend fun update(routine: FullRoutine): UUID
+    suspend fun delete(routineId: UUID)
 }
 
 class RoutineRepositoryImpl @Inject constructor(
@@ -45,5 +49,22 @@ class RoutineRepositoryImpl @Inject constructor(
 
     override suspend fun update(routine: Routine) {
         routineDao.update(routine.asEntity())
+    }
+
+    override suspend fun insert(routine: FullRoutine): UUID {
+        val id = UUID.randomUUID()
+        val (routineEntity, stepEntities) = routine.copy(id = id).asEntities()
+        routineDao.insert(routineEntity, stepEntities)
+        return id
+    }
+
+    override suspend fun update(routine: FullRoutine): UUID {
+        val (routineEntity, stepEntities) = routine.asEntities()
+        routineDao.update(routineEntity, stepEntities)
+        return routine.id
+    }
+
+    override suspend fun delete(routineId: UUID) {
+        routineDao.delete(routineId)
     }
 }

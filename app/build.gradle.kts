@@ -94,6 +94,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.material3.android)
     implementation(libs.collections.immutable)
+    implementation(libs.reorderable)
     testImplementation(libs.junit)
     testImplementation(libs.turbine)
     testImplementation(libs.coroutines.test)

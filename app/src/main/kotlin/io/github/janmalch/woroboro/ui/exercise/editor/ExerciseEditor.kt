@@ -1,7 +1,6 @@
 package io.github.janmalch.woroboro.ui.exercise.editor
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -30,18 +29,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.EditedMedia
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.Tag
+import io.github.janmalch.woroboro.ui.components.DurationTextField
+import io.github.janmalch.woroboro.ui.components.NumberTextField
 import io.github.janmalch.woroboro.ui.components.common.BackIconButton
-import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
+import io.github.janmalch.woroboro.ui.components.common.IsFavoriteCheckbox
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -230,6 +229,7 @@ fun ExerciseEditor(
         ) {
 
             IsFavoriteCheckbox(
+                text = "Lieblingsübung",
                 value = isFavorite,
                 onValueChange = { isFavorite = it },
             )
@@ -300,79 +300,4 @@ fun ExerciseEditor(
             }
         }
     }
-}
-
-@Composable
-fun IsFavoriteCheckbox(
-    value: Boolean,
-    onValueChange: (Boolean) -> Unit
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable { onValueChange(!value) }
-    ) {
-        FavoriteIcon(
-            isFavorite = value,
-            crossfadeLabel = "Crossfade:Icon:IsFavoriteCheckbox",
-        )
-        Text(text = "Lieblingsübung")
-    }
-}
-
-
-@Composable
-fun NumberTextField(
-    value: Int?,
-    onValueChange: (Int?) -> Unit,
-    modifier: Modifier = Modifier,
-    label: @Composable (() -> Unit)? = null,
-    required: Boolean = false,
-    min: Int = 1,
-    imeAction: ImeAction = ImeAction.Next,
-) {
-    OutlinedTextField(
-        value = value?.toString(10) ?: "",
-        onValueChange = {
-            if (it.isBlank()) {
-                onValueChange(null)
-            } else {
-                val parsed = it.toIntOrNull()
-                if (parsed != null) {
-                    onValueChange(parsed)
-                }
-            }
-        },
-        label = label,
-        singleLine = true,
-        isError = (value != null && value < min) || (required && value == null),
-        modifier = modifier,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = imeAction,
-        )
-    )
-}
-
-private val ONE_SECOND = 1.seconds
-
-@Composable
-fun DurationTextField(
-    value: Duration?,
-    onValueChange: (Duration?) -> Unit,
-    modifier: Modifier = Modifier,
-    label: @Composable (() -> Unit)? = null,
-    required: Boolean = false,
-    min: Duration = ONE_SECOND,
-    imeAction: ImeAction = ImeAction.Next,
-) {
-    NumberTextField(
-        value = value?.inWholeSeconds?.toInt(),
-        onValueChange = { onValueChange(it?.seconds) },
-        modifier = modifier,
-        required = required,
-        min = min.inWholeSeconds.toInt(),
-        label = label,
-        imeAction = imeAction,
-    )
 }

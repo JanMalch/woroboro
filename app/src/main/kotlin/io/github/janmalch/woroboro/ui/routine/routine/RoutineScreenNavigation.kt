@@ -29,6 +29,7 @@ fun NavController.navigateToRoutineScreen(id: UUID, navOptions: NavOptions? = nu
 
 fun NavGraphBuilder.routineScreen(
     onBackClick: () -> Unit,
+    onGoToEditor: (UUID) -> Unit,
 ) {
     composable(
         route = ROUTINE_SCREEN_ROUTE,
@@ -69,7 +70,7 @@ fun NavGraphBuilder.routineScreen(
 
         RoutineScreen(
             uiState = uiState,
-            onToggleFavorite = viewModel::toggleFavorite,
+            onGoToEditor = onGoToEditor,
             onRoutineDone = viewModel::saveAsLastRun,
             onBackClick = onBackClick,
         )

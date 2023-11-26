@@ -3,7 +3,9 @@ package io.github.janmalch.woroboro.data.dao
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Embedded
+import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import io.github.janmalch.woroboro.data.model.ExerciseEntityWithMediaAndTags
 import io.github.janmalch.woroboro.data.model.MediaEntity
@@ -14,7 +16,6 @@ import io.github.janmalch.woroboro.data.model.asModel
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineStep
-import io.github.janmalch.woroboro.models.basedOn
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -140,6 +141,31 @@ abstract class RoutineDao {
 
     @Update
     abstract suspend fun update(routineEntity: RoutineEntity)
+
+    @Insert
+    protected abstract suspend fun insertRoutine(routineEntity: RoutineEntity)
+
+    @Insert
+    protected abstract suspend fun insertSteps(steps: List<RoutineStepEntity>)
+
+    @Transaction
+    open suspend fun insert(routineEntity: RoutineEntity, steps: List<RoutineStepEntity>) {
+        insertRoutine(routineEntity)
+        insertSteps(steps)
+    }
+
+    @Query("DELETE FROM routine_step WHERE routine_id = :routineId")
+    protected abstract suspend fun deleteStepsOf(routineId: UUID)
+
+    @Transaction
+    open suspend fun update(routineEntity: RoutineEntity, steps: List<RoutineStepEntity>) {
+        deleteStepsOf(routineEntity.id)
+        update(routineEntity)
+        insertSteps(steps)
+    }
+
+    @Query("DELETE FROM routine WHERE id = :routineId")
+    abstract suspend fun delete(routineId: UUID)
 }
 
 data class RoutineQueryResult(
@@ -169,10 +195,9 @@ fun RoutineStepEntity.asModel(exerciseLookup: Collection<ExerciseEntityWithMedia
     }
     val exercise = exerciseLookup.firstOrNull { it.exercise.id == exerciseId }
     checkNotNull(exercise) { "Failed to find exercise $exerciseId for routine $routineId at step index ${sortIndex}." }
-    val execution = execution basedOn exercise.exercise.execution
     return RoutineStep.ExerciseStep(
         sortIndex = sortIndex,
         exercise = exercise.asModel(),
-        execution = execution,
+        customExecution = execution,
     )
 }

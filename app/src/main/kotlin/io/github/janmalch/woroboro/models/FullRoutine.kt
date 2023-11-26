@@ -53,13 +53,15 @@ sealed interface RoutineStep {
     data class ExerciseStep(
         override val sortIndex: Int,
         val exercise: Exercise,
+        val customExecution: ExerciseExecution?,
+    ) : RoutineStep {
         /**
          * The execution of this step, specific to this routine.
          * Might be the same as the default in [exercise].
          * Always use this in the context of a routine.
          */
-        val execution: ExerciseExecution,
-    ) : RoutineStep
+        val execution: ExerciseExecution = customExecution basedOn exercise.execution
+    }
 
     data class PauseStep(
         override val sortIndex: Int,

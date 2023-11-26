@@ -33,7 +33,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -42,7 +41,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -59,10 +57,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.RoutineStep
+import io.github.janmalch.woroboro.ui.components.ExerciseListItem
 import io.github.janmalch.woroboro.ui.theme.Success
 import kotlin.time.Duration
 
@@ -218,19 +216,18 @@ fun ExerciseStepListItem(
             .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
-        ListItem(
+        ExerciseListItem(
+            exercise = step.exercise,
+            execution = step.execution,
             leadingContent = {
                 MediaWithDoneState(media = step.exercise.media.firstOrNull(), isDone = isDone)
-            },
-            headlineContent = { Text(text = step.exercise.name) },
-            supportingContent = {
-                Text(text = exerciseExecution(execution = step.execution))
             },
             trailingContent = {
                 IconButton(onClick = { isExpanded = true }) {
                     Icon(Icons.Rounded.QuestionMark, contentDescription = null)
                 }
             },
+            overlineContent = null,
             modifier = Modifier.padding(vertical = 8.dp)
         )
         HorizontalDivider()
@@ -285,21 +282,6 @@ fun ExerciseStepListItem(
         }
     }
 }
-
-@Composable
-@ReadOnlyComposable
-fun exerciseExecution(
-    execution: ExerciseExecution,
-): String {
-    val base = when {
-        execution.reps != null -> "${execution.sets} × ${execution.reps}"
-        execution.hold != null -> "${execution.sets} × ${execution.hold.inWholeSeconds}s"
-        else -> "${execution.sets}"
-    }
-    return if (execution.pause != null) "$base · ${execution.pause.inWholeSeconds}s Pause"
-    else base
-}
-
 
 @Composable
 fun MediaWithDoneState(

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,14 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.ui.components.common.DoneCelebration
-import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
+import java.util.UUID
 import kotlin.time.Duration
 
 
 @Composable
 fun RoutineScreen(
     uiState: RoutineUiState,
-    onToggleFavorite: (FullRoutine) -> Unit,
+    onGoToEditor: (UUID) -> Unit,
     onRoutineDone: (FullRoutine, Duration) -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -47,7 +48,7 @@ fun RoutineScreen(
 
         is RoutineUiState.Success -> RoutineSuccessScreen(
             routine = uiState.routine,
-            onToggleFavorite = onToggleFavorite,
+            onGoToEditor = onGoToEditor,
             onRoutineDone = onRoutineDone,
             onBackClick = onBackClick,
         )
@@ -58,7 +59,7 @@ fun RoutineScreen(
 @Composable
 fun RoutineSuccessScreen(
     routine: FullRoutine,
-    onToggleFavorite: (FullRoutine) -> Unit,
+    onGoToEditor: (UUID) -> Unit,
     onRoutineDone: (FullRoutine, Duration) -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -76,8 +77,8 @@ fun RoutineSuccessScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { onToggleFavorite(routine) }) {
-                            FavoriteIcon(isFavorite = routine.isFavorite)
+                        IconButton(onClick = { onGoToEditor(routine.id) }) {
+                            Icon(Icons.Rounded.Edit, contentDescription = null)
                         }
                     }
                 )
