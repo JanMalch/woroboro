@@ -1,5 +1,9 @@
 package io.github.janmalch.woroboro.ui.exercise.editor
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,13 +52,17 @@ fun NavGraphBuilder.exerciseEditorScreen(
                 nullable = true
             }
         ),
+        enterTransition = { fadeIn() + slideInVertically { it / 2 } },
+        exitTransition = { fadeOut() + slideOutVertically { it / 2 } },
     ) {
         val viewModel = hiltViewModel<ExerciseEditorViewModel>()
         val exercise by viewModel.exerciseToEdit.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
+        val isLoading = viewModel.isLoading
 
         ExerciseEditorScreen(
             availableTags = availableTags,
+            isLoading = isLoading,
             exercise = exercise,
             onSave = viewModel::save,
             onDelete = viewModel::delete,
