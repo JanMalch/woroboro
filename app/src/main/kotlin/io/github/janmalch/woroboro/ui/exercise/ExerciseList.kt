@@ -14,9 +14,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +34,7 @@ import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.ExerciseListItem
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
+import io.github.janmalch.woroboro.ui.components.common.MoreMenu
 import io.github.janmalch.woroboro.ui.components.common.OnlyFavoritesChip
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
@@ -67,8 +68,11 @@ fun ExerciseListScreen(
                     Text("Übungen")
                 },
                 actions = {
-                    IconButton(onClick = onNavigateToTagEditor) {
-                        Icon(Icons.AutoMirrored.Outlined.Label, contentDescription = null)
+                    MoreMenu {
+                        DropdownMenuItem(
+                            text = { Text(text = "Tags bearbeiten") },
+                            onClick = onNavigateToTagEditor
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior,

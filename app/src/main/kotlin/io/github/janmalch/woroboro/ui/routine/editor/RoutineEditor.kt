@@ -175,10 +175,7 @@ fun RoutineEditorScreen(
                     }
                     MoreMenu(enabled = routine != null) {
                         DropdownMenuItem(
-                            leadingIcon = {
-                                Icon(Icons.Rounded.Delete, contentDescription = null)
-                            },
-                            text = { Text(text = "Löschen") },
+                            text = { Text(text = "Routine löschen") },
                             onClick = { if (routine != null) onDelete(routine.id) }
                         )
                     }
