@@ -44,9 +44,8 @@ fun OnlyFavoritesChip(
     onValueChange: (Boolean) -> Unit,
 ) {
     FilterChip(
-        label = { Text(text = "Favoriten", maxLines = 1) },
         selected = value,
-        trailingIcon = { FavoriteIcon(isFavorite = value, modifier = Modifier.size(18.dp)) },
+        label = { FavoriteIcon(isFavorite = value, modifier = Modifier.size(18.dp)) },
         onClick = { onValueChange(!value) }
     )
 }
