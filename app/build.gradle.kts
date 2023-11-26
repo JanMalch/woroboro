@@ -26,14 +26,21 @@ android {
     }
 
     buildTypes {
-        release {
-            // TODO: change this when doing proper builds
-            signingConfig = signingConfigs.getByName("debug")
+        val release = getByName("release") {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("releaseCi") {
+            initWith(release)
+            signingConfig = signingConfigs.create("releaseCi") {
+                storeFile = file("keystore/android_keystore.jks")
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            }
         }
     }
     compileOptions {
