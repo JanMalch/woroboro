@@ -32,7 +32,9 @@ class RoutineViewModel @Inject constructor(
         .map { if (it == null) RoutineUiState.Failure else RoutineUiState.Success(it) }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            // WhileSubscribed with immediate timeout to refresh after save in editor.
+            // Currently exercises don't update, because they are "snapshotted" in the Composable.
+            started = SharingStarted.WhileSubscribed(),
             initialValue = RoutineUiState.Loading,
         )
 
