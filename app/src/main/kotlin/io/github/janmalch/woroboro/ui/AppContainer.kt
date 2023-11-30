@@ -17,9 +17,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,15 +32,20 @@ import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.exercise.navigateToExercisesGraph
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.routine.navigateToRoutineGraph
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppContainer(startDestination: String) {
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             AppBottomBar(navController)
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Box(
             Modifier
@@ -51,7 +60,12 @@ fun AppContainer(startDestination: String) {
         ) {
             AppNavHost(
                 navController = navController,
-                startDestination = startDestination
+                startDestination = startDestination,
+                onShowSnackbar = {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(message = it)
+                    }
+                }
             )
         }
     }

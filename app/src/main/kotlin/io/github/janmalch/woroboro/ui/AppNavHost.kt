@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import io.github.janmalch.woroboro.ui.exercise.editor.navigateToExerciseEditor
 import io.github.janmalch.woroboro.ui.exercise.exercisesGraph
 import io.github.janmalch.woroboro.ui.exercise.tageditor.navigateToTagEditor
+import io.github.janmalch.woroboro.ui.routine.ROUTINE_LIST_ROUTE
 import io.github.janmalch.woroboro.ui.routine.editor.navigateToRoutineEditor
 import io.github.janmalch.woroboro.ui.routine.routine.navigateToRoutineScreen
 import io.github.janmalch.woroboro.ui.routine.routinesGraph
@@ -18,6 +19,7 @@ import io.github.janmalch.woroboro.ui.routine.routinesGraph
 fun AppNavHost(
     navController: NavHostController,
     startDestination: String,
+    onShowSnackbar: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -36,12 +38,17 @@ fun AppNavHost(
             onExerciseClick = { navController.navigateToExerciseEditor(exerciseId = it.id) },
             onNavigateToTagEditor = navController::navigateToTagEditor,
             onBackClick = navController::popBackStack,
+            onShowSnackbar = onShowSnackbar,
         )
         routinesGraph(
             onCreateRoutineClick = navController::navigateToRoutineEditor,
             onGoToEditor = navController::navigateToRoutineEditor,
             onRoutineClick = { navController.navigateToRoutineScreen(it.id) },
             onBackClick = navController::popBackStack,
+            onBackToRoutineList = {
+                navController.popBackStack(ROUTINE_LIST_ROUTE, inclusive = false)
+            },
+            onShowSnackbar = onShowSnackbar,
         )
     }
 }

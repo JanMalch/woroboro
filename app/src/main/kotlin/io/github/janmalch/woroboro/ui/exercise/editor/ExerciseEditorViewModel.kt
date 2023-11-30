@@ -11,15 +11,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.ExerciseRepository
 import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.EditedExercise
+import io.github.janmalch.woroboro.ui.Outcome
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -33,15 +36,25 @@ class ExerciseEditorViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val exerciseId = MutableStateFlow(ExerciseEditorArgs(savedStateHandle).exerciseId)
-    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        Log.e("ExerciseEditorViewModel", "Error while saving or removing exercise.", exception)
+    private val saveExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e("ExerciseEditorViewModel", "Error while saving exercise.", exception)
+        viewModelScope.launch {
+            _onSaveFinished.send(Outcome.Failure)
+        }
+    }
+    private val deleteExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e("ExerciseEditorViewModel", "Error while removing exercise.", exception)
+        viewModelScope.launch {
+            _onDeleteFinished.send(Outcome.Failure)
+        }
     }
 
     var isLoading by mutableStateOf(false)
         private set
 
     val exerciseToEdit = exerciseId.flatMapLatest { id ->
-        id?.let { exerciseRepository.resolve(it) } ?: flowOf(null)
+        if (id == null) flowOf(null)
+        else exerciseRepository.resolve(id)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -56,28 +69,27 @@ class ExerciseEditorViewModel @Inject constructor(
         initialValue = persistentMapOf(),
     )
 
+    private val _onSaveFinished = Channel<Outcome>()
+    val onSaveFinished = _onSaveFinished.receiveAsFlow()
+
+    private val _onDeleteFinished = Channel<Outcome>()
+    val onDeleteFinished = _onDeleteFinished.receiveAsFlow()
+
     fun save(exercise: EditedExercise) {
-        viewModelScope.launch(exceptionHandler) {
-            try {
-                exerciseId.value = if (exerciseId.value == null) {
-                    exerciseRepository.insert(exercise)
-                } else {
-                    exerciseRepository.update(exercise)
-                }
-            } finally {
-                isLoading = false
+        viewModelScope.launch(saveExceptionHandler) {
+            if (exerciseId.value == null) {
+                exerciseRepository.insert(exercise)
+            } else {
+                exerciseRepository.update(exercise)
             }
+            _onSaveFinished.send(Outcome.Success)
         }
     }
 
     fun delete(id: UUID) {
-        viewModelScope.launch(exceptionHandler) {
-            try {
-                exerciseRepository.delete(id)
-                exerciseId.value = null
-            } finally {
-                isLoading = false
-            }
+        viewModelScope.launch(deleteExceptionHandler) {
+            exerciseRepository.delete(id)
+            _onDeleteFinished.send(Outcome.Success)
         }
     }
 }

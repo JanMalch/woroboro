@@ -21,6 +21,8 @@ fun NavGraphBuilder.routinesGraph(
     onRoutineClick: (Routine) -> Unit,
     onGoToEditor: (UUID) -> Unit,
     onBackClick: () -> Unit,
+    onBackToRoutineList: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     navigation(
         route = ROUTINE_GRAPH_ROUTE,
@@ -36,6 +38,8 @@ fun NavGraphBuilder.routinesGraph(
         )
         routineEditorScreen(
             onBackClick = onBackClick,
+            onBackToRoutineList = onBackToRoutineList,
+            onShowSnackbar = onShowSnackbar,
         )
     }
 

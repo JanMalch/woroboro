@@ -14,6 +14,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.github.janmalch.woroboro.ui.CollectAsEvents
+import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
 import java.util.UUID
 
@@ -43,6 +45,8 @@ fun NavController.navigateToRoutineEditor(
 
 fun NavGraphBuilder.routineEditorScreen(
     onBackClick: () -> Unit,
+    onBackToRoutineList: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     composable(
         route = ROUTINE_EDITOR_ROUTE_PATTERN,
@@ -59,6 +63,33 @@ fun NavGraphBuilder.routineEditorScreen(
         val routine by viewModel.routineToEdit.collectAsState()
         val allExercises by viewModel.allExercises.collectAsState()
         val isLoading = viewModel.isLoading
+
+
+        CollectAsEvents(viewModel.onSaveFinished) {
+            when (it) {
+                Outcome.Success -> {
+                    onShowSnackbar("Routine erfolgreich gespeichert.")
+                    onBackClick()
+                }
+
+                Outcome.Failure -> {
+                    onShowSnackbar("Fehler beim Speichern der Routine.")
+                }
+            }
+        }
+
+        CollectAsEvents(viewModel.onDeleteFinished) {
+            when (it) {
+                Outcome.Success -> {
+                    onShowSnackbar("Routine erfolgreich gelöscht.")
+                    onBackToRoutineList()
+                }
+
+                Outcome.Failure -> {
+                    onShowSnackbar("Fehler beim Löschen der Routine.")
+                }
+            }
+        }
 
         RoutineEditorScreen(
             routine = routine,

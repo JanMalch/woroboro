@@ -14,6 +14,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.github.janmalch.woroboro.ui.CollectAsEvents
+import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import java.util.UUID
 
@@ -43,6 +45,7 @@ fun NavController.navigateToExerciseEditor(
 
 fun NavGraphBuilder.exerciseEditorScreen(
     onBackClick: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     composable(
         route = EXERCISE_EDITOR_ROUTE_PATTERN,
@@ -59,6 +62,32 @@ fun NavGraphBuilder.exerciseEditorScreen(
         val exercise by viewModel.exerciseToEdit.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
         val isLoading = viewModel.isLoading
+
+        CollectAsEvents(viewModel.onSaveFinished) {
+            when (it) {
+                Outcome.Success -> {
+                    onShowSnackbar("Übung erfolgreich gespeichert.")
+                    onBackClick()
+                }
+
+                Outcome.Failure -> {
+                    onShowSnackbar("Fehler beim Speichern der Übung.")
+                }
+            }
+        }
+
+        CollectAsEvents(viewModel.onDeleteFinished) {
+            when (it) {
+                Outcome.Success -> {
+                    onShowSnackbar("Übung erfolgreich gelöscht.")
+                    onBackClick()
+                }
+
+                Outcome.Failure -> {
+                    onShowSnackbar("Fehler beim Löschen der Übung.")
+                }
+            }
+        }
 
         ExerciseEditorScreen(
             availableTags = availableTags,

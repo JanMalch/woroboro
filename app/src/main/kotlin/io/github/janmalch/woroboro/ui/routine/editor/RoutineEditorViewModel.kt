@@ -11,14 +11,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.ExerciseRepository
 import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.models.FullRoutine
+import io.github.janmalch.woroboro.ui.Outcome
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -32,9 +35,19 @@ class RoutineEditorViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val routineId = MutableStateFlow(RoutineEditorArgs(savedStateHandle).routineId)
-    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        Log.e("RoutineEditorViewModel", "Error while saving or removing routine.", exception)
+    private val saveExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e("RoutineEditorViewModel", "Error while saving routine.", exception)
+        viewModelScope.launch {
+            _onSaveFinished.send(Outcome.Failure)
+        }
     }
+    private val deleteExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e("RoutineEditorViewModel", "Error while removing routine.", exception)
+        viewModelScope.launch {
+            _onDeleteFinished.send(Outcome.Failure)
+        }
+    }
+
     var isLoading by mutableStateOf(false)
         private set
 
@@ -56,30 +69,30 @@ class RoutineEditorViewModel @Inject constructor(
             initialValue = persistentListOf(),
         )
 
+    private val _onSaveFinished = Channel<Outcome>()
+    val onSaveFinished = _onSaveFinished.receiveAsFlow()
+
+    private val _onDeleteFinished = Channel<Outcome>()
+    val onDeleteFinished = _onDeleteFinished.receiveAsFlow()
+
     fun save(routine: FullRoutine) {
         isLoading = true
-        viewModelScope.launch(exceptionHandler) {
-            try {
-                routineId.value = if (routineId.value == null) {
-                    routineRepository.insert(routine)
-                } else {
-                    routineRepository.update(routine)
-                }
-            } finally {
-                isLoading = false
+        viewModelScope.launch(saveExceptionHandler) {
+            if (routineId.value == null) {
+                routineRepository.insert(routine)
+            } else {
+                routineRepository.update(routine)
             }
+            _onSaveFinished.send(Outcome.Success)
         }
     }
 
     fun delete(id: UUID) {
         isLoading = true
-        viewModelScope.launch(exceptionHandler) {
-            try {
-                routineRepository.delete(id)
-                routineId.value = null
-            } finally {
-                isLoading = false
-            }
+        viewModelScope.launch(deleteExceptionHandler) {
+            routineRepository.delete(id)
+            routineId.value = null
+            _onDeleteFinished.send(Outcome.Success)
         }
     }
 }

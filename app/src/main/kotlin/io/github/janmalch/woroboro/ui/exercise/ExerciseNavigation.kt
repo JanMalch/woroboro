@@ -20,6 +20,7 @@ fun NavGraphBuilder.exercisesGraph(
     onNavigateToTagEditor: () -> Unit,
     onExerciseClick: (Exercise) -> Unit,
     onBackClick: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     navigation(
         route = EXERCISES_GRAPH_ROUTE,
@@ -30,7 +31,7 @@ fun NavGraphBuilder.exercisesGraph(
             onExerciseClick = onExerciseClick,
             onNavigateToTagEditor = onNavigateToTagEditor,
         )
-        exerciseEditorScreen(onBackClick = onBackClick)
+        exerciseEditorScreen(onBackClick = onBackClick, onShowSnackbar = onShowSnackbar)
         tagEditorScreen(onBackClick = onBackClick)
     }
 
