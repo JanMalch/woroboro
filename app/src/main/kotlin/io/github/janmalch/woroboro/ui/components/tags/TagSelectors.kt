@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import io.github.janmalch.woroboro.models.Tag
+import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
@@ -61,9 +62,13 @@ fun TagTypeMultiDropdown(
     onValueChange: (List<String>) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    val clearFocus = rememberClearFocus()
     Box {
         FilterChip(
-            onClick = { expanded = true },
+            onClick = {
+                clearFocus()
+                expanded = true
+            },
             label = { Text(text = type, maxLines = 1) },
             selected = value.isNotEmpty(),
             leadingIcon = if (isCounterVisible && value.isNotEmpty()) {

@@ -19,8 +19,15 @@ fun MoreMenu(
     enabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val clearFocus = rememberClearFocus()
     var isOpen by remember { mutableStateOf(false) }
-    IconButton(onClick = { isOpen = true }, enabled = enabled) {
+    IconButton(
+        onClick = {
+            clearFocus()
+            isOpen = true
+        },
+        enabled = enabled
+    ) {
         Icon(Icons.Rounded.MoreVert, contentDescription = null)
     }
     DropdownMenu(

@@ -6,7 +6,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import io.github.janmalch.woroboro.models.EditedMedia
 import io.github.janmalch.woroboro.models.isEmpty
+import io.github.janmalch.woroboro.ui.components.common.clickableWithClearFocus
+import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 
@@ -48,6 +49,7 @@ fun MediaPicker(
     title: @Composable RowScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
+    val clearFocus = rememberClearFocus()
     val currentValue by rememberUpdatedState(value)
     val pickMedia = rememberMediaPicker { uris ->
         onValueChange(
@@ -64,7 +66,10 @@ fun MediaPicker(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             title()
-            IconButton(onClick = pickMedia) {
+            IconButton(onClick = {
+                clearFocus()
+                pickMedia()
+            }) {
                 Icon(Icons.Rounded.Add, contentDescription = null)
             }
         }
@@ -94,7 +99,7 @@ fun MediaPicker(
                                 RoundedCornerShape(8.dp)
                             )
                             .clip(RoundedCornerShape(8.dp))
-                            .clickable {
+                            .clickableWithClearFocus {
                                 onValueChange(
                                     currentValue.copy(
                                         added = currentValue.added - uri
@@ -120,7 +125,7 @@ fun MediaPicker(
                                 RoundedCornerShape(8.dp)
                             )
                             .clip(RoundedCornerShape(8.dp))
-                            .clickable {
+                            .clickableWithClearFocus {
                                 onValueChange(
                                     currentValue.copy(
                                         existing = (currentValue.existing - uri).toPersistentList()

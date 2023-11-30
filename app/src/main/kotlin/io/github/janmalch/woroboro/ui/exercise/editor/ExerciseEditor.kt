@@ -44,6 +44,7 @@ import io.github.janmalch.woroboro.ui.components.common.ButtonLoading
 import io.github.janmalch.woroboro.ui.components.common.CloseIconButton
 import io.github.janmalch.woroboro.ui.components.common.IsFavoriteCheckbox
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
+import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -160,6 +161,7 @@ fun ExerciseEditorScreen(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .clearFocusAsOutsideClick()
                 .padding(padding),
         ) {
 

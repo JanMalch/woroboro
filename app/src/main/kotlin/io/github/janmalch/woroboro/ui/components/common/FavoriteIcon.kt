@@ -1,7 +1,6 @@
 package io.github.janmalch.woroboro.ui.components.common
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -60,7 +59,7 @@ fun IsFavoriteCheckbox(
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onValueChange(!value) }
+        modifier = modifier.clickableWithClearFocus { onValueChange(!value) }
     ) {
         FavoriteIcon(
             isFavorite = value,

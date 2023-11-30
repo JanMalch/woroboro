@@ -7,7 +7,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,6 +82,9 @@ import io.github.janmalch.woroboro.ui.components.common.CloseIconButton
 import io.github.janmalch.woroboro.ui.components.common.HapticFeedback
 import io.github.janmalch.woroboro.ui.components.common.IsFavoriteCheckbox
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
+import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
+import io.github.janmalch.woroboro.ui.components.common.clickableWithClearFocus
+import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import io.github.janmalch.woroboro.ui.components.common.rememberHapticFeedback
 import io.github.janmalch.woroboro.ui.components.exerciseExecution
 import io.github.janmalch.woroboro.ui.theme.Success
@@ -114,6 +116,7 @@ fun RoutineEditorScreen(
     onDelete: (UUID) -> Unit,
     onBackClick: () -> Unit,
 ) {
+    val clearFocus = rememberClearFocus()
     val id = rememberSaveable(routine) { routine?.id ?: UUID.randomUUID() }
     var name by rememberSaveable(routine) {
         mutableStateOf(routine?.name ?: "")
@@ -186,6 +189,7 @@ fun RoutineEditorScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .clearFocusAsOutsideClick()
                 .padding(padding),
         ) {
             OutlinedTextField(
@@ -219,7 +223,10 @@ fun RoutineEditorScreen(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
             TextButton(
-                onClick = { isNewStepDialogOpen = true },
+                onClick = {
+                    clearFocus()
+                    isNewStepDialogOpen = true
+                },
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(horizontal = 16.dp),
@@ -559,7 +566,9 @@ fun LazyListScope.stepsItems(
                                 },
                                 tonalElevation = elevation,
                                 shadowElevation = elevation,
-                                modifier = Modifier.clickable { isStepDialogOpen = true },
+                                modifier = Modifier.clickableWithClearFocus {
+                                    isStepDialogOpen = true
+                                },
                             )
                         }
                     }
