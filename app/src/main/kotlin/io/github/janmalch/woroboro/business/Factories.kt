@@ -16,7 +16,6 @@ import java.util.UUID
 
 fun Exercise.asEntity(): ExerciseEntityWithMediaAndTags {
     require(name.isNotBlank()) { "Name of exercise must not be blank." }
-    require(description.isNotBlank()) { "Description of exercise must not be blank." }
 
     return ExerciseEntityWithMediaAndTags(
         exercise = ExerciseEntity(

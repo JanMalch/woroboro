@@ -137,7 +137,7 @@ fun ExerciseEditorScreen(
                                 onSave(edited)
                             }
                         },
-                        enabled = name.isNotBlank() && description.isNotBlank() && (reps != null || hold != null),
+                        enabled = name.isNotBlank() && (reps != null || hold != null),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         modifier = Modifier.defaultMinSize(
                             minWidth = ButtonDefaults.MinWidth,
@@ -189,12 +189,11 @@ fun ExerciseEditorScreen(
                     onValueChange = { description = it },
                     label = { Text(text = "Beschreibung") },
                     singleLine = false,
-                    // isError = description.isBlank(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = 192.dp),
                     keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
+                        imeAction = ImeAction.Default, // line break
                     ),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
