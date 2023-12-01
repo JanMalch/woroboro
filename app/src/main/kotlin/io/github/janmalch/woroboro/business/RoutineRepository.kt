@@ -55,7 +55,7 @@ class RoutineRepositoryImpl @Inject constructor(
             tags.isEmpty() || this.tags.any { rTag -> rTag.label in tags }
 
         fun Routine.isWithinDurationFilter(): Boolean =
-            durationFilter == DurationFilter.Any || (lastRunDuration?.let { it <= durationFilter.duration }
+            durationFilter == DurationFilter.Any || (lastRunDuration?.let { it in durationFilter.range }
                 ?: true)
 
         return routineDao.findAll(onlyFavorites).map { list ->

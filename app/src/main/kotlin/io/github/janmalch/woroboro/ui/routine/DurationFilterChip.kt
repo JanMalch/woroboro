@@ -4,16 +4,19 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.rounded.CheckBox
-import androidx.compose.material.icons.rounded.CheckBoxOutlineBlank
+import androidx.compose.material.icons.rounded.RadioButtonChecked
+import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import io.github.janmalch.woroboro.models.DurationFilter
@@ -25,6 +28,12 @@ fun DurationFilterChip(
     onValueChange: (DurationFilter) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    val emitAndClose = remember<(DurationFilter) -> Unit>(onValueChange) {
+        {
+            onValueChange(it)
+            expanded = false
+        }
+    }
 
     Box {
         FilterChip(
@@ -43,22 +52,29 @@ fun DurationFilterChip(
             DurationFilterItem(
                 selected = value,
                 value = DurationFilter.VeryShort,
-                onValueChange = onValueChange,
+                text = "< ${DurationFilter.VeryShort.range.endExclusive.inWholeMinutes} Minuten",
+                onValueChange = emitAndClose,
             )
             DurationFilterItem(
                 selected = value,
                 value = DurationFilter.Short,
-                onValueChange = onValueChange,
+                onValueChange = emitAndClose,
             )
             DurationFilterItem(
                 selected = value,
                 value = DurationFilter.Medium,
-                onValueChange = onValueChange,
+                onValueChange = emitAndClose,
+            )
+            DurationFilterItem(
+                selected = value,
+                value = DurationFilter.Long,
+                onValueChange = emitAndClose,
+                text = "≥ ${DurationFilter.Long.range.start.inWholeMinutes} Minuten"
             )
             DurationFilterItem(
                 selected = value,
                 value = DurationFilter.Any,
-                onValueChange = onValueChange,
+                onValueChange = emitAndClose,
                 text = "Beliebige Dauer",
             )
         }
@@ -70,7 +86,7 @@ fun DurationFilterChip(
 private fun DurationFilterItem(
     selected: DurationFilter,
     value: DurationFilter,
-    text: String = "≤ ${value.duration.inWholeMinutes} Minuten",
+    text: String = "${value.range.start.inWholeMinutes}–${value.range.endExclusive.inWholeMinutes} Minuten",
     onValueChange: (DurationFilter) -> Unit,
 ) {
     DropdownMenuItem(
@@ -82,8 +98,9 @@ private fun DurationFilterItem(
                 label = "Crossfade:Icon:${value}",
             ) {
                 Icon(
-                    if (it) Icons.Rounded.CheckBox
-                    else Icons.Rounded.CheckBoxOutlineBlank,
+                    if (it) Icons.Rounded.RadioButtonChecked
+                    else Icons.Rounded.RadioButtonUnchecked,
+                    tint = if (it) MaterialTheme.colorScheme.primary else LocalContentColor.current,
                     contentDescription = null
                 )
             }
