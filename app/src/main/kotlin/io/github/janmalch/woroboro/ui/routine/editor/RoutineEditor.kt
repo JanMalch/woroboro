@@ -67,16 +67,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import io.github.janmalch.woroboro.models.CustomExerciseExecution
 import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.models.asCustomExecution
 import io.github.janmalch.woroboro.models.asExerciseExecutionOrNull
-import io.github.janmalch.woroboro.ui.components.CustomExerciseExecutionEditor
 import io.github.janmalch.woroboro.ui.components.DurationTextField
 import io.github.janmalch.woroboro.ui.components.ExerciseListItem
 import io.github.janmalch.woroboro.ui.components.ExerciseListItemDefaults
 import io.github.janmalch.woroboro.ui.components.ExerciseListItemDefaults.ImageCornerSize
+import io.github.janmalch.woroboro.ui.components.NumberTextField
 import io.github.janmalch.woroboro.ui.components.common.ButtonLoading
 import io.github.janmalch.woroboro.ui.components.common.CloseIconButton
 import io.github.janmalch.woroboro.ui.components.common.HapticFeedback
@@ -87,6 +89,7 @@ import io.github.janmalch.woroboro.ui.components.common.clickableWithClearFocus
 import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import io.github.janmalch.woroboro.ui.components.common.rememberHapticFeedback
 import io.github.janmalch.woroboro.ui.components.exerciseExecution
+import io.github.janmalch.woroboro.ui.exercise.editor.DurationSaver
 import io.github.janmalch.woroboro.ui.theme.Success
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -638,3 +641,86 @@ private fun DismissBackground(dismissState: DismissState) {
 }
 
 
+@Composable
+fun CustomExerciseExecutionEditor(
+    value: CustomExerciseExecution?,
+    basedOn: ExerciseExecution?,
+    onValueChange: (CustomExerciseExecution) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    var sets: Int? by rememberSaveable(value) { mutableStateOf(value?.sets) }
+    var reps: Int? by rememberSaveable(value) { mutableStateOf(value?.reps) }
+    var hold: Duration? by rememberSaveable(value, stateSaver = DurationSaver) {
+        mutableStateOf(value?.hold)
+    }
+    var pause: Duration? by rememberSaveable(value, stateSaver = DurationSaver) {
+        mutableStateOf(value?.pause)
+    }
+
+    fun emitChange() {
+        onValueChange(
+            CustomExerciseExecution(
+                sets ?: basedOn?.sets, reps, hold, pause
+            )
+        )
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        NumberTextField(
+            value = sets,
+            onValueChange = {
+                sets = it
+                emitChange()
+            },
+            required = value != null,
+            label = { Text(text = "Sätze", softWrap = false, maxLines = 1) },
+            modifier = Modifier.weight(1F),
+            enabled = enabled,
+        )
+
+        if (basedOn?.reps != null) {
+            NumberTextField(
+                value = reps,
+                onValueChange = {
+                    reps = it
+                    emitChange()
+                },
+                required = false,
+                label = { Text(text = "Wdh.", softWrap = false, maxLines = 1) },
+                modifier = Modifier.weight(1F),
+                enabled = enabled,
+            )
+        }
+
+        if (basedOn?.hold != null) {
+            DurationTextField(
+                value = hold,
+                onValueChange = {
+                    hold = it
+                    emitChange()
+                },
+                required = false,
+                label = { Text(text = "Halten", softWrap = false, maxLines = 1) },
+                modifier = Modifier.weight(1F),
+                enabled = enabled,
+            )
+        }
+
+        DurationTextField(
+            value = pause,
+            onValueChange = {
+                pause = it
+                emitChange()
+            },
+            required = false,
+            label = { Text(text = "Pause", softWrap = false, maxLines = 1) },
+            modifier = Modifier.weight(1F),
+            imeAction = ImeAction.Done,
+            enabled = enabled,
+        )
+    }
+}
