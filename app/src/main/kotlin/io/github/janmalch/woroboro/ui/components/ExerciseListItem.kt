@@ -41,7 +41,7 @@ object ExerciseListItemDefaults {
     fun ExecutionAsSupportingContent(execution: ExerciseExecution) {
         Text(
             text = exerciseExecution(execution = execution),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 
