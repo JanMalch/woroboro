@@ -1,13 +1,17 @@
 package io.github.janmalch.woroboro.business
 
 import io.github.janmalch.woroboro.data.dao.RoutineDao
+import io.github.janmalch.woroboro.data.model.RoutineStepEntity
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.RoutineStep
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 interface RoutineRepository {
     /**
@@ -34,6 +38,8 @@ interface RoutineRepository {
     suspend fun insert(routine: FullRoutine): UUID
     suspend fun update(routine: FullRoutine): UUID
     suspend fun delete(routineId: UUID)
+    suspend fun appendExerciseToRoutine(exerciseId: UUID, routineId: UUID)
+
 }
 
 class RoutineRepositoryImpl @Inject constructor(
@@ -83,5 +89,27 @@ class RoutineRepositoryImpl @Inject constructor(
 
     override suspend fun delete(routineId: UUID) {
         routineDao.delete(routineId)
+    }
+
+    override suspend fun appendExerciseToRoutine(exerciseId: UUID, routineId: UUID) {
+        val routine = checkNotNull(findOne(routineId).firstOrNull()) {
+            "Must find routine to append to, but nothing found for $routineId."
+        }
+        val nextStepIndex = routine.steps.maxOf(RoutineStep::sortIndex) + 1
+        val pauseStepEntity = RoutineStepEntity(
+            routineId = routineId,
+            sortIndex = nextStepIndex,
+            exerciseId = null,
+            execution = null,
+            pauseStep = 1.minutes,
+        )
+        val exerciseStepEntity = RoutineStepEntity(
+            routineId = routineId,
+            sortIndex = nextStepIndex + 1,
+            exerciseId = exerciseId,
+            execution = null,
+            pauseStep = null,
+        )
+        routineDao.insertSteps(listOf(pauseStepEntity, exerciseStepEntity))
     }
 }

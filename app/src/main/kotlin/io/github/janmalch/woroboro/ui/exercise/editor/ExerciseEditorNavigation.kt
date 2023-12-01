@@ -89,12 +89,26 @@ fun NavGraphBuilder.exerciseEditorScreen(
             }
         }
 
+        CollectAsEvents(viewModel.onAddToRoutineFinished) {
+            when (it) {
+                Outcome.Success -> {
+                    onShowSnackbar("Übung erfolgreich zu Routine hinzugefügt.")
+                }
+
+                Outcome.Failure -> {
+                    onShowSnackbar("Fehler beim Hinzufügen zur Routine.")
+                }
+            }
+        }
+
         ExerciseEditorScreen(
             availableTags = availableTags,
             isLoading = isLoading,
             exercise = exercise,
+            allRoutinesFlow = viewModel.allRoutines,
             onSave = viewModel::save,
             onDelete = viewModel::delete,
+            onAddToRoutine = viewModel::addToRoutine,
             onBackClick = onBackClick,
         )
     }

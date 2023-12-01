@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.ExerciseRepository
+import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.business.TagRepository
+import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.ui.Outcome
 import kotlinx.collections.immutable.persistentMapOf
@@ -31,6 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExerciseEditorViewModel @Inject constructor(
     private val exerciseRepository: ExerciseRepository,
+    private val routineRepository: RoutineRepository,
     tagRepository: TagRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -46,6 +49,12 @@ class ExerciseEditorViewModel @Inject constructor(
         Log.e("ExerciseEditorViewModel", "Error while removing exercise.", exception)
         viewModelScope.launch {
             _onDeleteFinished.send(Outcome.Failure)
+        }
+    }
+    private val addToRoutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e("ExerciseEditorViewModel", "Error while adding exercise to routine.", exception)
+        viewModelScope.launch {
+            _onAddToRoutineFinished.send(Outcome.Failure)
         }
     }
 
@@ -69,11 +78,20 @@ class ExerciseEditorViewModel @Inject constructor(
         initialValue = persistentMapOf(),
     )
 
+    val allRoutines = routineRepository.findAll(
+        tags = emptyList(),
+        onlyFavorites = false,
+        durationFilter = DurationFilter.Any
+    ).map { list -> list.toImmutableList() }
+
     private val _onSaveFinished = Channel<Outcome>()
     val onSaveFinished = _onSaveFinished.receiveAsFlow()
 
     private val _onDeleteFinished = Channel<Outcome>()
     val onDeleteFinished = _onDeleteFinished.receiveAsFlow()
+
+    private val _onAddToRoutineFinished = Channel<Outcome>()
+    val onAddToRoutineFinished = _onAddToRoutineFinished.receiveAsFlow()
 
     fun save(exercise: EditedExercise) {
         viewModelScope.launch(saveExceptionHandler) {
@@ -90,6 +108,16 @@ class ExerciseEditorViewModel @Inject constructor(
         viewModelScope.launch(deleteExceptionHandler) {
             exerciseRepository.delete(id)
             _onDeleteFinished.send(Outcome.Success)
+        }
+    }
+
+    fun addToRoutine(exerciseId: UUID, routineId: UUID) {
+        viewModelScope.launch(addToRoutineExceptionHandler) {
+            routineRepository.appendExerciseToRoutine(
+                exerciseId = exerciseId,
+                routineId = routineId,
+            )
+            _onAddToRoutineFinished.send(Outcome.Success)
         }
     }
 }

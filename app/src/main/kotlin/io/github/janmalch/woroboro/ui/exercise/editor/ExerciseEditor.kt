@@ -1,5 +1,6 @@
 package io.github.janmalch.woroboro.ui.exercise.editor
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -12,18 +13,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,10 +41,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.EditedMedia
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.ExerciseExecution
+import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.DurationTextField
 import io.github.janmalch.woroboro.ui.components.NumberTextField
@@ -51,6 +61,7 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -65,9 +76,11 @@ fun ExerciseEditorScreen(
     isLoading: Boolean,
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     exercise: Exercise?,
+    allRoutinesFlow: Flow<ImmutableList<Routine>>,
     onSave: (EditedExercise) -> Unit,
     onDelete: (UUID) -> Unit,
     onBackClick: () -> Unit,
+    onAddToRoutine: (exerciseId: UUID, routineId: UUID) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val id: UUID = rememberSaveable(exercise) { exercise?.id ?: UUID.randomUUID() }
@@ -106,6 +119,9 @@ fun ExerciseEditorScreen(
         mutableStateOf(
             exercise?.isFavorite ?: false
         )
+    }
+    var isAddToRoutineDialogOpen by rememberSaveable(exercise) {
+        mutableStateOf(false)
     }
 
     Scaffold(
@@ -148,6 +164,10 @@ fun ExerciseEditorScreen(
                         Text(text = "Speichern")
                     }
                     MoreMenu(enabled = exercise != null) {
+                        DropdownMenuItem(
+                            text = { Text(text = "Zu Routine hinzufügen") },
+                            onClick = { if (exercise != null) isAddToRoutineDialogOpen = true }
+                        )
                         DropdownMenuItem(
                             text = { Text(text = "Übung löschen") },
                             onClick = { if (exercise != null) onDelete(exercise.id) }
@@ -275,6 +295,67 @@ fun ExerciseEditorScreen(
                         isCounterVisible = true,
                         onValueChange = { tags = it }
                     )
+                }
+            }
+        }
+
+        if (isAddToRoutineDialogOpen) {
+            AddToRoutineDialog(
+                allRoutinesFlow = allRoutinesFlow,
+                onRoutineSelected = {
+                    if (exercise != null) {
+                        onAddToRoutine(exercise.id, it)
+                        isAddToRoutineDialogOpen = false
+                    }
+                },
+                onDismissRequest = {
+                    isAddToRoutineDialogOpen = false
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun AddToRoutineDialog(
+    allRoutinesFlow: Flow<ImmutableList<Routine>>,
+    onRoutineSelected: (routineId: UUID) -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    var filter by rememberSaveable {
+        mutableStateOf("")
+    }
+    val allRoutines by allRoutinesFlow.collectAsState(initial = persistentListOf())
+    val filteredRoutines by remember {
+        derivedStateOf {
+            if (filter.isBlank()) persistentListOf()
+            else allRoutines.filter { it.name.contains(filter, ignoreCase = true) }
+                .toImmutableList()
+        }
+    }
+    Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            shape = AlertDialogDefaults.shape,
+            color = AlertDialogDefaults.containerColor,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                OutlinedTextField(
+                    value = filter,
+                    onValueChange = { filter = it },
+                    singleLine = true,
+                    label = { Text("Nach Routine suchen…") },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                LazyColumn {
+                    items(filteredRoutines, key = { it.id }) { routine ->
+                        ListItem(
+                            headlineContent = { Text(text = routine.name) },
+                            modifier = Modifier.clickable {
+                                onRoutineSelected(routine.id)
+                            }
+                        )
+                    }
                 }
             }
         }

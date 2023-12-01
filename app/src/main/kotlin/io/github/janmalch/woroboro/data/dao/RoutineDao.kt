@@ -146,7 +146,7 @@ abstract class RoutineDao {
     protected abstract suspend fun insertRoutine(routineEntity: RoutineEntity)
 
     @Insert
-    protected abstract suspend fun insertSteps(steps: List<RoutineStepEntity>)
+    abstract suspend fun insertSteps(steps: List<RoutineStepEntity>)
 
     @Transaction
     open suspend fun insert(routineEntity: RoutineEntity, steps: List<RoutineStepEntity>) {
