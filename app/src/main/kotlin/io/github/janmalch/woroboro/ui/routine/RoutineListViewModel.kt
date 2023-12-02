@@ -1,5 +1,6 @@
 package io.github.janmalch.woroboro.ui.routine
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,11 +11,13 @@ import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.utils.Quad
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -46,15 +49,16 @@ class RoutineListViewModel @Inject constructor(
     val durationFilter =
         savedStateHandle.getStateFlow(DURATION_FILTER_SSH_KEY, DurationFilter.Any)
 
-    val selectedTags = _selectedTagLabels.flatMapLatest {
+    // TODO: combine tag flows?
+    private val selectedTags = _selectedTagLabels.flatMapLatest {
         tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = persistentListOf(),
-    )
+    }
 
-    val routines = combine(
+    private val availableTags = tagRepository.findAllGrouped().map { allTags ->
+        allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
+    }
+
+    private val routines = combine(
         _selectedTagLabels,
         isOnlyFavorites,
         durationFilter,
@@ -68,19 +72,19 @@ class RoutineListViewModel @Inject constructor(
             textQuery = textQuery,
         )
             .map(List<Routine>::toImmutableList)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = persistentListOf(),
-    )
+    }
 
-    val availableTags = tagRepository.findAllGrouped().map { allTags ->
-        allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = persistentMapOf(),
-    )
+    val uiState = combine(routines, selectedTags, availableTags, RoutineListUiState::Success)
+        .widen<RoutineListUiState, RoutineListUiState.Success>()
+        .catch {
+            Log.e("RoutineListViewModel", "Error while building UI state.", it)
+            emit(RoutineListUiState.Failure)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = RoutineListUiState.Loading,
+        )
 
     fun toggleFavorite(routine: Routine) {
         val isFavorite = routine.isFavorite
@@ -106,3 +110,17 @@ class RoutineListViewModel @Inject constructor(
         savedStateHandle[TEXT_QUERY_SSH_KEY] = query
     }
 }
+
+sealed interface RoutineListUiState {
+    data class Success(
+        val routines: ImmutableList<Routine>,
+        val selectedTags: ImmutableList<Tag>,
+        val availableTags: ImmutableMap<String, ImmutableList<String>>,
+    ) : RoutineListUiState
+
+    data object Loading : RoutineListUiState
+    data object Failure : RoutineListUiState
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun <A, B : A> Flow<B>.widen(): Flow<A> = this
