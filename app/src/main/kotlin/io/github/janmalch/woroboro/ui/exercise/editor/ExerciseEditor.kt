@@ -18,11 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.PostAdd
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -54,6 +57,7 @@ import io.github.janmalch.woroboro.ui.components.common.ButtonLoading
 import io.github.janmalch.woroboro.ui.components.common.CloseIconButton
 import io.github.janmalch.woroboro.ui.components.common.IsFavoriteCheckbox
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
+import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
@@ -164,12 +168,24 @@ fun ExerciseEditorScreen(
                         Text(text = "Speichern")
                     }
                     MoreMenu(enabled = exercise != null) {
-                        DropdownMenuItem(
+                        MoreMenuItem(
                             text = { Text(text = "Zu Routine hinzufügen") },
+                            icon = {
+                                Icon(
+                                    Icons.Rounded.PostAdd,
+                                    contentDescription = null,
+                                )
+                            },
                             onClick = { if (exercise != null) isAddToRoutineDialogOpen = true }
                         )
-                        DropdownMenuItem(
+                        MoreMenuItem(
                             text = { Text(text = "Übung löschen") },
+                            icon = {
+                                Icon(
+                                    Icons.Rounded.DeleteOutline,
+                                    contentDescription = null,
+                                )
+                            },
                             onClick = { if (exercise != null) onDelete(exercise.id) }
                         )
                     }

@@ -29,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.DragHandle
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material3.AlertDialogDefaults
@@ -37,7 +38,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -84,6 +84,7 @@ import io.github.janmalch.woroboro.ui.components.common.CloseIconButton
 import io.github.janmalch.woroboro.ui.components.common.HapticFeedback
 import io.github.janmalch.woroboro.ui.components.common.IsFavoriteCheckbox
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
+import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
 import io.github.janmalch.woroboro.ui.components.common.clickableWithClearFocus
 import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
@@ -180,8 +181,14 @@ fun RoutineEditorScreen(
                         Text(text = "Speichern")
                     }
                     MoreMenu(enabled = routine != null) {
-                        DropdownMenuItem(
+                        MoreMenuItem(
                             text = { Text(text = "Routine löschen") },
+                            icon = {
+                                Icon(
+                                    Icons.Rounded.DeleteOutline,
+                                    contentDescription = null,
+                                )
+                            },
                             onClick = { if (routine != null) onDelete(routine.id) }
                         )
                     }
