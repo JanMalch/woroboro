@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -51,6 +51,7 @@ import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
 import io.github.janmalch.woroboro.ui.components.common.OnlyFavoritesChip
+import io.github.janmalch.woroboro.ui.components.common.SearchTopAppBar
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -63,6 +64,8 @@ fun RoutineListScreen(
     selectedTags: ImmutableList<Tag>,
     isOnlyFavorites: Boolean,
     durationFilter: DurationFilter,
+    textQuery: String,
+    onTextQueryChange: (String) -> Unit,
     onDurationFilterChange: (DurationFilter) -> Unit,
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
@@ -78,12 +81,14 @@ fun RoutineListScreen(
             scrollBehavior.state.collapsedFraction == 1.0f
         }
     }
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text("Routinen")
-                },
+            SearchTopAppBar(
+                title = { Text(text = "Routinen") },
+                query = textQuery,
+                placeholder = "Nach Routinen suchen…",
+                onQueryChange = onTextQueryChange,
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -149,6 +154,7 @@ fun RoutineList(
             Row(
                 modifier = Modifier
                     .background(containerColor)
+                    .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
                     .padding(vertical = 0.dp, horizontal = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -174,7 +180,7 @@ fun RoutineList(
             RoutineListItem(
                 routine = routine,
                 onToggleFavorite = { onToggleFavorite(routine) },
-                onClick = { onRoutineClick(routine) }
+                onClick = { onRoutineClick(routine) },
             )
         }
     }

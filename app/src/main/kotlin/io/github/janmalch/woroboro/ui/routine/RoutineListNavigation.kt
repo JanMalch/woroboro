@@ -27,6 +27,7 @@ fun NavGraphBuilder.routineListScreen(
     ) {
         val viewModel = hiltViewModel<RoutineListViewModel>()
         val routines by viewModel.routines.collectAsState()
+        val textQuery by viewModel.textQuery.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
         val selectedTags by viewModel.selectedTags.collectAsState()
         val durationFilter by viewModel.durationFilter.collectAsState()
@@ -38,6 +39,8 @@ fun NavGraphBuilder.routineListScreen(
             selectedTags = selectedTags,
             isOnlyFavorites = isOnlyFavorites,
             durationFilter = durationFilter,
+            textQuery = textQuery,
+            onTextQueryChange = viewModel::setTextQuery,
             onDurationFilterChange = viewModel::setDurationFilter,
             onOnlyFavoritesChange = viewModel::setOnlyFavorites,
             onSelectedTagsChange = viewModel::changeSelectedTags,

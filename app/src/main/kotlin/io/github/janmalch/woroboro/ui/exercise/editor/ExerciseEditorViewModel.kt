@@ -81,7 +81,8 @@ class ExerciseEditorViewModel @Inject constructor(
     val allRoutines = routineRepository.findAll(
         tags = emptyList(),
         onlyFavorites = false,
-        durationFilter = DurationFilter.Any
+        durationFilter = DurationFilter.Any,
+        textQuery = "",
     ).map { list -> list.toImmutableList() }
 
     private val _onSaveFinished = Channel<Outcome>()

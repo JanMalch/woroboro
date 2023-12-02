@@ -24,7 +24,8 @@ interface RoutineRepository {
     fun findAll(
         tags: List<String>,
         onlyFavorites: Boolean,
-        durationFilter: DurationFilter
+        durationFilter: DurationFilter,
+        textQuery: String,
     ): Flow<List<Routine>>
 
     fun findOne(id: UUID): Flow<FullRoutine?>
@@ -48,7 +49,8 @@ class RoutineRepositoryImpl @Inject constructor(
     override fun findAll(
         tags: List<String>,
         onlyFavorites: Boolean,
-        durationFilter: DurationFilter
+        durationFilter: DurationFilter,
+        textQuery: String,
     ): Flow<List<Routine>> {
         // TODO: improve this, because it reruns query on every tag change ...
         fun Routine.matchesAnyTag(): Boolean =
@@ -58,10 +60,17 @@ class RoutineRepositoryImpl @Inject constructor(
             durationFilter == DurationFilter.Any || (lastRunDuration?.let { it in durationFilter.range }
                 ?: true)
 
+        val matchesQuery: (Routine) -> Boolean = if (textQuery.isEmpty()) {
+            { true }
+        } else {
+            { it.name.contains(textQuery, ignoreCase = true) }
+        }
+
         return routineDao.findAll(onlyFavorites).map { list ->
             list.asSequence()
                 .filter(Routine::matchesAnyTag)
                 .filter(Routine::isWithinDurationFilter)
+                .filter(matchesQuery)
                 .toList()
         }
     }

@@ -9,6 +9,7 @@ import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
+import io.github.janmalch.woroboro.utils.Quad
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
@@ -24,6 +25,7 @@ import javax.inject.Inject
 private const val SELECTED_TAGS_SSH_KEY = "selected_tags"
 private const val ONLY_FAVORITES_SSH_KEY = "only_favorites"
 private const val DURATION_FILTER_SSH_KEY = "duration_filter"
+private const val TEXT_QUERY_SSH_KEY = "text_query"
 
 @HiltViewModel
 class RoutineListViewModel @Inject constructor(
@@ -34,6 +36,9 @@ class RoutineListViewModel @Inject constructor(
 
     private val _selectedTagLabels =
         savedStateHandle.getStateFlow(SELECTED_TAGS_SSH_KEY, emptyList<String>())
+
+    val textQuery =
+        savedStateHandle.getStateFlow(TEXT_QUERY_SSH_KEY, "")
 
     val isOnlyFavorites =
         savedStateHandle.getStateFlow(ONLY_FAVORITES_SSH_KEY, false)
@@ -53,12 +58,14 @@ class RoutineListViewModel @Inject constructor(
         _selectedTagLabels,
         isOnlyFavorites,
         durationFilter,
-        ::Triple
-    ).flatMapLatest { (selectedTags, isOnlyFavorites, durationFilter) ->
+        textQuery.map(String::trim),
+        ::Quad
+    ).flatMapLatest { (selectedTags, isOnlyFavorites, durationFilter, textQuery) ->
         routineRepository.findAll(
             selectedTags,
             onlyFavorites = isOnlyFavorites,
-            durationFilter = durationFilter
+            durationFilter = durationFilter,
+            textQuery = textQuery,
         )
             .map(List<Routine>::toImmutableList)
     }.stateIn(
@@ -93,5 +100,9 @@ class RoutineListViewModel @Inject constructor(
 
     fun setDurationFilter(durationFilter: DurationFilter) {
         savedStateHandle[DURATION_FILTER_SSH_KEY] = durationFilter
+    }
+
+    fun setTextQuery(query: String) {
+        savedStateHandle[TEXT_QUERY_SSH_KEY] = query
     }
 }
