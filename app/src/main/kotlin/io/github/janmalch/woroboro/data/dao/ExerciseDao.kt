@@ -56,7 +56,9 @@ abstract class ExerciseDao {
     @Query("SELECT * FROM exercise WHERE id = :id")
     abstract fun resolve(id: UUID): Flow<ExerciseEntityWithMediaAndTags?>
 
+    // TODO: How to make FTS work?
     @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
         SELECT * 
@@ -66,10 +68,19 @@ abstract class ExerciseDao {
             THEN is_favorite = 1
             ELSE 1
             END
+        AND
+            CASE WHEN :useTextQuery
+            THEN (exercise.name LIKE '%' || :textQuery || '%' OR exercise.description LIKE '%' || :textQuery || '%')
+            ELSE 1
+            END
         ORDER BY exercise.name COLLATE NOCASE ASC
         """
     )
-    abstract fun resolveAll(onlyFavorites: Boolean): Flow<List<ExerciseEntityWithMediaAndTags>>
+    abstract fun findAll(
+        onlyFavorites: Boolean,
+        textQuery: String,
+        useTextQuery: Boolean = textQuery.isNotBlank()
+    ): Flow<List<ExerciseEntityWithMediaAndTags>>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
@@ -85,12 +96,19 @@ abstract class ExerciseDao {
             THEN is_favorite = 1
             ELSE 1
             END
+        AND
+            CASE WHEN :useTextQuery
+            THEN (exercise.name LIKE '%' || :textQuery || '%' OR exercise.description LIKE '%' || :textQuery || '%')
+            ELSE 1
+            END
         ORDER BY exercise.name COLLATE NOCASE ASC
     """
     )
-    abstract fun findByTags(
+    abstract fun findAll(
         selectedTags: List<String>,
-        onlyFavorites: Boolean
+        onlyFavorites: Boolean,
+        textQuery: String,
+        useTextQuery: Boolean = textQuery.isNotBlank(),
     ): Flow<List<ExerciseEntityWithMediaAndTags>>
 
     @Query("DELETE FROM exercise WHERE id = :id")
@@ -102,20 +120,6 @@ abstract class ExerciseDao {
         deleteMediaOfExercise(id)
         deleteTagRefsOfExercise(id)
     }
-
-    @Transaction
-    @Query(
-        """
-        SELECT *
-        FROM exercise
-        JOIN exercise_fts as fts
-        ON exercise.id = fts.id
-        WHERE fts.name MATCH :query
-        OR fts.description MATCH :query
-        ORDER BY fts.name COLLATE NOCASE ASC
-    """
-    )
-    abstract suspend fun searchInNameOrDescription(query: String): List<ExerciseEntityWithMediaAndTags>
 
     @Query(
         """

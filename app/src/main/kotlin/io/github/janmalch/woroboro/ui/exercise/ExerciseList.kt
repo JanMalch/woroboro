@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +36,7 @@ import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
 import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.OnlyFavoritesChip
+import io.github.janmalch.woroboro.ui.components.common.SearchTopAppBar
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -47,6 +47,8 @@ fun ExerciseListScreen(
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     selectedTags: ImmutableList<Tag>,
     isOnlyFavorites: Boolean,
+    textQuery: String,
+    onTextQueryChange: (String) -> Unit,
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
     onCreateExerciseClick: () -> Unit,
@@ -64,10 +66,11 @@ fun ExerciseListScreen(
     }
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text("Übungen")
-                },
+            SearchTopAppBar(
+                title = { Text("Übungen") },
+                query = textQuery,
+                placeholder = "Nach Übungen suchen…",
+                onQueryChange = onTextQueryChange,
                 actions = {
                     MoreMenu {
                         MoreMenuItem(

@@ -23,6 +23,7 @@ import javax.inject.Inject
 
 private const val SELECTED_TAGS_SSH_KEY = "selected_tags"
 private const val ONLY_FAVORITES_SSH_KEY = "only_favorites"
+private const val TEXT_QUERY_SSH_KEY = "text_query"
 
 @HiltViewModel
 class ExerciseListViewModel @Inject constructor(
@@ -37,6 +38,9 @@ class ExerciseListViewModel @Inject constructor(
     val isOnlyFavorites =
         savedStateHandle.getStateFlow(ONLY_FAVORITES_SSH_KEY, false)
 
+    val textQuery =
+        savedStateHandle.getStateFlow(TEXT_QUERY_SSH_KEY, "")
+
     val selectedTags = _selectedTagLabels.flatMapLatest {
         tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
     }.stateIn(
@@ -48,9 +52,14 @@ class ExerciseListViewModel @Inject constructor(
     val exercises = combine(
         _selectedTagLabels,
         isOnlyFavorites,
-        ::Pair
-    ).flatMapLatest { (selectedTags, isOnlyFavorites) ->
-        exerciseRepository.findByTags(selectedTags, onlyFavorites = isOnlyFavorites)
+        textQuery,
+        ::Triple
+    ).flatMapLatest { (selectedTags, isOnlyFavorites, textQuery) ->
+        exerciseRepository.findAll(
+            selectedTags,
+            onlyFavorites = isOnlyFavorites,
+            textQuery = textQuery,
+        )
             .map(List<Exercise>::toImmutableList)
     }.stateIn(
         scope = viewModelScope,
@@ -84,5 +93,9 @@ class ExerciseListViewModel @Inject constructor(
 
     fun setOnlyFavorites(onlyFavorites: Boolean) {
         savedStateHandle[ONLY_FAVORITES_SSH_KEY] = onlyFavorites
+    }
+
+    fun setTextQuery(query: String) {
+        savedStateHandle[TEXT_QUERY_SSH_KEY] = query
     }
 }

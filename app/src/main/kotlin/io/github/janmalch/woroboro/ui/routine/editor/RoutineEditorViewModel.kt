@@ -61,7 +61,7 @@ class RoutineEditorViewModel @Inject constructor(
     )
 
     val allExercises = exerciseRepository
-        .findByTags(tags = emptyList(), onlyFavorites = false)
+        .findAll(tags = emptyList(), onlyFavorites = false, textQuery = "")
         .map { list -> list.toImmutableList() }
         .stateIn(
             scope = viewModelScope,
