@@ -25,6 +25,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -79,24 +82,27 @@ fun AppBottomBar(navController: NavHostController) {
     val isRoutineTabActive =
         currentBackStack?.destination?.route?.startsWith(ROUTINE_GRAPH_ROUTE) ?: false
 
-    NavigationBar {
+    NavigationBar(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
         NavigationBarItem(
             selected = isRoutineTabActive,
             onClick = navController::navigateToRoutineGraph,
             icon = { Icon(Icons.Outlined.FitnessCenter, contentDescription = null) },
             label = { Text(text = "Routinen") },
+            modifier = Modifier.testTag("bottom_bar_button_routines"),
         )
         NavigationBarItem(
             selected = isExerciseTabActive,
             onClick = navController::navigateToExercisesGraph,
             icon = { Icon(Icons.Outlined.SportsGymnastics, contentDescription = null) },
             label = { Text(text = "Übungen") },
+            modifier = Modifier.testTag("bottom_bar_button_exercises"),
         )
         NavigationBarItem(
             selected = false,
             onClick = { /*TODO*/ },
             icon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
             label = { Text(text = "Erinnerungen") },
+            modifier = Modifier.testTag("bottom_bar_button_notifications"),
         )
     }
 }
