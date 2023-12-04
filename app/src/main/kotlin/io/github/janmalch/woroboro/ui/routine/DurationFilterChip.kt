@@ -2,10 +2,11 @@ package io.github.janmalch.woroboro.ui.routine
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.rounded.RadioButtonChecked
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
+import androidx.compose.material.icons.rounded.Timelapse
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -19,6 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.models.DurationFilter
 
 
@@ -37,11 +40,16 @@ fun DurationFilterChip(
 
     Box {
         FilterChip(
-            label = { Text(text = "Dauer", maxLines = 1) },
-            selected = value != DurationFilter.Any,
-            trailingIcon = {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+            label = {
+                Icon(
+                    Icons.Rounded.Timelapse,
+                    contentDescription = null,
+                    tint = if (value != DurationFilter.Any) MaterialTheme.colorScheme.primary
+                    else LocalContentColor.current,
+                    modifier = Modifier.size(18.dp)
+                )
             },
+            selected = value != DurationFilter.Any,
             onClick = { expanded = true }
         )
 
