@@ -12,6 +12,7 @@ interface TagRepository {
     suspend fun insert(tag: Tag)
     suspend fun update(tag: Tag, oldLabel: String)
     suspend fun delete(label: String)
+    suspend fun renameType(from: String, to: String)
     fun findAllGrouped(): Flow<Map<String, List<String>>>
     fun resolveAll(labels: List<String>): Flow<List<Tag>>
 }
@@ -30,6 +31,10 @@ class TagRepositoryImpl @Inject constructor(
 
     override suspend fun delete(label: String) {
         tagDao.delete(label)
+    }
+
+    override suspend fun renameType(from: String, to: String) {
+        tagDao.renameType(from, to)
     }
 
     override fun findAllGrouped(): Flow<Map<String, List<String>>> {

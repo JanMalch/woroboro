@@ -46,4 +46,10 @@ class TagEditorViewModel @Inject constructor(
             tagRepository.delete(tag.label)
         }
     }
+
+    fun renameType(fromTo: Pair<String, String>) {
+        viewModelScope.launch {
+            tagRepository.renameType(fromTo.first, fromTo.second)
+        }
+    }
 }

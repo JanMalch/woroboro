@@ -29,6 +29,7 @@ fun NavGraphBuilder.tagEditorScreen(
             onAddTag = viewModel::addTag,
             onUpdateTag = viewModel::updateTag,
             onDeleteTag = viewModel::deleteTag,
+            onRenameType = viewModel::renameType,
             onBackClick = onBackClick,
         )
     }

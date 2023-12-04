@@ -1,13 +1,10 @@
 package io.github.janmalch.woroboro.ui.exercise.tageditor
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,19 +14,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.DeleteOutline
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,15 +37,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.BackIconButton
+import io.github.janmalch.woroboro.ui.components.common.SimpleTextField
 import io.github.janmalch.woroboro.ui.components.common.TextFieldSheet
-import io.github.janmalch.woroboro.ui.components.common.TextWithEditSheet
+import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.launch
@@ -56,6 +57,7 @@ fun TagEditorScreen(
     onAddTag: (Tag) -> Unit,
     onUpdateTag: (Tag, String) -> Unit,
     onDeleteTag: (Tag) -> Unit,
+    onRenameType: (Pair<String, String>) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -88,8 +90,10 @@ fun TagEditorScreen(
             onAddTag = onAddTag,
             onUpdateTag = onUpdateTag,
             onDeleteTag = onDeleteTag,
+            onRenameType = onRenameType,
             modifier = modifier
                 .fillMaxSize()
+                .clearFocusAsOutsideClick()
                 .padding(padding),
         )
 
@@ -118,21 +122,23 @@ fun TagEditor(
     onAddTag: (Tag) -> Unit,
     onUpdateTag: (Tag, String) -> Unit,
     onDeleteTag: (Tag) -> Unit,
+    onRenameType: (Pair<String, String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         state = listState,
         modifier = modifier,
+        contentPadding = PaddingValues(24.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        items(newTypes, key = { it }, contentType = { "TypeCard" }) { type ->
+        items(newTypes, key = { "_new_$it" }, contentType = { "TypeCard" }) { type ->
             TypeCard(
                 type = type,
                 tags = emptyList(),
-                isExpanded = true,
                 onAddTag = onAddTag,
                 onUpdateTag = onUpdateTag,
                 onDeleteTag = onDeleteTag,
-                modifier = Modifier.animateItemPlacement(),
+                onRenameType = onRenameType,
             )
         }
 
@@ -150,8 +156,7 @@ fun TagEditor(
                 onAddTag = onAddTag,
                 onUpdateTag = onUpdateTag,
                 onDeleteTag = onDeleteTag,
-                modifier = Modifier
-                    .animateItemPlacement(),
+                onRenameType = onRenameType,
             )
         }
         item(key = "FabSpacer", contentType = "FabSpacer") {
@@ -167,90 +172,83 @@ fun TypeCard(
     onAddTag: (Tag) -> Unit,
     onUpdateTag: (Tag, String) -> Unit,
     onDeleteTag: (Tag) -> Unit,
+    onRenameType: (Pair<String, String>) -> Unit,
     modifier: Modifier = Modifier,
-    isExpanded: Boolean = false,
 ) {
-    var isSheetVisible by remember { mutableStateOf(false) }
-    var areLabelsVisible by remember(isExpanded) { mutableStateOf(isExpanded) }
+    var labelInputValue by rememberSaveable {
+        mutableStateOf("")
+    }
+    var editedType by remember(type) {
+        mutableStateOf(type)
+    }
+    var editingLabel by remember {
+        mutableStateOf<String?>(null)
+    }
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    OutlinedCard(modifier = modifier.fillMaxWidth()) {
 
-        ListItem(
-            headlineContent = {
-                Text(
-                    text = type,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    fontWeight = if (areLabelsVisible) FontWeight.Medium else null
-                )
-            },
-            trailingContent = {
-                val rotation by animateFloatAsState(
-                    targetValue = if (areLabelsVisible) 180f else 0f,
-                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                    label = "ChevronSpin:$type",
-                )
-                IconButton(onClick = { areLabelsVisible = !areLabelsVisible }) {
-                    Icon(
-                        Icons.Rounded.KeyboardArrowDown, contentDescription = null,
-                        modifier = Modifier.rotate(rotation)
-                    )
-                }
-            }
-        )
-
-        AnimatedVisibility(visible = areLabelsVisible) {
-            Column {
-                tags.forEach { tag ->
-                    val label = tag.label
-
-                    ListItem(
-                        headlineContent = {
-
-                            TextWithEditSheet(
-                                value = label,
-                                placeholder = "Aktualisiertes Label",
-                                buttonText = "Speichern",
-                                onValueChange = {
-                                    onUpdateTag(
-                                        Tag(label = it, type = tag.type),
-                                        label,
-                                    )
-                                },
-                                contentPadding = PaddingValues(vertical = 4.dp, horizontal = 16.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        },
-                        trailingContent = {
-                            IconButton(onClick = { onDeleteTag(tag) }) {
-                                Icon(Icons.Rounded.DeleteOutline, contentDescription = null)
-                            }
-                        }
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 24.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.End,
-                ) {
-                    TextButton(onClick = { isSheetVisible = true }) {
-                        Text(text = "Neuer Tag")
+        TextField(
+            value = editedType,
+            onValueChange = { editedType = it },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                if (editedType != type) {
+                    IconButton(onClick = { onRenameType(type to editedType) }) {
+                        Icon(Icons.Rounded.Save, contentDescription = null)
                     }
                 }
             }
+        )
+
+        AnimatedVisibility(
+            visible = tags.isNotEmpty(),
+        ) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+                modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp),
+            ) {
+                tags.forEach { tag ->
+                    InputChip(
+                        selected = editingLabel == tag.label,
+                        onClick = {
+                            editingLabel = if (editingLabel == tag.label) null else tag.label
+                        },
+                        label = { Text(text = tag.label) },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Rounded.Close, contentDescription = null,
+                                modifier = Modifier.clickable { onDeleteTag(tag) },
+                            )
+                        }
+                    )
+                }
+            }
+
         }
 
-        HorizontalDivider()
-    }
-
-    if (isSheetVisible) {
-        TextFieldSheet(
-            value = "",
-            placeholder = "Neuer Tag für $type",
-            buttonText = "Erstellen",
-            onValueChange = { onAddTag(Tag(it, type)) },
-            onDismissRequest = { isSheetVisible = false },
+        SimpleTextField(
+            value = labelInputValue,
+            onValueChange = { labelInputValue = it },
+            placeholder = if (editingLabel == null) "Neuer Tag für $type…" else "$editingLabel umbenennen…",
+            contentPadding = PaddingValues(16.dp),
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    val tag = Tag(label = labelInputValue.trim(), type = type)
+                    val currentEditingLabel = editingLabel
+                    if (currentEditingLabel == null) {
+                        onAddTag(tag)
+                    } else {
+                        onUpdateTag(tag, currentEditingLabel)
+                    }
+                    labelInputValue = ""
+                }
+            )
         )
-    }
+        }
 }
 
