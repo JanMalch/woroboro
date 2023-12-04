@@ -193,7 +193,10 @@ fun TypeCard(
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 if (editedType != type) {
-                    IconButton(onClick = { onRenameType(type to editedType) }) {
+                    IconButton(
+                        onClick = { onRenameType(type to editedType) },
+                        enabled = editedType.isNotBlank(),
+                    ) {
                         Icon(Icons.Rounded.Save, contentDescription = null)
                     }
                 }
