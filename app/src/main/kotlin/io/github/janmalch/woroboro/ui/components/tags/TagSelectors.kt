@@ -11,6 +11,8 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -108,6 +110,8 @@ fun TagTypeMultiDropdown(
                             Icon(
                                 if (it) Icons.Rounded.CheckBox
                                 else Icons.Rounded.CheckBoxOutlineBlank,
+                                tint = if (it) MaterialTheme.colorScheme.primary
+                                else LocalContentColor.current,
                                 contentDescription = null
                             )
                         }
