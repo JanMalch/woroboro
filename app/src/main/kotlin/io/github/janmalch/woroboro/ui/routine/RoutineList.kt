@@ -7,17 +7,12 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -53,9 +48,8 @@ import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
-import io.github.janmalch.woroboro.ui.components.common.OnlyFavoritesChip
 import io.github.janmalch.woroboro.ui.components.common.SearchTopAppBar
-import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
+import io.github.janmalch.woroboro.ui.components.routines.RoutineFilterRow
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.delay
@@ -156,29 +150,16 @@ fun RoutineList(
                 animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
                 label = "Color:Filters"
             )
-            Row(
-                modifier = Modifier
-                    .background(containerColor)
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(vertical = 0.dp, horizontal = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OnlyFavoritesChip(
-                    value = isOnlyFavorites,
-                    onValueChange = onOnlyFavoritesChange,
-                )
-                DurationFilterChip(
-                    value = durationFilter,
-                    onValueChange = onDurationFilterChange,
-                )
-                TagSelectors(
-                    availableTags = availableTags,
-                    value = selectedTags,
-                    isCounterVisible = false,
-                    onValueChange = onSelectedTagsChange,
-                )
-            }
+            RoutineFilterRow(
+                availableTags = availableTags,
+                selectedTags = selectedTags,
+                isOnlyFavorites = isOnlyFavorites,
+                durationFilter = durationFilter,
+                onDurationFilterChange = onDurationFilterChange,
+                onOnlyFavoritesChange = onOnlyFavoritesChange,
+                onSelectedTagsChange = onSelectedTagsChange,
+                containerColor = containerColor,
+            )
         }
 
         items(routines, key = { it.id }, contentType = { "Routine" }) { routine ->

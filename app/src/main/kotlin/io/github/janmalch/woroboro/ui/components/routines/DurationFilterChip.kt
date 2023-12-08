@@ -1,4 +1,4 @@
-package io.github.janmalch.woroboro.ui.routine
+package io.github.janmalch.woroboro.ui.components.routines
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
