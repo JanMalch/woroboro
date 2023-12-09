@@ -3,6 +3,7 @@ package io.github.janmalch.woroboro.ui.components.routines
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,13 +28,14 @@ fun RoutineFilterRow(
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
     containerColor: Color = Color.Unspecified,
+    contentPadding: PaddingValues = PaddingValues(vertical = 0.dp, horizontal = 12.dp)
 ) {
     Row(
         modifier = androidx.compose.ui.Modifier
             .background(containerColor)
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
-            .padding(vertical = 0.dp, horizontal = 12.dp),
+            .padding(contentPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         OnlyFavoritesChip(

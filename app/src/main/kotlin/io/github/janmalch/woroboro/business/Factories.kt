@@ -3,12 +3,14 @@ package io.github.janmalch.woroboro.business
 import io.github.janmalch.woroboro.data.model.ExerciseEntity
 import io.github.janmalch.woroboro.data.model.ExerciseEntityWithMediaAndTags
 import io.github.janmalch.woroboro.data.model.MediaEntity
+import io.github.janmalch.woroboro.data.model.ReminderEntity
 import io.github.janmalch.woroboro.data.model.RoutineEntity
 import io.github.janmalch.woroboro.data.model.RoutineStepEntity
 import io.github.janmalch.woroboro.data.model.TagEntity
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Media
+import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.models.Tag
@@ -78,3 +80,15 @@ fun FullRoutine.asEntities(): Pair<RoutineEntity, List<RoutineStepEntity>> = Rou
     lastRunDuration = lastRunDuration,
     lastRunEnded = lastRunEnded,
 ) to steps.map { it.asEntity(id) }
+
+
+fun Reminder.asEntities(): Pair<ReminderEntity, List<String>> = ReminderEntity(
+    id = id,
+    name = name,
+    remindAt = remindAt,
+    weekdays = weekdays,
+    repeatEvery = repeat?.every,
+    repeatUntil = repeat?.until,
+    filterOnlyFavorites = filter.onlyFavorites,
+    filterDuration = filter.durationFilter,
+) to filter.selectedTags.map { it.label }

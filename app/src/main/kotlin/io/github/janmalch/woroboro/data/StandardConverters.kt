@@ -2,6 +2,7 @@ package io.github.janmalch.woroboro.data
 
 import androidx.room.TypeConverter
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.UUID
 import kotlin.time.Duration
 
@@ -13,6 +14,16 @@ class StandardConverters {
 
     @TypeConverter
     fun fromLocalDateTime(date: LocalDateTime?): String? {
+        return date?.toString()
+    }
+
+    @TypeConverter
+    fun toLocalTime(value: String?): LocalTime? {
+        return value?.let { LocalTime.parse(it) }
+    }
+
+    @TypeConverter
+    fun fromLocalTime(date: LocalTime?): String? {
         return date?.toString()
     }
 

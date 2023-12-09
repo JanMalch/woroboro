@@ -4,8 +4,10 @@ import io.github.janmalch.woroboro.data.dao.RoutineDao
 import io.github.janmalch.woroboro.data.model.RoutineStepEntity
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.FullRoutine
+import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineStep
+import io.github.janmalch.woroboro.models.Tag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -41,6 +43,15 @@ interface RoutineRepository {
     suspend fun delete(routineId: UUID)
     suspend fun appendExerciseToRoutine(exerciseId: UUID, routineId: UUID)
 
+}
+
+fun RoutineRepository.findByReminder(reminder: Reminder): Flow<List<Routine>> {
+    return findAll(
+        tags = reminder.filter.selectedTags.map(Tag::label),
+        onlyFavorites = reminder.filter.onlyFavorites,
+        durationFilter = reminder.filter.durationFilter,
+        textQuery = "",
+    )
 }
 
 class RoutineRepositoryImpl @Inject constructor(

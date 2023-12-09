@@ -13,6 +13,7 @@ class MainViewModel @Inject constructor(
 
 ) : ViewModel() {
 
+    // FIXME: remove all this until needed
     val state = flowOf(MainUiState.Success)
         .stateIn(
             scope = viewModelScope,

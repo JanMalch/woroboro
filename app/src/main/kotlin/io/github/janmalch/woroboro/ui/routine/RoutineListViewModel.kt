@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.janmalch.woroboro.business.LaunchDataService
 import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.DurationFilter
@@ -35,19 +36,30 @@ class RoutineListViewModel @Inject constructor(
     private val routineRepository: RoutineRepository,
     private val tagRepository: TagRepository,
     private val savedStateHandle: SavedStateHandle,
+    launchDataService: LaunchDataService,
 ) : ViewModel() {
 
+    private val _routineFilter = launchDataService.consumeRoutineFilter()
+
     private val _selectedTagLabels =
-        savedStateHandle.getStateFlow(SELECTED_TAGS_SSH_KEY, emptyList<String>())
+        savedStateHandle.getStateFlow(SELECTED_TAGS_SSH_KEY,
+            _routineFilter?.selectedTags?.map { it.label } ?: emptyList()
+        )
 
     val textQuery =
         savedStateHandle.getStateFlow(TEXT_QUERY_SSH_KEY, "")
 
     val isOnlyFavorites =
-        savedStateHandle.getStateFlow(ONLY_FAVORITES_SSH_KEY, false)
+        savedStateHandle.getStateFlow(
+            ONLY_FAVORITES_SSH_KEY,
+            _routineFilter?.onlyFavorites ?: false
+        )
 
     val durationFilter =
-        savedStateHandle.getStateFlow(DURATION_FILTER_SSH_KEY, DurationFilter.Any)
+        savedStateHandle.getStateFlow(
+            DURATION_FILTER_SSH_KEY,
+            _routineFilter?.durationFilter ?: DurationFilter.Any
+        )
 
     // TODO: combine tag flows?
     private val selectedTags = _selectedTagLabels.flatMapLatest {

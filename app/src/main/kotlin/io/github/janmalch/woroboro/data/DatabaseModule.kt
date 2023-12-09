@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.janmalch.woroboro.data.dao.ExerciseDao
+import io.github.janmalch.woroboro.data.dao.ReminderDao
 import io.github.janmalch.woroboro.data.dao.RoutineDao
 import io.github.janmalch.woroboro.data.dao.TagDao
 import javax.inject.Singleton
@@ -34,5 +35,8 @@ object DatabaseModule {
 
     @Provides
     fun providesRoutineDao(db: AppDatabase): RoutineDao = db.routineDao()
+
+    @Provides
+    fun providesReminderDao(db: AppDatabase): ReminderDao = db.reminderDao()
 
 }

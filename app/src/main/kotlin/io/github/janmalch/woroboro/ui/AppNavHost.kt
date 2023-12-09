@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import io.github.janmalch.woroboro.ui.exercise.editor.navigateToExerciseEditor
 import io.github.janmalch.woroboro.ui.exercise.exercisesGraph
 import io.github.janmalch.woroboro.ui.exercise.tageditor.navigateToTagEditor
+import io.github.janmalch.woroboro.ui.reminder.remindersGraph
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_LIST_ROUTE
 import io.github.janmalch.woroboro.ui.routine.editor.navigateToRoutineEditor
 import io.github.janmalch.woroboro.ui.routine.routine.navigateToRoutineScreen
@@ -48,6 +49,10 @@ fun AppNavHost(
             onBackToRoutineList = {
                 navController.popBackStack(ROUTINE_LIST_ROUTE, inclusive = false)
             },
+            onShowSnackbar = onShowSnackbar,
+        )
+        remindersGraph(
+            onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
         )
     }

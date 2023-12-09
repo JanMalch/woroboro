@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.SportsGymnastics
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -30,6 +31,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.exercise.navigateToExercisesGraph
+import io.github.janmalch.woroboro.ui.reminder.REMINDER_GRAPH_ROUTE
+import io.github.janmalch.woroboro.ui.reminder.navigateToReminderGraph
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.routine.navigateToRoutineGraph
 import kotlinx.coroutines.launch
@@ -78,6 +81,8 @@ fun AppBottomBar(navController: NavHostController) {
         currentBackStack?.destination?.route?.startsWith(EXERCISES_GRAPH_ROUTE) ?: false
     val isRoutineTabActive =
         currentBackStack?.destination?.route?.startsWith(ROUTINE_GRAPH_ROUTE) ?: false
+    val isRemindersTabActive =
+        currentBackStack?.destination?.route?.startsWith(REMINDER_GRAPH_ROUTE) ?: false
 
     NavigationBar {
         NavigationBarItem(
@@ -93,9 +98,15 @@ fun AppBottomBar(navController: NavHostController) {
             label = { Text(text = "Übungen") },
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { /*TODO*/ },
-            icon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
+            selected = isRemindersTabActive,
+            onClick = navController::navigateToReminderGraph,
+            icon = {
+                if (isRemindersTabActive) {
+                    Icon(Icons.Rounded.Notifications, contentDescription = null)
+                } else {
+                    Icon(Icons.Outlined.Notifications, contentDescription = null)
+                }
+            },
             label = { Text(text = "Erinnerungen") },
         )
     }
