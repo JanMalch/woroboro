@@ -37,9 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -97,11 +94,9 @@ fun RoutineListScreen(
                 text = {
                     Text(text = "Neue Routine")
                 },
-                onClick = onCreateRoutineClick,
-                modifier = Modifier.testTag("button_new_routine"),
+                onClick = onCreateRoutineClick
             )
-        },
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        }
     ) { padding ->
         RoutineList(
             routines = routines,

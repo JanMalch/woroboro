@@ -28,9 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
@@ -96,11 +93,9 @@ fun ExerciseListScreen(
                 text = {
                     Text(text = "Neue Übung")
                 },
-                onClick = onCreateExerciseClick,
-                modifier = Modifier.testTag("button_new_exercise"),
+                onClick = onCreateExerciseClick
             )
-        },
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        }
     ) { padding ->
         ExerciseList(
             exercises = exercises,

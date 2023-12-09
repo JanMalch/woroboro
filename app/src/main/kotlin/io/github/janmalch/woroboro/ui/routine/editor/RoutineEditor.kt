@@ -64,9 +64,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -175,12 +172,10 @@ fun RoutineEditorScreen(
                         },
                         enabled = !isLoading && name.isNotBlank() && steps.any { it is RoutineStep.ExerciseStep },
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        modifier = Modifier
-                            .defaultMinSize(
-                                minWidth = ButtonDefaults.MinWidth,
-                                minHeight = 36.dp
-                            )
-                            .testTag("button_save")
+                        modifier = Modifier.defaultMinSize(
+                            minWidth = ButtonDefaults.MinWidth,
+                            minHeight = 36.dp
+                        )
                     ) {
                         ButtonLoading(isVisible = isLoading)
                         Text(text = "Speichern")
@@ -199,8 +194,7 @@ fun RoutineEditorScreen(
                     }
                 }
             )
-        },
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -215,8 +209,7 @@ fun RoutineEditorScreen(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .testTag("input_routine_name"),
+                    .padding(horizontal = 24.dp),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                 ),
@@ -246,8 +239,7 @@ fun RoutineEditorScreen(
                 },
                 modifier = Modifier
                     .align(Alignment.End)
-                    .padding(horizontal = 16.dp)
-                    .testTag("button_new_step"),
+                    .padding(horizontal = 16.dp),
             ) {
                 Text(text = "Neuer Schritt")
             }
@@ -324,7 +316,6 @@ fun RoutineStepEditorDialog(
             shape = AlertDialogDefaults.shape,
             color = AlertDialogDefaults.containerColor,
             tonalElevation = AlertDialogDefaults.TonalElevation,
-            modifier = Modifier.semantics { testTagsAsResourceId = true }
         ) {
 
             Column(modifier = Modifier.padding(24.dp)) {
@@ -384,7 +375,6 @@ fun RoutineStepEditorDialog(
                         onValueChange = { exerciseFilterQuery = it },
                         singleLine = true,
                         label = { Text("Nach Übung suchen…") },
-                        modifier = Modifier.testTag("input_exercise_filter"),
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -470,9 +460,7 @@ fun RoutineStepEditorDialog(
                     enabled =
                     if (isExercise) selectedExercise != null
                     else pauseStep?.isPositive() ?: false,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .testTag("button_save_step"),
+                    modifier = Modifier.align(Alignment.End),
                 ) {
                     Text(text = "Speichern")
                 }

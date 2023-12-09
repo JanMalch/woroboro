@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "woroboro"
 include(":app")
-include(":baselineprofile")
+ 

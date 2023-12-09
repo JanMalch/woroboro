@@ -26,10 +26,6 @@ google-oss-plugin = "0.10.6"
 material = "1.10.0"
 reorderable = "1.0.1"
 turbine = "0.6.0"
-uiautomator = "2.2.0"
-benchmark-macro-junit4 = "1.2.2"
-baselineprofile = "1.2.2"
-profileinstaller = "1.3.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -70,17 +66,12 @@ hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "an
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 hilt-viewmodel = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "android-hilt" }
-androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
-androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
-androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
 com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-androidTest = { id = "com.android.test", version.ref = "agp" }
-baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
 
 [bundles]
 hilt = ["hilt", "hilt-viewmodel", "hilt-common"]

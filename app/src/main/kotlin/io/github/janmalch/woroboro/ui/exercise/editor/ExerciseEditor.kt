@@ -42,9 +42,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -162,12 +159,10 @@ fun ExerciseEditorScreen(
                         },
                         enabled = name.isNotBlank() && (reps != null || hold != null),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        modifier = Modifier
-                            .defaultMinSize(
-                                minWidth = ButtonDefaults.MinWidth,
-                                minHeight = 36.dp
-                            )
-                            .testTag("button_save")
+                        modifier = Modifier.defaultMinSize(
+                            minWidth = ButtonDefaults.MinWidth,
+                            minHeight = 36.dp
+                        )
                     ) {
                         ButtonLoading(isVisible = isLoading)
                         Text(text = "Speichern")
@@ -196,9 +191,6 @@ fun ExerciseEditorScreen(
                     }
                 },
             )
-        },
-        modifier = Modifier.semantics {
-            testTagsAsResourceId = true
         }
     ) { padding ->
         Column(
@@ -221,9 +213,7 @@ fun ExerciseEditorScreen(
                     label = { Text(text = "Name") },
                     singleLine = true,
                     // isError = name.isBlank(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("input_exercise_name"),
+                    modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
                     ),
@@ -261,9 +251,7 @@ fun ExerciseEditorScreen(
                         onValueChange = { reps = it },
                         required = false,
                         label = { Text(text = "Wdh.", softWrap = false, maxLines = 1) },
-                        modifier = Modifier
-                            .weight(1F)
-                            .testTag("input_reps"),
+                        modifier = Modifier.weight(1F),
                     )
 
                     DurationTextField(

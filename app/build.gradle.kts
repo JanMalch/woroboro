@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.com.google.devtools.ksp)
     id("com.google.android.gms.oss-licenses-plugin")
     id("kotlin-parcelize")
-    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -59,7 +58,6 @@ android {
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
             "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
-            "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi", // for test tags
         )
     }
     buildFeatures {
@@ -77,7 +75,6 @@ android {
         // Adds exported schema location as test app assets.
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
-    experimentalProperties["android.experimental.r8.dex-startup-optimization"] = true
 }
 
 extensions.configure<com.google.devtools.ksp.gradle.KspExtension> {
@@ -105,7 +102,6 @@ dependencies {
     implementation(libs.material3.android)
     implementation(libs.collections.immutable)
     implementation(libs.reorderable)
-    implementation(libs.androidx.profileinstaller)
     testImplementation(libs.junit)
     testImplementation(libs.turbine)
     testImplementation(libs.coroutines.test)
@@ -113,7 +109,6 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
-    "baselineProfile"(project(":baselineprofile"))
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
