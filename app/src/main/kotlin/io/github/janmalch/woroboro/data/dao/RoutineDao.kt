@@ -87,8 +87,10 @@ abstract class RoutineDao {
                         lastRunDuration = routine.routine.lastRunDuration,
                         lastRunEnded = routine.routine.lastRunEnded,
                         exerciseCount = routine.exerciseCount,
-                        media = mediaOfRoutine.map { it.mediaEntity.asModel() }.toImmutableList(),
-                        tags = tagsOfRoutine.map { it.tagEntity.asModel() }.toImmutableList(),
+                        media = mediaOfRoutine.map { it.mediaEntity.asModel() }.distinct()
+                            .toImmutableList(),
+                        tags = tagsOfRoutine.map { it.tagEntity.asModel() }.distinct()
+                            .toImmutableList(),
                     )
                 }
             }
