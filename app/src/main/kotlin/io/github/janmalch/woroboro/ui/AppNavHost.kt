@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import io.github.janmalch.woroboro.ui.exercise.editor.navigateToExerciseEditor
 import io.github.janmalch.woroboro.ui.exercise.exercisesGraph
 import io.github.janmalch.woroboro.ui.exercise.tageditor.navigateToTagEditor
+import io.github.janmalch.woroboro.ui.reminder.editor.navigateToReminderEditor
 import io.github.janmalch.woroboro.ui.reminder.remindersGraph
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_LIST_ROUTE
 import io.github.janmalch.woroboro.ui.routine.editor.navigateToRoutineEditor
@@ -52,6 +53,8 @@ fun AppNavHost(
             onShowSnackbar = onShowSnackbar,
         )
         remindersGraph(
+            onNewReminder = navController::navigateToReminderEditor,
+            onGoToReminder = navController::navigateToReminderEditor,
             onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
         )
