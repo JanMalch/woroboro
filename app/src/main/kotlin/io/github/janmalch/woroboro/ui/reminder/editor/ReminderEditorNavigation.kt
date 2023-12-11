@@ -1,9 +1,5 @@
 package io.github.janmalch.woroboro.ui.reminder.editor
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import io.github.janmalch.woroboro.ui.CollectAsEvents
 import io.github.janmalch.woroboro.ui.Outcome
+import io.github.janmalch.woroboro.ui.components.NavigationDefaults
 import io.github.janmalch.woroboro.ui.reminder.REMINDER_GRAPH_ROUTE
 import java.util.UUID
 
@@ -56,8 +53,8 @@ fun NavGraphBuilder.reminderEditorScreen(
                 nullable = true
             }
         ),
-        enterTransition = { fadeIn() + slideInVertically { it / 2 } },
-        exitTransition = { fadeOut() + slideOutVertically { it / 2 } },
+        enterTransition = NavigationDefaults.enterEditorTransition,
+        exitTransition = NavigationDefaults.exitEditorTransition,
     ) {
         val viewModel = hiltViewModel<ReminderEditorViewModel>()
         val reminder by viewModel.reminderToEdit.collectAsState()
