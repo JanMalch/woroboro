@@ -9,6 +9,7 @@ import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Media
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
@@ -76,7 +77,10 @@ class ExerciseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(id: UUID) {
+        val existing = resolve(id).firstOrNull() ?: return
         exerciseDao.delete(id)
+        // TODO: orphan worker?
+        mediaFileManager.delete(existing.media.map(Media::id))
     }
 
     override fun resolve(id: UUID): Flow<Exercise?> {
