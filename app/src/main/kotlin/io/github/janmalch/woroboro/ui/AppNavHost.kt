@@ -37,7 +37,7 @@ fun AppNavHost(
     ) {
         exercisesGraph(
             onCreateExerciseClick = navController::navigateToExerciseEditor,
-            onExerciseClick = { navController.navigateToExerciseEditor(exerciseId = it.id) },
+            onExerciseClick = navController::navigateToExerciseEditor,
             onNavigateToTagEditor = navController::navigateToTagEditor,
             onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,

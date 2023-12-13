@@ -4,9 +4,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
-import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.ui.exercise.editor.exerciseEditorScreen
 import io.github.janmalch.woroboro.ui.exercise.tageditor.tagEditorScreen
+import java.util.UUID
 
 
 const val EXERCISES_GRAPH_ROUTE = "exercises"
@@ -18,7 +18,7 @@ fun NavController.navigateToExercisesGraph(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.exercisesGraph(
     onCreateExerciseClick: () -> Unit,
     onNavigateToTagEditor: () -> Unit,
-    onExerciseClick: (Exercise) -> Unit,
+    onExerciseClick: (UUID) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {

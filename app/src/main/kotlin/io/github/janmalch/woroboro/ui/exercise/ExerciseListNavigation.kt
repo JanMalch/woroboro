@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import io.github.janmalch.woroboro.models.Exercise
+import java.util.UUID
 
 const val EXERCISE_LIST_ROUTE = "$EXERCISES_GRAPH_ROUTE/exercise-list"
 
@@ -18,7 +18,7 @@ fun NavController.navigateToExerciseList(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.exerciseListScreen(
     onCreateExerciseClick: () -> Unit,
     onNavigateToTagEditor: () -> Unit,
-    onExerciseClick: (Exercise) -> Unit,
+    onExerciseClick: (UUID) -> Unit,
 ) {
     composable(
         route = EXERCISE_LIST_ROUTE,

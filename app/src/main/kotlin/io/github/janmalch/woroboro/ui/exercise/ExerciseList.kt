@@ -40,6 +40,7 @@ import io.github.janmalch.woroboro.ui.components.common.SearchTopAppBar
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import java.util.UUID
 
 @Composable
 fun ExerciseListScreen(
@@ -53,7 +54,7 @@ fun ExerciseListScreen(
     onSelectedTagsChange: (List<Tag>) -> Unit,
     onCreateExerciseClick: () -> Unit,
     onToggleFavorite: (Exercise) -> Unit,
-    onExerciseClick: (Exercise) -> Unit,
+    onExerciseClick: (UUID) -> Unit,
     onNavigateToTagEditor: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -124,7 +125,7 @@ fun ExerciseList(
     isOnlyFavorites: Boolean,
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
-    onExerciseClick: (Exercise) -> Unit,
+    onExerciseClick: (UUID) -> Unit,
     onToggleFavorite: (Exercise) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -171,7 +172,7 @@ fun ExerciseList(
                         )
                     }
                 },
-                onClick = { onExerciseClick(exercise) },
+                onClick = { onExerciseClick(exercise.id) },
             )
         }
     }
