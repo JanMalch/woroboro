@@ -14,9 +14,9 @@ import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.ui.Outcome
+import io.github.janmalch.woroboro.ui.findAvailableTags
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,13 +71,12 @@ class ExerciseEditorViewModel @Inject constructor(
         initialValue = null,
     )
 
-    val availableTags = tagRepository.findAllGrouped().map { allTags ->
-        allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = persistentMapOf(),
-    )
+    val availableTags = tagRepository.findAvailableTags()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = persistentMapOf(),
+        )
 
     val allRoutines = routineRepository.findAll(
         tags = emptyList(),

@@ -9,10 +9,10 @@ import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
+import io.github.janmalch.woroboro.ui.findAvailableTags
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -67,13 +67,12 @@ class ExerciseListViewModel @Inject constructor(
         initialValue = persistentListOf(),
     )
 
-    val availableTags = tagRepository.findAllGrouped().map { allTags ->
-        allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = persistentMapOf(),
-    )
+    val availableTags = tagRepository.findAvailableTags()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = persistentMapOf(),
+        )
 
     fun toggleFavorite(exercise: Exercise) {
         val isFavorite = exercise.isFavorite

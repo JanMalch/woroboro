@@ -12,16 +12,14 @@ import io.github.janmalch.woroboro.business.ReminderRepository
 import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.ui.Outcome
+import io.github.janmalch.woroboro.ui.findAvailableTags
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -70,13 +68,12 @@ class ReminderEditorViewModel @Inject constructor(
     var isLoading by mutableStateOf(false)
         private set
 
-    val availableTags = tagRepository.findAllGrouped().map { allTags ->
-        allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = persistentMapOf(),
-    )
+    val availableTags = tagRepository.findAvailableTags()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = persistentMapOf(),
+        )
 
     fun save(reminder: Reminder) {
         // don't reset loading, because we navigate away on success

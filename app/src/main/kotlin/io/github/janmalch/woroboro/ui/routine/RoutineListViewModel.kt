@@ -11,11 +11,11 @@ import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.Tag
+import io.github.janmalch.woroboro.ui.findAvailableTags
 import io.github.janmalch.woroboro.utils.Quad
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
@@ -66,9 +66,7 @@ class RoutineListViewModel @Inject constructor(
         tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
     }
 
-    private val availableTags = tagRepository.findAllGrouped().map { allTags ->
-        allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
-    }
+    private val availableTags = tagRepository.findAvailableTags()
 
     private val routines = combine(
         _selectedTagLabels,
