@@ -90,6 +90,7 @@ class AndroidReminderNotifications @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 getParcelable(INTENT_EXTRA_FILTER, RoutineFilter::class.java)
             } else {
+                @Suppress("DEPRECATION")
                 getParcelable(INTENT_EXTRA_FILTER)
             }
     }

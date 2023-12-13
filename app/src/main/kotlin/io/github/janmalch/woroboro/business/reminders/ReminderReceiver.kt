@@ -125,5 +125,6 @@ private fun Intent.getReminderId(): UUID? =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         getSerializableExtra(ReminderReceiver.INTENT_REMINDER_ID, UUID::class.java)
     } else {
+        @Suppress("DEPRECATION")
         getSerializableExtra(ReminderReceiver.INTENT_REMINDER_ID) as UUID?
     }
