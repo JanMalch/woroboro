@@ -3,6 +3,7 @@ package io.github.janmalch.woroboro.ui.routine
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.navigation
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.ui.routine.editor.routineEditorScreen
@@ -14,6 +15,10 @@ const val ROUTINE_GRAPH_ROUTE = "routines"
 
 fun NavController.navigateToRoutineGraph(navOptions: NavOptions? = null) {
     this.navigate(ROUTINE_GRAPH_ROUTE, navOptions)
+}
+
+fun NavController.navigateToRoutineGraph(builder: NavOptionsBuilder.() -> Unit) {
+    this.navigate(ROUTINE_GRAPH_ROUTE, builder)
 }
 
 fun NavGraphBuilder.routinesGraph(

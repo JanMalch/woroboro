@@ -87,19 +87,25 @@ fun AppBottomBar(navController: NavHostController) {
     NavigationBar {
         NavigationBarItem(
             selected = isRoutineTabActive,
-            onClick = navController::navigateToRoutineGraph,
+            onClick = {
+                navController.navigateToRoutineGraph(forBackstack(navController))
+            },
             icon = { Icon(Icons.Outlined.FitnessCenter, contentDescription = null) },
             label = { Text(text = "Routinen") },
         )
         NavigationBarItem(
             selected = isExerciseTabActive,
-            onClick = navController::navigateToExercisesGraph,
+            onClick = {
+                navController.navigateToExercisesGraph(forBackstack(navController))
+            },
             icon = { Icon(Icons.Outlined.SportsGymnastics, contentDescription = null) },
             label = { Text(text = "Übungen") },
         )
         NavigationBarItem(
             selected = isRemindersTabActive,
-            onClick = navController::navigateToReminderGraph,
+            onClick = {
+                navController.navigateToReminderGraph(forBackstack(navController))
+            },
             icon = {
                 if (isRemindersTabActive) {
                     Icon(Icons.Rounded.Notifications, contentDescription = null)

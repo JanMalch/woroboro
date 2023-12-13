@@ -3,6 +3,7 @@ package io.github.janmalch.woroboro.ui.reminder
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.navigation
 import io.github.janmalch.woroboro.ui.reminder.editor.reminderEditorScreen
 import java.util.UUID
@@ -12,6 +13,10 @@ const val REMINDER_GRAPH_ROUTE = "reminders"
 
 fun NavController.navigateToReminderGraph(navOptions: NavOptions? = null) {
     this.navigate(REMINDER_GRAPH_ROUTE, navOptions)
+}
+
+fun NavController.navigateToReminderGraph(builder: NavOptionsBuilder.() -> Unit) {
+    this.navigate(REMINDER_GRAPH_ROUTE, builder)
 }
 
 fun NavGraphBuilder.remindersGraph(

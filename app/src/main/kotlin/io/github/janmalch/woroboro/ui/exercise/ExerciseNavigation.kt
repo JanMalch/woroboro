@@ -3,6 +3,7 @@ package io.github.janmalch.woroboro.ui.exercise
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.navigation
 import io.github.janmalch.woroboro.ui.exercise.editor.exerciseEditorScreen
 import io.github.janmalch.woroboro.ui.exercise.tageditor.tagEditorScreen
@@ -13,6 +14,10 @@ const val EXERCISES_GRAPH_ROUTE = "exercises"
 
 fun NavController.navigateToExercisesGraph(navOptions: NavOptions? = null) {
     this.navigate(EXERCISES_GRAPH_ROUTE, navOptions)
+}
+
+fun NavController.navigateToExercisesGraph(builder: NavOptionsBuilder.() -> Unit) {
+    this.navigate(EXERCISES_GRAPH_ROUTE, builder)
 }
 
 fun NavGraphBuilder.exercisesGraph(
