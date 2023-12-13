@@ -59,7 +59,7 @@ fun NavGraphBuilder.reminderEditorScreen(
         val viewModel = hiltViewModel<ReminderEditorViewModel>()
         val reminder by viewModel.reminderToEdit.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
-
+        val isLoading = viewModel.isLoading
 
         CollectAsEvents(viewModel.onSaveFinished) {
             when (it) {
@@ -89,6 +89,7 @@ fun NavGraphBuilder.reminderEditorScreen(
 
         ReminderEditorScreen(
             reminder = reminder,
+            isLoading = isLoading,
             availableTags = availableTags,
             onSave = viewModel::save,
             onDelete = viewModel::delete,

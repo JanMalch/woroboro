@@ -180,7 +180,7 @@ fun RoutineEditorScreen(
                         ButtonLoading(isVisible = isLoading)
                         Text(text = "Speichern")
                     }
-                    MoreMenu(enabled = routine != null) {
+                    MoreMenu(enabled = !isLoading && routine != null) {
                         MoreMenuItem(
                             text = { Text(text = "Routine löschen") },
                             icon = {

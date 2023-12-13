@@ -1,6 +1,9 @@
 package io.github.janmalch.woroboro.ui.reminder.editor
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,6 +56,7 @@ class ReminderEditorViewModel @Inject constructor(
     private val saveExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("ReminderEditorViewModel", "Error while saving reminder.", exception)
         viewModelScope.launch {
+            isLoading = false
             _onSaveFinished.send(Outcome.Failure)
         }
     }
@@ -63,6 +67,9 @@ class ReminderEditorViewModel @Inject constructor(
         }
     }
 
+    var isLoading by mutableStateOf(false)
+        private set
+
     val availableTags = tagRepository.findAllGrouped().map { allTags ->
         allTags.mapValues { it.value.toImmutableList() }.toImmutableMap()
     }.stateIn(
@@ -72,6 +79,8 @@ class ReminderEditorViewModel @Inject constructor(
     )
 
     fun save(reminder: Reminder) {
+        // don't reset loading, because we navigate away on success
+        isLoading = true
         viewModelScope.launch(saveExceptionHandler) {
             if (reminderId.value == null) {
                 reminderRepository.insert(reminder)

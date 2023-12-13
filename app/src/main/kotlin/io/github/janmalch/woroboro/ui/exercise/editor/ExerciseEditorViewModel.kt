@@ -42,6 +42,7 @@ class ExerciseEditorViewModel @Inject constructor(
     private val saveExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("ExerciseEditorViewModel", "Error while saving exercise.", exception)
         viewModelScope.launch {
+            isLoading = false
             _onSaveFinished.send(Outcome.Failure)
         }
     }
@@ -95,6 +96,8 @@ class ExerciseEditorViewModel @Inject constructor(
     val onAddToRoutineFinished = _onAddToRoutineFinished.receiveAsFlow()
 
     fun save(exercise: EditedExercise) {
+        // don't reset loading, because we navigate away on success
+        isLoading = true
         viewModelScope.launch(saveExceptionHandler) {
             if (exerciseId.value == null) {
                 exerciseRepository.insert(exercise)

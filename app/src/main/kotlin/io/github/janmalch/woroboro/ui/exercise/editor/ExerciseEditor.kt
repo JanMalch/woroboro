@@ -157,7 +157,7 @@ fun ExerciseEditorScreen(
                                 onSave(edited)
                             }
                         },
-                        enabled = name.isNotBlank() && (reps != null || hold != null),
+                        enabled = !isLoading && name.isNotBlank() && (reps != null || hold != null),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         modifier = Modifier.defaultMinSize(
                             minWidth = ButtonDefaults.MinWidth,
@@ -167,7 +167,7 @@ fun ExerciseEditorScreen(
                         ButtonLoading(isVisible = isLoading)
                         Text(text = "Speichern")
                     }
-                    MoreMenu(enabled = exercise != null) {
+                    MoreMenu(enabled = !isLoading && exercise != null) {
                         MoreMenuItem(
                             text = { Text(text = "Zu Routine hinzufügen") },
                             icon = {

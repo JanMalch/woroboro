@@ -38,6 +38,7 @@ import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.RoutineFilter
 import io.github.janmalch.woroboro.ui.components.DurationTextField
 import io.github.janmalch.woroboro.ui.components.TimeField
+import io.github.janmalch.woroboro.ui.components.common.ButtonLoading
 import io.github.janmalch.woroboro.ui.components.common.CloseIconButton
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
 import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
@@ -55,6 +56,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun ReminderEditorScreen(
+    isLoading: Boolean,
     reminder: Reminder?,
     availableTags: ImmutableMap<String, ImmutableList<String>>,
     onSave: (Reminder) -> Unit,
@@ -118,7 +120,8 @@ fun ReminderEditorScreen(
                             )
                             onSave(edited)
                         },
-                        enabled = name.isNotBlank() &&
+                        enabled = !isLoading &&
+                                name.isNotBlank() &&
                                 weekdays.isNotEmpty() &&
                                 (repeatUntil?.let { it > remindAt } ?: true) &&
                                 (repeatEvery?.let { it in Reminder.Repeat.VALID_REPEAT_RANGE }
@@ -129,9 +132,10 @@ fun ReminderEditorScreen(
                             minHeight = 36.dp
                         )
                     ) {
+                        ButtonLoading(isVisible = isLoading)
                         Text(text = "Speichern")
                     }
-                    MoreMenu(enabled = reminder != null) {
+                    MoreMenu(enabled = !isLoading && reminder != null) {
                         MoreMenuItem(
                             text = { Text(text = "Erinnerung löschen") },
                             icon = {

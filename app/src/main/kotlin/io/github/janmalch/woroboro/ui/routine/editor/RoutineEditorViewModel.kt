@@ -38,6 +38,7 @@ class RoutineEditorViewModel @Inject constructor(
     private val saveExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("RoutineEditorViewModel", "Error while saving routine.", exception)
         viewModelScope.launch {
+            isLoading = false
             _onSaveFinished.send(Outcome.Failure)
         }
     }
@@ -76,6 +77,7 @@ class RoutineEditorViewModel @Inject constructor(
     val onDeleteFinished = _onDeleteFinished.receiveAsFlow()
 
     fun save(routine: FullRoutine) {
+        // don't reset loading, because we navigate away on success
         isLoading = true
         viewModelScope.launch(saveExceptionHandler) {
             if (routineId.value == null) {
@@ -88,7 +90,6 @@ class RoutineEditorViewModel @Inject constructor(
     }
 
     fun delete(id: UUID) {
-        isLoading = true
         viewModelScope.launch(deleteExceptionHandler) {
             routineRepository.delete(id)
             routineId.value = null
