@@ -46,7 +46,7 @@ data class ExerciseFtsEntity(
 data class MediaEntity(
     @PrimaryKey
     val id: UUID,
-    @ColumnInfo(name = "exercise_id")
+    @ColumnInfo(name = "exercise_id", index = true)
     val exerciseId: UUID,
     val thumbnail: String,
     val source: String,

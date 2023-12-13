@@ -108,6 +108,7 @@ abstract class RoutineDao {
     )
     protected abstract fun resolveWithSteps(routineId: UUID): Flow<Map<RoutineEntity, List<RoutineStepEntity>>>
 
+    @Transaction
     @Query(
         """
         SELECT exercise.*
