@@ -85,6 +85,7 @@ class ReminderEditorViewModel @Inject constructor(
     fun delete(reminderId: UUID) {
         viewModelScope.launch(deleteExceptionHandler) {
             reminderRepository.delete(reminderId)
+            _onDeleteFinished.send(Outcome.Success)
         }
     }
 }
