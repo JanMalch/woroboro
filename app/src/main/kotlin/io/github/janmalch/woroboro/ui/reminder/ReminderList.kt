@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -40,15 +40,11 @@ fun ReminderListScreen(
             CenterAlignedTopAppBar(title = { Text(text = "Erinnerungen") })
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                icon = {
-                    Icon(Icons.Rounded.Add, contentDescription = null)
-                },
-                text = {
-                    Text(text = "Neue Erinnerung")
-                },
+            FloatingActionButton(
                 onClick = onNewReminder,
-            )
+            ) {
+                Icon(Icons.Rounded.Add, contentDescription = null)
+            }
         },
     ) { padding ->
         ReminderList(

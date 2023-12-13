@@ -16,7 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -87,15 +87,11 @@ fun ExerciseListScreen(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                icon = {
-                    Icon(Icons.Rounded.Add, contentDescription = null)
-                },
-                text = {
-                    Text(text = "Neue Übung")
-                },
+            FloatingActionButton(
                 onClick = onCreateExerciseClick
-            )
+            ) {
+                Icon(Icons.Rounded.Add, contentDescription = null)
+            }
         }
     ) { padding ->
         ExerciseList(
