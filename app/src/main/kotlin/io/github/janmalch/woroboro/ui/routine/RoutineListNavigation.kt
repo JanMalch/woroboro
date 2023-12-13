@@ -1,7 +1,6 @@
 package io.github.janmalch.woroboro.ui.routine
 
 import androidx.activity.compose.ReportDrawnWhen
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -45,35 +44,33 @@ fun NavGraphBuilder.routineListScreen(
         val durationFilter by viewModel.durationFilter.collectAsState()
         val isOnlyFavorites by viewModel.isOnlyFavorites.collectAsState()
 
-        Crossfade(targetState = uiState, label = "ScreenStateTransition") {
-            when (it) {
-                RoutineListUiState.Failure -> {
-                    RoutineListErrorScreen()
-                }
+        when (val state = uiState) {
+            RoutineListUiState.Failure -> {
+                RoutineListErrorScreen()
+            }
 
-                RoutineListUiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
+            RoutineListUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
+            }
 
-                is RoutineListUiState.Success -> {
-                    RoutineListScreen(
-                        routines = it.routines,
-                        availableTags = it.availableTags,
-                        selectedTags = it.selectedTags,
-                        isOnlyFavorites = isOnlyFavorites,
-                        durationFilter = durationFilter,
-                        textQuery = textQuery,
-                        onTextQueryChange = viewModel::setTextQuery,
-                        onDurationFilterChange = viewModel::setDurationFilter,
-                        onOnlyFavoritesChange = viewModel::setOnlyFavorites,
-                        onSelectedTagsChange = viewModel::changeSelectedTags,
-                        onToggleFavorite = viewModel::toggleFavorite,
-                        onCreateRoutineClick = onCreateRoutineClick,
-                        onRoutineClick = onRoutineClick,
-                    )
-                }
+            is RoutineListUiState.Success -> {
+                RoutineListScreen(
+                    routines = state.routines,
+                    availableTags = state.availableTags,
+                    selectedTags = state.selectedTags,
+                    isOnlyFavorites = isOnlyFavorites,
+                    durationFilter = durationFilter,
+                    textQuery = textQuery,
+                    onTextQueryChange = viewModel::setTextQuery,
+                    onDurationFilterChange = viewModel::setDurationFilter,
+                    onOnlyFavoritesChange = viewModel::setOnlyFavorites,
+                    onSelectedTagsChange = viewModel::changeSelectedTags,
+                    onToggleFavorite = viewModel::toggleFavorite,
+                    onCreateRoutineClick = onCreateRoutineClick,
+                    onRoutineClick = onRoutineClick,
+                )
             }
         }
 
