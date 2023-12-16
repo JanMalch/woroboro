@@ -18,9 +18,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Reminder
 import kotlinx.collections.immutable.ImmutableList
 import java.time.format.DateTimeFormatter
@@ -37,7 +40,7 @@ fun ReminderListScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = "Erinnerungen") })
+            CenterAlignedTopAppBar(title = { Text(text = stringResource(id = R.string.reminders)) })
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -64,6 +67,8 @@ fun ReminderList(
     onGoToReminder: (UUID) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val timeFormat = stringResource(id = R.string.time_format)
+    val dtf = remember(timeFormat) { DateTimeFormatter.ofPattern(timeFormat) }
     Box(modifier = modifier) {
         LazyColumn(
             contentPadding = PaddingValues(bottom = 80.dp),
@@ -73,6 +78,7 @@ fun ReminderList(
                     headlineContent = { Text(reminder.name) },
                     supportingContent = {
                         Text(text = buildString {
+                            // TODO: be smart and join ranges
                             val weekdays = reminder.weekdays.joinToString {
                                 it.getDisplayName(
                                     TextStyle.SHORT,
@@ -81,11 +87,8 @@ fun ReminderList(
                             }
                             append(weekdays)
                             append(" · ")
-                            // TODO: i18n
                             append(
-                                reminder.remindAt.format(
-                                    DateTimeFormatter.ofPattern("HH:mm")
-                                )
+                                reminder.remindAt.format(dtf)
                             )
                         })
 

@@ -2,6 +2,8 @@ package io.github.janmalch.woroboro.ui.components.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.res.stringResource
+import io.github.janmalch.woroboro.R
 import kotlin.time.Duration
 
 @Composable
@@ -19,36 +21,24 @@ fun formatDuration(duration: Duration, zero: String = seconds(0)): String {
 
 @Composable
 @ReadOnlyComposable
-fun seconds(value: Long): String {
-    return "${value}s" // TODO: translate
-}
+fun seconds(value: Long): String = stringResource(id = R.string.duration_in_seconds, value)
 
 @Composable
 @ReadOnlyComposable
-fun seconds(value: Int): String {
-    return "${value}s" // TODO: translate
-}
+fun seconds(value: Int): String = stringResource(id = R.string.duration_in_seconds, value)
 
 @Composable
 @ReadOnlyComposable
-fun minutes(value: Long): String {
-    return "${value}m" // TODO: translate
-}
+fun minutes(value: Long): String = stringResource(id = R.string.duration_in_minutes, value)
 
 @Composable
 @ReadOnlyComposable
-fun minutes(value: Int): String {
-    return "${value}m" // TODO: translate
-}
+fun minutes(value: Int): String = stringResource(id = R.string.duration_in_minutes, value)
 
 @Composable
 @ReadOnlyComposable
-fun hours(value: Long): String {
-    return "${value}h" // TODO: translate
-}
+fun hours(value: Long): String = stringResource(id = R.string.duration_in_hours, value)
 
 @Composable
 @ReadOnlyComposable
-fun hours(value: Int): String {
-    return "${value}h" // TODO: translate
-}
+fun hours(value: Int): String = stringResource(id = R.string.duration_in_hours, value)

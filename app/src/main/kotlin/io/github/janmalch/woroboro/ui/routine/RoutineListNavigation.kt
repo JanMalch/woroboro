@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,6 +21,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Routine
 
 const val ROUTINE_LIST_ROUTE = "$ROUTINE_GRAPH_ROUTE/routine-list"
@@ -80,7 +82,7 @@ private fun RoutineListErrorScreen() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "Routinen") },
+                title = { Text(text = stringResource(id = R.string.routines)) },
             )
         },
     ) { padding ->
@@ -92,7 +94,7 @@ private fun RoutineListErrorScreen() {
                 .padding(padding),
         ) {
             Text(
-                text = "Leider ist ein unbekannter Fehler aufgetreten.",
+                text = stringResource(R.string.unknown_error_message),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 48.dp)
             )

@@ -2,6 +2,7 @@ package io.github.janmalch.woroboro.ui.routine.editor
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
@@ -10,6 +11,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.ui.CollectAsEvents
 import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.components.NavigationDefaults
@@ -60,17 +62,17 @@ fun NavGraphBuilder.routineEditorScreen(
         val routine by viewModel.routineToEdit.collectAsState()
         val allExercises by viewModel.allExercises.collectAsState()
         val isLoading = viewModel.isLoading
-
+        val context = LocalContext.current
 
         CollectAsEvents(viewModel.onSaveFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar("Routine erfolgreich gespeichert.")
+                    onShowSnackbar(context.getString(R.string.routine_save_success))
                     onBackClick()
                 }
 
                 Outcome.Failure -> {
-                    onShowSnackbar("Fehler beim Speichern der Routine.")
+                    onShowSnackbar(context.getString(R.string.routine_save_error))
                 }
             }
         }
@@ -78,12 +80,12 @@ fun NavGraphBuilder.routineEditorScreen(
         CollectAsEvents(viewModel.onDeleteFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar("Routine erfolgreich gelöscht.")
+                    onShowSnackbar(context.getString(R.string.routine_delete_success))
                     onBackToRoutineList()
                 }
 
                 Outcome.Failure -> {
-                    onShowSnackbar("Fehler beim Löschen der Routine.")
+                    onShowSnackbar(context.getString(R.string.routine_delete_error))
                 }
             }
         }

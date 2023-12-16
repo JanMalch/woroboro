@@ -2,6 +2,7 @@ package io.github.janmalch.woroboro.ui.exercise.editor
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
@@ -10,6 +11,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.ui.CollectAsEvents
 import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.components.NavigationDefaults
@@ -59,16 +61,17 @@ fun NavGraphBuilder.exerciseEditorScreen(
         val exercise by viewModel.exerciseToEdit.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
         val isLoading = viewModel.isLoading
+        val context = LocalContext.current
 
         CollectAsEvents(viewModel.onSaveFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar("Übung erfolgreich gespeichert.")
+                    onShowSnackbar(context.getString(R.string.exercise_save_success))
                     onBackClick()
                 }
 
                 Outcome.Failure -> {
-                    onShowSnackbar("Fehler beim Speichern der Übung.")
+                    onShowSnackbar(context.getString(R.string.exercise_save_error))
                 }
             }
         }
@@ -76,12 +79,12 @@ fun NavGraphBuilder.exerciseEditorScreen(
         CollectAsEvents(viewModel.onDeleteFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar("Übung erfolgreich gelöscht.")
+                    onShowSnackbar(context.getString(R.string.exercise_delete_success))
                     onBackClick()
                 }
 
                 Outcome.Failure -> {
-                    onShowSnackbar("Fehler beim Löschen der Übung.")
+                    onShowSnackbar(context.getString(R.string.exercise_delete_error))
                 }
             }
         }
@@ -89,11 +92,11 @@ fun NavGraphBuilder.exerciseEditorScreen(
         CollectAsEvents(viewModel.onAddToRoutineFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar("Übung erfolgreich zu Routine hinzugefügt.")
+                    onShowSnackbar(context.getString(R.string.exercise_add_to_routine_success))
                 }
 
                 Outcome.Failure -> {
-                    onShowSnackbar("Fehler beim Hinzufügen zur Routine.")
+                    onShowSnackbar(context.getString(R.string.exercise_add_to_routine_error))
                 }
             }
         }

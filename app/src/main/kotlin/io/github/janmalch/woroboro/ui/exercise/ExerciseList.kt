@@ -28,7 +28,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.ExerciseListItem
@@ -68,14 +70,14 @@ fun ExerciseListScreen(
     Scaffold(
         topBar = {
             SearchTopAppBar(
-                title = { Text("Übungen") },
+                title = { Text(text = stringResource(id = R.string.exercises)) },
                 query = textQuery,
-                placeholder = "Nach Übungen suchen…",
+                placeholder = stringResource(R.string.exercise_search_placeholder),
                 onQueryChange = onTextQueryChange,
                 actions = {
                     MoreMenu {
                         MoreMenuItem(
-                            text = { Text(text = "Tags bearbeiten") },
+                            text = { Text(text = stringResource(R.string.edit_tags)) },
                             icon = {
                                 Icon(Icons.Rounded.Edit, contentDescription = null)
                             },

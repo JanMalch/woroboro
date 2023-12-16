@@ -64,9 +64,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.CustomExerciseExecution
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.ExerciseExecution
@@ -87,6 +89,7 @@ import io.github.janmalch.woroboro.ui.components.common.MoreMenu
 import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
 import io.github.janmalch.woroboro.ui.components.common.clickableWithClearFocus
+import io.github.janmalch.woroboro.ui.components.common.formatDuration
 import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import io.github.janmalch.woroboro.ui.components.common.rememberHapticFeedback
 import io.github.janmalch.woroboro.ui.components.exerciseExecution
@@ -178,11 +181,11 @@ fun RoutineEditorScreen(
                         )
                     ) {
                         ButtonLoading(isVisible = isLoading)
-                        Text(text = "Speichern")
+                        Text(text = stringResource(R.string.save))
                     }
                     MoreMenu(enabled = !isLoading && routine != null) {
                         MoreMenuItem(
-                            text = { Text(text = "Routine löschen") },
+                            text = { Text(text = stringResource(R.string.delete_routine)) },
                             icon = {
                                 Icon(
                                     Icons.Rounded.DeleteOutline,
@@ -205,7 +208,7 @@ fun RoutineEditorScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text(text = "Name") },
+                label = { Text(text = stringResource(R.string.name)) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -223,7 +226,7 @@ fun RoutineEditorScreen(
                     .padding(horizontal = 24.dp)
             ) {
                 IsFavoriteCheckbox(
-                    text = "Lieblingsroutine",
+                    text = stringResource(R.string.favorite_routine),
                     value = isFavorite,
                     onValueChange = { isFavorite = it },
                 )
@@ -241,7 +244,7 @@ fun RoutineEditorScreen(
                     .align(Alignment.End)
                     .padding(horizontal = 16.dp),
             ) {
-                Text(text = "Neuer Schritt")
+                Text(text = stringResource(R.string.new_step))
             }
 
             LazyColumn(
@@ -332,7 +335,7 @@ fun RoutineStepEditorDialog(
                     ) {
                         if (it) {
                             Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-                                Text(text = "Übung")
+                                Text(text = stringResource(R.string.exercise))
                             }
                         } else {
 
@@ -340,7 +343,7 @@ fun RoutineStepEditorDialog(
                                 onClick = { isExercise = true },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(text = "Übung")
+                                Text(text = stringResource(R.string.exercise))
                             }
                         }
                     }
@@ -355,12 +358,12 @@ fun RoutineStepEditorDialog(
                                 onClick = { isExercise = false },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(text = "Pause")
+                                Text(text = stringResource(R.string.pause))
                             }
                         } else {
 
                             Button(onClick = { }, modifier = Modifier.fillMaxWidth()) {
-                                Text(text = "Pause")
+                                Text(text = stringResource(R.string.pause))
                             }
                         }
                     }
@@ -374,7 +377,7 @@ fun RoutineStepEditorDialog(
                         value = exerciseFilterQuery,
                         onValueChange = { exerciseFilterQuery = it },
                         singleLine = true,
-                        label = { Text("Nach Übung suchen…") },
+                        label = { Text(text = stringResource(R.string.exercise_search_placeholder)) },
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -414,7 +417,7 @@ fun RoutineStepEditorDialog(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Sie können die Ausführung individuell für diese Routine überschreiben.",
+                        text = stringResource(R.string.execution_override_explanation),
                         style = MaterialTheme.typography.bodySmall,
                     )
 
@@ -429,7 +432,13 @@ fun RoutineStepEditorDialog(
                         value = pauseStep,
                         onValueChange = { pauseStep = it },
                         required = false,
-                        label = { Text(text = "Pause", softWrap = false, maxLines = 1) },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.pause),
+                                softWrap = false,
+                                maxLines = 1
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         imeAction = ImeAction.Done,
                     )
@@ -462,7 +471,7 @@ fun RoutineStepEditorDialog(
                     else pauseStep?.isPositive() ?: false,
                     modifier = Modifier.align(Alignment.End),
                 ) {
-                    Text(text = "Speichern")
+                    Text(text = stringResource(R.string.save))
                 }
 
             }
@@ -557,7 +566,14 @@ fun LazyListScope.stepsItems(
                                         )
                                     }
                                 },
-                                headlineContent = { Text(text = "${step.duration.inWholeSeconds}s Pause") },
+                                headlineContent = {
+                                    Text(
+                                        text = stringResource(
+                                            id = R.string.pause_value,
+                                            formatDuration(duration = step.duration)
+                                        )
+                                    )
+                                },
                                 trailingContent = {
                                     IconButton(
                                         modifier = Modifier
@@ -684,7 +700,13 @@ fun CustomExerciseExecutionEditor(
                 emitChange()
             },
             required = value != null,
-            label = { Text(text = "Sätze", softWrap = false, maxLines = 1) },
+            label = {
+                Text(
+                    text = stringResource(id = R.string.sets),
+                    softWrap = false,
+                    maxLines = 1
+                )
+            },
             modifier = Modifier.weight(1F),
             enabled = enabled,
         )
@@ -697,7 +719,13 @@ fun CustomExerciseExecutionEditor(
                     emitChange()
                 },
                 required = false,
-                label = { Text(text = "Wdh.", softWrap = false, maxLines = 1) },
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.reps),
+                        softWrap = false,
+                        maxLines = 1
+                    )
+                },
                 modifier = Modifier.weight(1F),
                 enabled = enabled,
             )
@@ -711,7 +739,13 @@ fun CustomExerciseExecutionEditor(
                     emitChange()
                 },
                 required = false,
-                label = { Text(text = "Halten", softWrap = false, maxLines = 1) },
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.hold),
+                        softWrap = false,
+                        maxLines = 1
+                    )
+                },
                 modifier = Modifier.weight(1F),
                 enabled = enabled,
             )
@@ -724,7 +758,13 @@ fun CustomExerciseExecutionEditor(
                 emitChange()
             },
             required = false,
-            label = { Text(text = "Pause", softWrap = false, maxLines = 1) },
+            label = {
+                Text(
+                    text = stringResource(id = R.string.pause),
+                    softWrap = false,
+                    maxLines = 1
+                )
+            },
             modifier = Modifier.weight(1F),
             imeAction = ImeAction.Done,
             enabled = enabled,

@@ -2,6 +2,7 @@ package io.github.janmalch.woroboro.ui.reminder.editor
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
@@ -10,6 +11,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.ui.CollectAsEvents
 import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.components.NavigationDefaults
@@ -60,16 +62,17 @@ fun NavGraphBuilder.reminderEditorScreen(
         val reminder by viewModel.reminderToEdit.collectAsState()
         val availableTags by viewModel.availableTags.collectAsState()
         val isLoading = viewModel.isLoading
+        val context = LocalContext.current
 
         CollectAsEvents(viewModel.onSaveFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar("Erinnerung erfolgreich gespeichert.")
+                    onShowSnackbar(context.getString(R.string.reminder_save_success))
                     onBackClick()
                 }
 
                 Outcome.Failure -> {
-                    onShowSnackbar("Fehler beim Speichern der Erinnerung.")
+                    onShowSnackbar(context.getString(R.string.reminder_save_error))
                 }
             }
         }
@@ -77,12 +80,12 @@ fun NavGraphBuilder.reminderEditorScreen(
         CollectAsEvents(viewModel.onDeleteFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar("Erinnerung erfolgreich gelöscht.")
+                    onShowSnackbar(context.getString(R.string.reminder_delete_success))
                     onBackClick()
                 }
 
                 Outcome.Failure -> {
-                    onShowSnackbar("Fehler beim Löschen der Erinnerung.")
+                    onShowSnackbar(context.getString(R.string.reminder_delete_error))
                 }
             }
         }

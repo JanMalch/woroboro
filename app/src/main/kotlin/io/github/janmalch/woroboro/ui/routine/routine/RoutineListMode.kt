@@ -54,9 +54,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.RoutineStep
@@ -111,7 +113,14 @@ fun RoutineListMode(
             }
             item {
                 Text(
-                    text = if (isCompletelyDone) "Fertig! 🎉" else "Erledigt (${doneExercises.size} / ${routine.exercises.size})",
+                    text = if (isCompletelyDone)
+                        stringResource(id = R.string.routine_done)
+                    else
+                        stringResource(
+                            id = R.string.routine_in_progress,
+                            doneExercises.size,
+                            routine.exercises.size
+                        ),
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
@@ -198,6 +207,7 @@ fun TimerOverlay(
 }
 
 fun formatForTimer(duration: Duration): String = duration.toComponents { minutes, seconds, _ ->
+    // TODO: i18n?
     "${minutes.toString(10).padStart(2, '0')}:${seconds.toString(10).padStart(2, '0')}"
 }
 

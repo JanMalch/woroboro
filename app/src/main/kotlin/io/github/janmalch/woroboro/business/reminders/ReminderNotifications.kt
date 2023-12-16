@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.janmalch.woroboro.MainActivity
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.RoutineFilter
 import javax.inject.Inject
@@ -47,7 +48,7 @@ class AndroidReminderNotifications @Inject constructor(
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(reminder.name)
-            .setContentText("Es ist Zeit für eine deiner Routinen!") // TODO: i18n
+            .setContentText(context.getString(R.string.reminder_notification_content))
             .setLargeIcon(image)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(Notification.CATEGORY_REMINDER)
@@ -70,9 +71,9 @@ class AndroidReminderNotifications @Inject constructor(
     }
 
     private fun createNotificationChannel() {
-        val name = "Woroboro Reminders" // TODO: i18n
+        val name = context.getString(R.string.reminders)
         val descriptionText =
-            "Benachrichtigungen für deine selbsterstellten Erinnerungen." // TODO: i18n
+            context.getString(R.string.reminders_notification_channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
             description = descriptionText

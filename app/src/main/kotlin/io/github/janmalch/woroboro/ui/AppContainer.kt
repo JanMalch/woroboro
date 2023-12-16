@@ -26,9 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.exercise.navigateToExercisesGraph
 import io.github.janmalch.woroboro.ui.reminder.REMINDER_GRAPH_ROUTE
@@ -91,7 +93,7 @@ fun AppBottomBar(navController: NavHostController) {
                 navController.navigateToRoutineGraph(forBackstack(navController))
             },
             icon = { Icon(Icons.Outlined.FitnessCenter, contentDescription = null) },
-            label = { Text(text = "Routinen") },
+            label = { Text(text = stringResource(id = R.string.routines)) },
         )
         NavigationBarItem(
             selected = isExerciseTabActive,
@@ -99,7 +101,7 @@ fun AppBottomBar(navController: NavHostController) {
                 navController.navigateToExercisesGraph(forBackstack(navController))
             },
             icon = { Icon(Icons.Outlined.SportsGymnastics, contentDescription = null) },
-            label = { Text(text = "Übungen") },
+            label = { Text(text = stringResource(id = R.string.exercises)) },
         )
         NavigationBarItem(
             selected = isRemindersTabActive,
@@ -113,7 +115,7 @@ fun AppBottomBar(navController: NavHostController) {
                     Icon(Icons.Outlined.Notifications, contentDescription = null)
                 }
             },
-            label = { Text(text = "Erinnerungen") },
+            label = { Text(text = stringResource(id = R.string.reminders)) },
         )
     }
 }

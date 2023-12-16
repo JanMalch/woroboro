@@ -14,10 +14,12 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.Media
@@ -126,19 +128,23 @@ fun ExerciseListItem(
 fun exerciseExecution(
     execution: ExerciseExecution,
 ): String {
-    // TODO: translate
     val base = when {
-        execution.reps != null -> "${execution.sets} × ${execution.reps}"
+        execution.reps != null -> stringResource(
+            R.string.exercise_execution_sets_reps,
+            execution.sets,
+            execution.reps
+        )
+
         execution.hold != null -> {
             val hold = formatDuration(execution.hold)
-            "${execution.sets} × $hold"
+            stringResource(R.string.exercise_execution_sets_hold, execution.sets, hold)
         }
 
-        else -> "${execution.sets}"
+        else -> stringResource(R.string.exercise_execution_sets, execution.sets)
     }
     return if (execution.pause != null) {
         val pause = formatDuration(execution.pause)
-        "$base · $pause Pause"
+        stringResource(R.string.exercise_execution_with_pause, base, pause)
     } else {
         base
     }

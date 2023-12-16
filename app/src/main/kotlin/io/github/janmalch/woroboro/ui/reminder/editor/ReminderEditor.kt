@@ -32,7 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.RoutineFilter
@@ -133,11 +135,11 @@ fun ReminderEditorScreen(
                         )
                     ) {
                         ButtonLoading(isVisible = isLoading)
-                        Text(text = "Speichern")
+                        Text(text = stringResource(R.string.save))
                     }
                     MoreMenu(enabled = !isLoading && reminder != null) {
                         MoreMenuItem(
-                            text = { Text(text = "Erinnerung löschen") },
+                            text = { Text(text = stringResource(R.string.delete_reminder)) },
                             icon = {
                                 Icon(
                                     Icons.Rounded.DeleteOutline,
@@ -161,7 +163,7 @@ fun ReminderEditorScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.name)) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -169,7 +171,7 @@ fun ReminderEditorScreen(
             )
 
             Text(
-                text = "Erinnerungen",
+                text = stringResource(R.string.reminders),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -204,7 +206,7 @@ fun ReminderEditorScreen(
             TimeField(
                 value = remindAt,
                 onValueChange = { remindAt = it },
-                label = { Text(text = "Erstmalig") },
+                label = { Text(text = stringResource(R.string.remind_at_input_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 8.dp),
@@ -223,7 +225,7 @@ fun ReminderEditorScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 8.dp),
                 min = 15.minutes,
-                label = { Text(text = "Intervall") },
+                label = { Text(text = stringResource(R.string.repeat_every_input_label)) },
                 leadingIcon = { Icon(Icons.Rounded.HourglassEmpty, contentDescription = null) }
             )
 
@@ -231,7 +233,7 @@ fun ReminderEditorScreen(
                 TimeField(
                     value = repeatUntil,
                     onValueChange = { repeatUntil = it },
-                    label = { Text(text = "Bis") },
+                    label = { Text(text = stringResource(R.string.repeat_until_input_label)) },
                     required = repeatEvery != null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -244,7 +246,7 @@ fun ReminderEditorScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Routinenfilter",
+                text = stringResource(R.string.routine_filter),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )

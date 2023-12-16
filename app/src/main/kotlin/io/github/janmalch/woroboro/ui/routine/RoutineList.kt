@@ -40,10 +40,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.Routine
@@ -52,6 +55,7 @@ import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
 import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.SearchTopAppBar
+import io.github.janmalch.woroboro.ui.components.common.formatDuration
 import io.github.janmalch.woroboro.ui.components.routines.RoutineFilterRow
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -86,15 +90,15 @@ fun RoutineListScreen(
     Scaffold(
         topBar = {
             SearchTopAppBar(
-                title = { Text(text = "Routinen") },
+                title = { Text(text = stringResource(id = R.string.routines)) },
                 query = textQuery,
-                placeholder = "Nach Routinen suchen…",
+                placeholder = stringResource(id = R.string.routine_search_placeholder),
                 onQueryChange = onTextQueryChange,
                 scrollBehavior = scrollBehavior,
                 actions = {
                     MoreMenu {
                         MoreMenuItem(
-                            text = { Text("Lizenzen") },
+                            text = { Text(text = stringResource(id = R.string.licenses)) },
                             icon = { Icon(Icons.Rounded.Code, contentDescription = null) },
                             onClick = {
                                 context.startActivity(
@@ -202,12 +206,19 @@ fun RoutineListItem(
             Text(text = routine.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
         supportingContent = {
-            Text(buildString {
-                append("${routine.exerciseCount} Übungen")
-                if (routine.lastRunDuration != null) {
-                    append(" · ${routine.lastRunDuration.inWholeMinutes} Minuten")
-                }
-            })
+            val fmtExercises = pluralStringResource(
+                id = R.plurals.exercises_with_count,
+                count = routine.exerciseCount,
+                routine.exerciseCount
+            )
+            val text = if (routine.lastRunDuration != null) {
+                stringResource(
+                    id = R.string.routine_summary_with_duration,
+                    fmtExercises,
+                    formatDuration(duration = routine.lastRunDuration),
+                )
+            } else fmtExercises
+            Text(text = text)
         },
         overlineContent = {
             if (routine.tags.isNotEmpty()) {

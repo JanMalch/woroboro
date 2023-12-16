@@ -28,16 +28,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.utils.findWholeUnit
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -99,7 +100,7 @@ fun TimeField(
                     onValueChange(LocalTime.of(state.hour, state.minute))
                     isPickerOpen = false
                 }) {
-                    Text(text = "OK")
+                    Text(text = stringResource(R.string.confirm))
                 }
             },
             text = {
@@ -251,13 +252,27 @@ fun DurationTextField(
 @Composable
 @ReadOnlyComposable
 fun abbreviationOfDurationUnit(unit: DurationUnit): String {
-    return unit.name.lowercase().capitalize(Locale.ROOT).take(3).plus('.') // TODO: translate
+    return stringResource(
+        id = when (unit) {
+            DurationUnit.SECONDS -> R.string.unit_seconds_abbreviation
+            DurationUnit.MINUTES -> R.string.unit_minutes_abbreviation
+            DurationUnit.HOURS -> R.string.unit_hours_abbreviation
+            else -> R.string.unit_unknown_abbreviation
+        }
+    )
 }
 
 @Composable
 @ReadOnlyComposable
 fun nameOfDurationUnit(unit: DurationUnit): String {
-    return unit.name.lowercase().capitalize(Locale.ROOT) // TODO: translate
+    return stringResource(
+        id = when (unit) {
+            DurationUnit.SECONDS -> R.string.unit_seconds_name
+            DurationUnit.MINUTES -> R.string.unit_minutes_name
+            DurationUnit.HOURS -> R.string.unit_hours_name
+            else -> R.string.unit_unknown_name
+        }
+    )
 }
 
 private fun Long.coerceToInt(): Int = coerceAtMost(Int.MAX_VALUE.toLong()).toInt()

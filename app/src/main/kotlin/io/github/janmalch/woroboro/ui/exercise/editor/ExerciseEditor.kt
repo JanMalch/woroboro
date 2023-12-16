@@ -47,9 +47,11 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.models.EditedMedia
 import io.github.janmalch.woroboro.models.Exercise
@@ -169,11 +171,11 @@ fun ExerciseEditorScreen(
                         )
                     ) {
                         ButtonLoading(isVisible = isLoading)
-                        Text(text = "Speichern")
+                        Text(text = stringResource(R.string.save))
                     }
                     MoreMenu(enabled = !isLoading && exercise != null) {
                         MoreMenuItem(
-                            text = { Text(text = "Zu Routine hinzufügen") },
+                            text = { Text(text = stringResource(R.string.add_to_routine)) },
                             icon = {
                                 Icon(
                                     Icons.Rounded.PostAdd,
@@ -183,7 +185,7 @@ fun ExerciseEditorScreen(
                             onClick = { if (exercise != null) isAddToRoutineDialogOpen = true }
                         )
                         MoreMenuItem(
-                            text = { Text(text = "Übung löschen") },
+                            text = { Text(text = stringResource(R.string.delete_exercise)) },
                             icon = {
                                 Icon(
                                     Icons.Rounded.DeleteOutline,
@@ -214,7 +216,7 @@ fun ExerciseEditorScreen(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text(text = "Name") },
+                    label = { Text(text = stringResource(R.string.name)) },
                     singleLine = true,
                     // isError = name.isBlank(), // TODO: only when dirty/touched?
                     modifier = Modifier.fillMaxWidth(),
@@ -227,7 +229,7 @@ fun ExerciseEditorScreen(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(text = "Beschreibung") },
+                    label = { Text(text = stringResource(R.string.description)) },
                     leadingIcon = { Icon(Icons.Rounded.QuestionMark, contentDescription = null) },
                     singleLine = false,
                     modifier = Modifier
@@ -247,7 +249,13 @@ fun ExerciseEditorScreen(
                         value = sets,
                         onValueChange = { sets = it },
                         required = true,
-                        label = { Text(text = "Sätze", softWrap = false, maxLines = 1) },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.sets),
+                                softWrap = false,
+                                maxLines = 1
+                            )
+                        },
                         leadingIcon = { Icon(Icons.Rounded.Replay, contentDescription = null) },
                         modifier = Modifier.weight(1F),
                     )
@@ -255,7 +263,13 @@ fun ExerciseEditorScreen(
                         value = pause,
                         onValueChange = { pause = it },
                         required = false,
-                        label = { Text(text = "Pause", softWrap = false, maxLines = 1) },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.pause),
+                                softWrap = false,
+                                maxLines = 1
+                            )
+                        },
                         leadingIcon = {
                             Icon(
                                 Icons.Rounded.PauseCircle,
@@ -277,7 +291,13 @@ fun ExerciseEditorScreen(
                         value = reps,
                         onValueChange = { reps = it },
                         required = false,
-                        label = { Text(text = "Wdh.", softWrap = false, maxLines = 1) },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.reps),
+                                softWrap = false,
+                                maxLines = 1
+                            )
+                        },
                         leadingIcon = { Icon(Icons.Rounded.Repeat, contentDescription = null) },
                         modifier = Modifier.weight(1F),
                     )
@@ -285,7 +305,13 @@ fun ExerciseEditorScreen(
                         value = hold,
                         onValueChange = { hold = it },
                         required = false,
-                        label = { Text(text = "Halten", softWrap = false, maxLines = 1) },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.hold),
+                                softWrap = false,
+                                maxLines = 1
+                            )
+                        },
                         leadingIcon = {
                             Icon(
                                 Icons.Rounded.HourglassBottom,
@@ -303,7 +329,7 @@ fun ExerciseEditorScreen(
             MediaPicker(
                 value = media,
                 onValueChange = { media = it },
-                title = { Text(text = "Bilder und Videos") },
+                title = { Text(text = stringResource(R.string.images_and_videos)) },
                 contentPadding = PaddingValues(horizontal = 24.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -320,7 +346,7 @@ fun ExerciseEditorScreen(
             ) {
 
                 IsFavoriteCheckbox(
-                    text = "Lieblingsübung",
+                    text = stringResource(R.string.favorite_exercise),
                     value = isFavorite,
                     onValueChange = { isFavorite = it },
                 )
@@ -385,7 +411,7 @@ fun AddToRoutineDialog(
                     value = filter,
                     onValueChange = { filter = it },
                     singleLine = true,
-                    label = { Text("Nach Routine suchen…") },
+                    label = { Text(stringResource(R.string.routine_search_placeholder)) },
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 LazyColumn {
