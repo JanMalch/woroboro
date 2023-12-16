@@ -24,6 +24,7 @@ import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.ExerciseListItemDefaults.ExecutionAsSupportingContent
 import io.github.janmalch.woroboro.ui.components.ExerciseListItemDefaults.TagsAsOverlineContent
+import io.github.janmalch.woroboro.ui.components.common.formatDuration
 import kotlinx.collections.immutable.ImmutableList
 
 object ExerciseListItemDefaults {
@@ -125,13 +126,22 @@ fun ExerciseListItem(
 fun exerciseExecution(
     execution: ExerciseExecution,
 ): String {
+    // TODO: translate
     val base = when {
         execution.reps != null -> "${execution.sets} × ${execution.reps}"
-        execution.hold != null -> "${execution.sets} × ${execution.hold.inWholeSeconds}s"
+        execution.hold != null -> {
+            val hold = formatDuration(execution.hold)
+            "${execution.sets} × $hold"
+        }
+
         else -> "${execution.sets}"
     }
-    return if (execution.pause != null) "$base · ${execution.pause.inWholeSeconds}s Pause"
-    else base
+    return if (execution.pause != null) {
+        val pause = formatDuration(execution.pause)
+        "$base · $pause Pause"
+    } else {
+        base
+    }
 }
 
 
