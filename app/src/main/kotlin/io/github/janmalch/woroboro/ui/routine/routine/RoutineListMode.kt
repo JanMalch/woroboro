@@ -61,6 +61,7 @@ import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.ui.components.ExerciseListItem
+import io.github.janmalch.woroboro.ui.components.common.LinkifyText
 import io.github.janmalch.woroboro.ui.theme.Success
 import kotlin.time.Duration
 
@@ -251,7 +252,10 @@ fun ExerciseStepListItem(
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
             )
 
-            Text(text = step.exercise.description, modifier = Modifier.padding(horizontal = 24.dp))
+            LinkifyText(
+                text = step.exercise.description,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
 
             if (step.exercise.media.isNotEmpty()) {
 
