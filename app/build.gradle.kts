@@ -102,6 +102,10 @@ dependencies {
     implementation(libs.material3.android)
     implementation(libs.collections.immutable)
     implementation(libs.reorderable)
+    implementation(libs.google.oss.licenses) {
+        exclude(group = "androidx.appcompat")
+    }
+
     testImplementation(libs.junit)
     testImplementation(libs.turbine)
     testImplementation(libs.coroutines.test)
