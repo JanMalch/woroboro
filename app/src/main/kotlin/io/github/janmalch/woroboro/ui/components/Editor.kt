@@ -119,6 +119,7 @@ fun NumberTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
     required: Boolean = false,
     enabled: Boolean = true,
     min: Int = 1,
@@ -145,6 +146,7 @@ fun NumberTextField(
         trailingIcon = trailingIcon,
         prefix = prefix,
         suffix = suffix,
+        supportingText = supportingText,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction = imeAction,
@@ -162,6 +164,7 @@ fun DurationTextField(
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
     required: Boolean = false,
     enabled: Boolean = true,
     min: Duration = ONE_SECOND,
@@ -189,6 +192,7 @@ fun DurationTextField(
         label = label,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
+        supportingText = supportingText,
         enabled = enabled,
         imeAction = imeAction,
         suffix = {
@@ -247,7 +251,7 @@ fun DurationTextField(
 @Composable
 @ReadOnlyComposable
 fun abbreviationOfDurationUnit(unit: DurationUnit): String {
-    return unit.name.lowercase().take(3) // TODO: translate
+    return unit.name.lowercase().capitalize(Locale.ROOT).take(3).plus('.') // TODO: translate
 }
 
 @Composable

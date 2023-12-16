@@ -20,7 +20,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.HourglassBottom
+import androidx.compose.material.icons.rounded.PauseCircle
 import androidx.compose.material.icons.rounded.PostAdd
+import androidx.compose.material.icons.rounded.QuestionMark
+import androidx.compose.material.icons.rounded.Repeat
+import androidx.compose.material.icons.rounded.Replay
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -68,7 +73,6 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 val DurationSaver = Saver<Duration?, String>(
     save = { it?.toIsoString() ?: "" },
@@ -116,7 +120,7 @@ fun ExerciseEditorScreen(
     }
     var pause: Duration? by rememberSaveable(exercise, stateSaver = DurationSaver) {
         mutableStateOf(
-            exercise?.execution?.pause ?: 30.seconds
+            exercise?.execution?.pause
         )
     }
     var isFavorite: Boolean by rememberSaveable(exercise) {
@@ -212,7 +216,7 @@ fun ExerciseEditorScreen(
                     onValueChange = { name = it },
                     label = { Text(text = "Name") },
                     singleLine = true,
-                    // isError = name.isBlank(),
+                    // isError = name.isBlank(), // TODO: only when dirty/touched?
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
@@ -224,6 +228,7 @@ fun ExerciseEditorScreen(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text(text = "Beschreibung") },
+                    leadingIcon = { Icon(Icons.Rounded.QuestionMark, contentDescription = null) },
                     singleLine = false,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -236,41 +241,61 @@ fun ExerciseEditorScreen(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     NumberTextField(
                         value = sets,
                         onValueChange = { sets = it },
                         required = true,
                         label = { Text(text = "Sätze", softWrap = false, maxLines = 1) },
+                        leadingIcon = { Icon(Icons.Rounded.Replay, contentDescription = null) },
                         modifier = Modifier.weight(1F),
                     )
-
-                    NumberTextField(
-                        value = reps,
-                        onValueChange = { reps = it },
-                        required = false,
-                        label = { Text(text = "Wdh.", softWrap = false, maxLines = 1) },
-                        modifier = Modifier.weight(1F),
-                    )
-
-                    DurationTextField(
-                        value = hold,
-                        onValueChange = { hold = it },
-                        required = false,
-                        label = { Text(text = "Halten", softWrap = false, maxLines = 1) },
-                        modifier = Modifier.weight(1F),
-                    )
-
                     DurationTextField(
                         value = pause,
                         onValueChange = { pause = it },
                         required = false,
                         label = { Text(text = "Pause", softWrap = false, maxLines = 1) },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Rounded.PauseCircle,
+                                contentDescription = null
+                            )
+                        },
                         modifier = Modifier.weight(1F),
                         imeAction = ImeAction.Done,
                     )
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    NumberTextField(
+                        value = reps,
+                        onValueChange = { reps = it },
+                        required = false,
+                        label = { Text(text = "Wdh.", softWrap = false, maxLines = 1) },
+                        leadingIcon = { Icon(Icons.Rounded.Repeat, contentDescription = null) },
+                        modifier = Modifier.weight(1F),
+                    )
+                    DurationTextField(
+                        value = hold,
+                        onValueChange = { hold = it },
+                        required = false,
+                        label = { Text(text = "Halten", softWrap = false, maxLines = 1) },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Rounded.HourglassBottom,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier.weight(1F),
+                    )
+                }
+
             }
 
             HorizontalDivider()
