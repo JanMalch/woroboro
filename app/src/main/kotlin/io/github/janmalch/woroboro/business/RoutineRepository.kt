@@ -1,13 +1,16 @@
 package io.github.janmalch.woroboro.business
 
+import android.util.Log
 import io.github.janmalch.woroboro.data.dao.RoutineDao
 import io.github.janmalch.woroboro.data.model.RoutineStepEntity
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.RoutineQuery
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.models.Tag
+import io.github.janmalch.woroboro.models.asRoutineFilter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -46,10 +49,17 @@ interface RoutineRepository {
 }
 
 fun RoutineRepository.findByReminder(reminder: Reminder): Flow<List<Routine>> {
+    if (reminder.query !is RoutineQuery.RoutineFilter) {
+        Log.w(
+            "RoutineRepository",
+            "findByReminder called with a query that is not a RoutineFilter."
+        )
+    }
+    val filter = reminder.query.asRoutineFilter()
     return findAll(
-        tags = reminder.filter.selectedTags.map(Tag::label),
-        onlyFavorites = reminder.filter.onlyFavorites,
-        durationFilter = reminder.filter.durationFilter,
+        tags = filter.selectedTags.map(Tag::label),
+        onlyFavorites = filter.onlyFavorites,
+        durationFilter = filter.durationFilter,
         textQuery = "",
     )
 }

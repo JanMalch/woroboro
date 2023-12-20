@@ -18,7 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.janmalch.woroboro.MainActivity
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Reminder
-import io.github.janmalch.woroboro.models.RoutineFilter
+import io.github.janmalch.woroboro.models.RoutineQuery
 import javax.inject.Inject
 
 
@@ -32,10 +32,11 @@ class AndroidReminderNotifications @Inject constructor(
     override fun show(reminder: Reminder, image: Bitmap?) {
         createNotificationChannel()
 
+        // TODO: if ReminderQuery.Single -> DeepLink?
         val intent = Intent(context, MainActivity::class.java).apply {
             // TODO: revisit flags
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(INTENT_EXTRA_FILTER, reminder.filter)
+            putExtra(INTENT_EXTRA_FILTER, reminder.query)
         }
         val pendingIntent =
             PendingIntent.getActivity(
@@ -87,12 +88,12 @@ class AndroidReminderNotifications @Inject constructor(
         const val CHANNEL_ID = "Woroboro Reminders"
         private const val INTENT_EXTRA_FILTER = "filters"
 
-        fun Bundle.getRoutineFilter(): RoutineFilter? =
+        fun Bundle.getRoutineFilter(): RoutineQuery.RoutineFilter? =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getParcelable(INTENT_EXTRA_FILTER, RoutineFilter::class.java)
+                getParcelable(INTENT_EXTRA_FILTER, RoutineQuery.RoutineFilter::class.java)
             } else {
                 @Suppress("DEPRECATION")
-                getParcelable(INTENT_EXTRA_FILTER)
+                getParcelable(INTENT_EXTRA_FILTER) as? RoutineQuery.RoutineFilter
             }
     }
 }

@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Reminder
-import io.github.janmalch.woroboro.models.RoutineFilter
+import io.github.janmalch.woroboro.models.RoutineQuery
 import kotlinx.collections.immutable.toImmutableList
 import java.time.DayOfWeek
 import java.time.LocalTime
@@ -28,6 +28,9 @@ data class ReminderEntity(
     val repeatEvery: Duration?,
     @ColumnInfo("repeat_until")
     val repeatUntil: LocalTime?,
+    // if filterRoutineId is set, the other values don't matter (see asModel below)
+    @ColumnInfo("filter_routine_id")
+    val filterRoutineId: UUID?,
     @ColumnInfo("filter_only_favorites")
     val filterOnlyFavorites: Boolean,
     @ColumnInfo("filter_duration")
@@ -85,9 +88,13 @@ fun ReminderEntityWithFilterTags.asModel() = Reminder(
             until = reminder.repeatUntil,
         )
     } else null,
-    filter = RoutineFilter(
-        onlyFavorites = reminder.filterOnlyFavorites,
-        durationFilter = reminder.filterDuration,
-        selectedTags = filterTags.map(TagEntity::asModel).toImmutableList(),
-    )
+    query = if (reminder.filterRoutineId != null) {
+        RoutineQuery.Single(reminder.filterRoutineId)
+    } else {
+        RoutineQuery.RoutineFilter(
+            onlyFavorites = reminder.filterOnlyFavorites,
+            durationFilter = reminder.filterDuration,
+            selectedTags = filterTags.map(TagEntity::asModel).toImmutableList(),
+        )
+    }
 )

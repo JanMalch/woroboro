@@ -37,7 +37,8 @@ import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Reminder
-import io.github.janmalch.woroboro.models.RoutineFilter
+import io.github.janmalch.woroboro.models.RoutineQuery
+import io.github.janmalch.woroboro.models.asRoutineFilter
 import io.github.janmalch.woroboro.ui.components.DurationTextField
 import io.github.janmalch.woroboro.ui.components.TimeField
 import io.github.janmalch.woroboro.ui.components.common.ButtonLoading
@@ -81,17 +82,17 @@ fun ReminderEditorScreen(
     var repeatEvery by remember(reminder) { mutableStateOf(reminder?.repeat?.every) }
     var onlyFavorites by rememberSaveable(reminder) {
         mutableStateOf(
-            reminder?.filter?.onlyFavorites ?: false
+            reminder?.query?.asRoutineFilter()?.onlyFavorites ?: false
         )
     }
     var durationFilter by remember(reminder) {
         mutableStateOf(
-            reminder?.filter?.durationFilter ?: DurationFilter.Any
+            reminder?.query?.asRoutineFilter()?.durationFilter ?: DurationFilter.Any
         )
     }
     val selectedTags = remember(reminder) {
         mutableStateListOf(
-            *(reminder?.filter?.selectedTags?.toTypedArray() ?: emptyArray())
+            *(reminder?.query?.asRoutineFilter()?.selectedTags?.toTypedArray() ?: emptyArray())
         )
     }
 
@@ -114,7 +115,7 @@ fun ReminderEditorScreen(
                                 repeat = if (repeatEverySnapshot != null && repeatUntilSnapshot != null)
                                     Reminder.Repeat(repeatEverySnapshot, repeatUntilSnapshot)
                                 else null,
-                                filter = RoutineFilter(
+                                query = RoutineQuery.RoutineFilter(
                                     onlyFavorites = onlyFavorites,
                                     durationFilter = durationFilter,
                                     selectedTags = selectedTags,

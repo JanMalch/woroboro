@@ -12,8 +12,10 @@ import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.RoutineQuery
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.models.Tag
+import io.github.janmalch.woroboro.models.asRoutineFilter
 import java.util.UUID
 
 fun Exercise.asEntity(): ExerciseEntityWithMediaAndTags {
@@ -85,13 +87,17 @@ fun FullRoutine.asEntities(overwriteStepIds: Boolean = false): Pair<RoutineEntit
     ) to steps.map { it.asEntity(id, if (overwriteStepIds) UUID.randomUUID() else it.id) }
 
 
-fun Reminder.asEntities(): Pair<ReminderEntity, List<String>> = ReminderEntity(
-    id = id,
-    name = name,
-    remindAt = remindAt,
-    weekdays = weekdays,
-    repeatEvery = repeat?.every,
-    repeatUntil = repeat?.until,
-    filterOnlyFavorites = filter.onlyFavorites,
-    filterDuration = filter.durationFilter,
-) to filter.selectedTags.map { it.label }
+fun Reminder.asEntities(): Pair<ReminderEntity, List<String>> {
+    val filter = query.asRoutineFilter()
+    return ReminderEntity(
+        id = id,
+        name = name,
+        remindAt = remindAt,
+        weekdays = weekdays,
+        repeatEvery = repeat?.every,
+        repeatUntil = repeat?.until,
+        filterOnlyFavorites = filter.onlyFavorites,
+        filterDuration = filter.durationFilter,
+        filterRoutineId = (query as? RoutineQuery.Single)?.routineId,
+    ) to filter.selectedTags.map { it.label }
+}

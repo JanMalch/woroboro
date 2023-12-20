@@ -16,7 +16,7 @@ data class Reminder(
     val weekdays: Set<DayOfWeek>,
     val remindAt: LocalTime,
     val repeat: Repeat?,
-    val filter: RoutineFilter,
+    val query: RoutineQuery,
 ) {
 
     init {
@@ -46,9 +46,27 @@ data class Reminder(
     }
 }
 
-@Parcelize
-data class RoutineFilter(
-    val onlyFavorites: Boolean,
-    val durationFilter: DurationFilter,
-    val selectedTags: List<Tag>,
-) : Parcelable
+sealed interface RoutineQuery : Parcelable {
+
+    @Parcelize
+    data class Single(
+        val routineId: UUID,
+    ) : RoutineQuery
+
+    @Parcelize
+    data class RoutineFilter(
+        val onlyFavorites: Boolean,
+        val durationFilter: DurationFilter,
+        val selectedTags: List<Tag>,
+    ) : RoutineQuery
+
+}
+
+fun RoutineQuery.asRoutineFilter(): RoutineQuery.RoutineFilter = when (this) {
+    is RoutineQuery.RoutineFilter -> this
+    is RoutineQuery.Single -> RoutineQuery.RoutineFilter(
+        onlyFavorites = false,
+        durationFilter = DurationFilter.Any,
+        selectedTags = emptyList(),
+    )
+}
