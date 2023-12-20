@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +33,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.DragHandle
 import androidx.compose.material.icons.rounded.Pause
-import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DismissDirection
@@ -47,7 +48,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -68,7 +68,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.CustomExerciseExecution
 import io.github.janmalch.woroboro.models.Exercise
@@ -313,16 +312,11 @@ fun RoutineStepEditorDialog(
         }
     }
 
-    Dialog(
+    // FIXME: rework UI
+    AlertDialog(
         onDismissRequest = onDismissRequest,
-    ) {
-        Surface(
-            shape = AlertDialogDefaults.shape,
-            color = AlertDialogDefaults.containerColor,
-            tonalElevation = AlertDialogDefaults.TonalElevation,
-        ) {
-
-            Column(modifier = Modifier.padding(24.dp)) {
+        text = {
+            Column {
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -385,7 +379,7 @@ fun RoutineStepEditorDialog(
 
                     HorizontalDivider()
 
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.weight(1F)) {
                         items(filteredExercises, key = { it.id }) { exercise ->
                             ExerciseListItem(
                                 exercise = exercise,
@@ -444,42 +438,41 @@ fun RoutineStepEditorDialog(
                         imeAction = ImeAction.Done,
                     )
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        val stepToSave = if (isExercise) {
-                            selectedExercise?.let {
-                                RoutineStep.ExerciseStep(
-                                    id = step?.id ?: UUID.randomUUID(),
-                                    sortIndex = -1,
-                                    exercise = it,
-                                    customExecution = customExecution?.asExerciseExecutionOrNull(),
-                                )
-                            }
-                        } else {
-                            pauseStep?.let {
-                                RoutineStep.PauseStep(
-                                    id = step?.id ?: UUID.randomUUID(),
-                                    sortIndex = -1,
-                                    duration = it,
-                                )
-                            }
-                        }
-                        if (stepToSave != null) onSave(stepToSave)
-                    },
-                    enabled =
-                    if (isExercise) selectedExercise != null
-                    else pauseStep?.isPositive() ?: false,
-                    modifier = Modifier.align(Alignment.End),
-                ) {
-                    Text(text = stringResource(R.string.save))
-                }
-
             }
+
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val stepToSave = if (isExercise) {
+                        selectedExercise?.let {
+                            RoutineStep.ExerciseStep(
+                                id = step?.id ?: UUID.randomUUID(),
+                                sortIndex = -1,
+                                exercise = it,
+                                customExecution = customExecution?.asExerciseExecutionOrNull(),
+                            )
+                        }
+                    } else {
+                        pauseStep?.let {
+                            RoutineStep.PauseStep(
+                                id = step?.id ?: UUID.randomUUID(),
+                                sortIndex = -1,
+                                duration = it,
+                            )
+                        }
+                    }
+                    if (stepToSave != null) onSave(stepToSave)
+                },
+                enabled =
+                if (isExercise) selectedExercise != null
+                else pauseStep?.isPositive() ?: false,
+            ) {
+                Text(text = stringResource(R.string.save))
+            }
+
         }
-    }
+    )
 }
 
 
@@ -670,11 +663,10 @@ private fun DismissBackground(dismissState: DismissState) {
 
 
 @Composable
-fun CustomExerciseExecutionEditor(
+fun ColumnScope.CustomExerciseExecutionEditor(
     value: CustomExerciseExecution?,
     basedOn: ExerciseExecution?,
     onValueChange: (CustomExerciseExecution) -> Unit,
-    modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
     var sets: Int? by rememberSaveable(value) { mutableStateOf(value?.sets) }
@@ -694,85 +686,83 @@ fun CustomExerciseExecutionEditor(
         )
     }
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
+    NumberTextField(
+        value = sets,
+        onValueChange = {
+            sets = it
+            emitChange()
+        },
+        required = value != null,
+        label = {
+            Text(
+                text = stringResource(id = R.string.sets),
+                softWrap = false,
+                maxLines = 1
+            )
+        },
+        modifier = Modifier.fillMaxWidth(),
+        enabled = enabled,
+    )
+
+    if (basedOn?.reps != null) {
+        Spacer(modifier = Modifier.height(16.dp))
         NumberTextField(
-            value = sets,
+            value = reps,
             onValueChange = {
-                sets = it
-                emitChange()
-            },
-            required = value != null,
-            label = {
-                Text(
-                    text = stringResource(id = R.string.sets),
-                    softWrap = false,
-                    maxLines = 1
-                )
-            },
-            modifier = Modifier.weight(1F),
-            enabled = enabled,
-        )
-
-        if (basedOn?.reps != null) {
-            NumberTextField(
-                value = reps,
-                onValueChange = {
-                    reps = it
-                    emitChange()
-                },
-                required = false,
-                label = {
-                    Text(
-                        text = stringResource(id = R.string.reps),
-                        softWrap = false,
-                        maxLines = 1
-                    )
-                },
-                modifier = Modifier.weight(1F),
-                enabled = enabled,
-            )
-        }
-
-        if (basedOn?.hold != null) {
-            DurationTextField(
-                value = hold,
-                onValueChange = {
-                    hold = it
-                    emitChange()
-                },
-                required = false,
-                label = {
-                    Text(
-                        text = stringResource(id = R.string.hold),
-                        softWrap = false,
-                        maxLines = 1
-                    )
-                },
-                modifier = Modifier.weight(1F),
-                enabled = enabled,
-            )
-        }
-
-        DurationTextField(
-            value = pause,
-            onValueChange = {
-                pause = it
+                reps = it
                 emitChange()
             },
             required = false,
             label = {
                 Text(
-                    text = stringResource(id = R.string.pause),
+                    text = stringResource(id = R.string.reps),
                     softWrap = false,
                     maxLines = 1
                 )
             },
-            modifier = Modifier.weight(1F),
-            imeAction = ImeAction.Done,
+            modifier = Modifier.fillMaxWidth(),
             enabled = enabled,
         )
     }
+
+    if (basedOn?.hold != null) {
+        Spacer(modifier = Modifier.height(16.dp))
+        DurationTextField(
+            value = hold,
+            onValueChange = {
+                hold = it
+                emitChange()
+            },
+            required = false,
+            label = {
+                Text(
+                    text = stringResource(id = R.string.hold),
+                    softWrap = false,
+                    maxLines = 1
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+        )
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+    DurationTextField(
+        value = pause,
+        onValueChange = {
+            pause = it
+            emitChange()
+        },
+        required = false,
+        label = {
+            Text(
+                text = stringResource(id = R.string.pause),
+                softWrap = false,
+                maxLines = 1
+            )
+        },
+        modifier = Modifier.fillMaxWidth(),
+        imeAction = ImeAction.Done,
+        enabled = enabled,
+    )
 }
