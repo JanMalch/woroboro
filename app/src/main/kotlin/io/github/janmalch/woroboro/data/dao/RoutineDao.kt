@@ -194,11 +194,12 @@ data class RoutineMediaQueryResult(
 
 fun RoutineStepEntity.asModel(exerciseLookup: Collection<ExerciseEntityWithMediaAndTags>): RoutineStep {
     if (pauseStep != null) {
-        return RoutineStep.PauseStep(sortIndex = sortIndex, duration = pauseStep)
+        return RoutineStep.PauseStep(id = id, sortIndex = sortIndex, duration = pauseStep)
     }
     val exercise = exerciseLookup.firstOrNull { it.exercise.id == exerciseId }
     checkNotNull(exercise) { "Failed to find exercise $exerciseId for routine $routineId at step index ${sortIndex}." }
     return RoutineStep.ExerciseStep(
+        id = id,
         sortIndex = sortIndex,
         exercise = exercise.asModel(),
         customExecution = execution,

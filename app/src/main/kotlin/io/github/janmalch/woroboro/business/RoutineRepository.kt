@@ -96,7 +96,8 @@ class RoutineRepositoryImpl @Inject constructor(
 
     override suspend fun insert(routine: FullRoutine): UUID {
         val id = UUID.randomUUID()
-        val (routineEntity, stepEntities) = routine.copy(id = id).asEntities()
+        val (routineEntity, stepEntities) = routine.copy(id = id)
+            .asEntities(overwriteStepIds = true)
         routineDao.insert(routineEntity, stepEntities)
         return id
     }
@@ -117,6 +118,7 @@ class RoutineRepositoryImpl @Inject constructor(
         }
         val nextStepIndex = routine.steps.maxOf(RoutineStep::sortIndex) + 1
         val pauseStepEntity = RoutineStepEntity(
+            id = UUID.randomUUID(),
             routineId = routineId,
             sortIndex = nextStepIndex,
             exerciseId = null,
@@ -124,6 +126,7 @@ class RoutineRepositoryImpl @Inject constructor(
             pauseStep = 1.minutes,
         )
         val exerciseStepEntity = RoutineStepEntity(
+            id = UUID.randomUUID(),
             routineId = routineId,
             sortIndex = nextStepIndex + 1,
             exerciseId = exerciseId,

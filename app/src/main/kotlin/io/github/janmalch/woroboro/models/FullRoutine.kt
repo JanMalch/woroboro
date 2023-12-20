@@ -50,8 +50,14 @@ sealed interface RoutineStep {
      */
     val sortIndex: Int
 
+    /**
+     * The id of this step within a routine.
+     */
+    val id: UUID
+
     data class ExerciseStep(
         override val sortIndex: Int,
+        override val id: UUID,
         val exercise: Exercise,
         val customExecution: ExerciseExecution?,
     ) : RoutineStep {
@@ -65,6 +71,7 @@ sealed interface RoutineStep {
 
     data class PauseStep(
         override val sortIndex: Int,
+        override val id: UUID,
         val duration: Duration,
     ) : RoutineStep
 }

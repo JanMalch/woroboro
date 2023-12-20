@@ -4,10 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import io.github.janmalch.woroboro.models.ExerciseExecution
-import io.github.janmalch.woroboro.models.FullRoutine
-import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.time.Duration
@@ -28,6 +27,9 @@ data class RoutineEntity(
 @Entity(
     tableName = "routine_step",
     primaryKeys = ["routine_id", "sort_index"],
+    indices = [
+        Index("id", unique = true)
+    ],
     foreignKeys = [
         ForeignKey(
             entity = RoutineEntity::class,
@@ -44,6 +46,7 @@ data class RoutineEntity(
     ]
 )
 data class RoutineStepEntity(
+    val id: UUID,
     @ColumnInfo(name = "routine_id", index = true)
     val routineId: UUID,
     @ColumnInfo(name = "sort_index", index = true)
@@ -55,4 +58,3 @@ data class RoutineStepEntity(
     @ColumnInfo(name = "pause_step")
     val pauseStep: Duration?,
 )
-

@@ -71,6 +71,8 @@ fun NavGraphBuilder.routineScreen(
         RoutineScreen(
             uiState = uiState,
             onGoToEditor = onGoToEditor,
+            onFinishStep = viewModel::finishStep,
+            onUndoStep = viewModel::undoStep,
             onRoutineDone = viewModel::saveAsLastRun,
             onBackClick = onBackClick,
         )

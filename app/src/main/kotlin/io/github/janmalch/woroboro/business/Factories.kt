@@ -55,8 +55,9 @@ fun Routine.asEntity() = RoutineEntity(
     lastRunEnded = lastRunEnded,
 )
 
-fun RoutineStep.asEntity(routineId: UUID): RoutineStepEntity = when (this) {
+fun RoutineStep.asEntity(routineId: UUID, stepId: UUID = id): RoutineStepEntity = when (this) {
     is RoutineStep.ExerciseStep -> RoutineStepEntity(
+        id = stepId,
         routineId = routineId,
         sortIndex = sortIndex,
         exerciseId = exercise.id,
@@ -65,6 +66,7 @@ fun RoutineStep.asEntity(routineId: UUID): RoutineStepEntity = when (this) {
     )
 
     is RoutineStep.PauseStep -> RoutineStepEntity(
+        id = stepId,
         routineId = routineId,
         sortIndex = sortIndex,
         exerciseId = null,
@@ -73,13 +75,14 @@ fun RoutineStep.asEntity(routineId: UUID): RoutineStepEntity = when (this) {
     )
 }
 
-fun FullRoutine.asEntities(): Pair<RoutineEntity, List<RoutineStepEntity>> = RoutineEntity(
-    id = id,
-    name = name,
-    isFavorite = isFavorite,
-    lastRunDuration = lastRunDuration,
-    lastRunEnded = lastRunEnded,
-) to steps.map { it.asEntity(id) }
+fun FullRoutine.asEntities(overwriteStepIds: Boolean = false): Pair<RoutineEntity, List<RoutineStepEntity>> =
+    RoutineEntity(
+        id = id,
+        name = name,
+        isFavorite = isFavorite,
+        lastRunDuration = lastRunDuration,
+        lastRunEnded = lastRunEnded,
+    ) to steps.map { it.asEntity(id, if (overwriteStepIds) UUID.randomUUID() else it.id) }
 
 
 fun Reminder.asEntities(): Pair<ReminderEntity, List<String>> = ReminderEntity(

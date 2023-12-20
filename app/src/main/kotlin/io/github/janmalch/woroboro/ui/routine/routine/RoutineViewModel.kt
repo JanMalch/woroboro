@@ -6,8 +6,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.models.FullRoutine
+import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.models.asRoutine
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -25,25 +28,36 @@ class RoutineViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
+    private val _finishedSteps = MutableStateFlow(listOf<UUID>())
+
     val uiState = savedStateHandle.getStateFlow<String?>(ROUTINE_SCREEN_ARG_ID, null)
         .filterNotNull()
         .map { UUID.fromString(it) }
         .flatMapLatest(routineRepository::findOne)
-        .map { if (it == null) RoutineUiState.Failure else RoutineUiState.Success(it) }
+        .combine(_finishedSteps) { fullRoutine, finishedSteps ->
+            if (fullRoutine == null) RoutineUiState.Failure else {
+                val (finished, unfinished) = fullRoutine.steps.partition { it.id in finishedSteps }
+                RoutineUiState.Success(
+                    routine = fullRoutine,
+                    // retain order
+                    finished = finished.sortedBy { finishedSteps.indexOf(it.id) },
+                    unfinished = unfinished,
+                )
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             // WhileSubscribed with immediate timeout to refresh after save in editor.
-            // Currently exercises don't update, because they are "snapshotted" in the Composable.
             started = SharingStarted.WhileSubscribed(),
             initialValue = RoutineUiState.Loading,
         )
 
-    fun toggleFavorite(routine: FullRoutine) {
-        val isFavorite = routine.isFavorite
-        val update = routine.asRoutine().copy(isFavorite = !isFavorite)
-        viewModelScope.launch {
-            routineRepository.update(update)
-        }
+    fun finishStep(step: RoutineStep) {
+        _finishedSteps.value = _finishedSteps.value + step.id
+    }
+
+    fun undoStep(step: RoutineStep) {
+        _finishedSteps.value = _finishedSteps.value - step.id
     }
 
     fun saveAsLastRun(routine: FullRoutine, duration: Duration) {
@@ -59,6 +73,14 @@ class RoutineViewModel @Inject constructor(
 
 sealed interface RoutineUiState {
     data object Loading : RoutineUiState
-    data class Success(val routine: FullRoutine) : RoutineUiState
+    data class Success(
+        val routine: FullRoutine,
+        val finished: List<RoutineStep>,
+        val unfinished: List<RoutineStep>,
+    ) : RoutineUiState {
+        val finishedExercises = finished.filterIsInstance<RoutineStep.ExerciseStep>()
+        val unfinishedExercises = unfinished.filterIsInstance<RoutineStep.ExerciseStep>()
+    }
+
     data object Failure : RoutineUiState
 }

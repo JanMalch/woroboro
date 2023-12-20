@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.github.janmalch.woroboro.models.FullRoutine
+import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.ui.components.common.DoneCelebration
 import java.util.UUID
 import kotlin.time.Duration
@@ -28,6 +29,8 @@ import kotlin.time.Duration
 fun RoutineScreen(
     uiState: RoutineUiState,
     onGoToEditor: (UUID) -> Unit,
+    onFinishStep: (RoutineStep) -> Unit,
+    onUndoStep: (RoutineStep) -> Unit,
     onRoutineDone: (FullRoutine, Duration) -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -47,8 +50,10 @@ fun RoutineScreen(
         }
 
         is RoutineUiState.Success -> RoutineSuccessScreen(
-            routine = uiState.routine,
+            uiState = uiState,
             onGoToEditor = onGoToEditor,
+            onFinishStep = onFinishStep,
+            onUndoStep = onUndoStep,
             onRoutineDone = onRoutineDone,
             onBackClick = onBackClick,
         )
@@ -58,9 +63,11 @@ fun RoutineScreen(
 
 @Composable
 fun RoutineSuccessScreen(
-    routine: FullRoutine,
+    uiState: RoutineUiState.Success,
     onGoToEditor: (UUID) -> Unit,
     onRoutineDone: (FullRoutine, Duration) -> Unit,
+    onFinishStep: (RoutineStep) -> Unit,
+    onUndoStep: (RoutineStep) -> Unit,
     onBackClick: () -> Unit,
 ) {
     var isCelebrationVisible by remember { mutableStateOf(false) }
@@ -69,7 +76,7 @@ fun RoutineSuccessScreen(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text(text = routine.name)
+                        Text(text = uiState.routine.name)
                     },
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
@@ -77,7 +84,7 @@ fun RoutineSuccessScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { onGoToEditor(routine.id) }) {
+                        IconButton(onClick = { onGoToEditor(uiState.routine.id) }) {
                             Icon(Icons.Rounded.Edit, contentDescription = null)
                         }
                     }
@@ -90,10 +97,12 @@ fun RoutineSuccessScreen(
                     .padding(padding)
             ) {
                 RoutineListMode(
-                    routine = routine,
+                    uiState = uiState,
+                    onFinishStep = onFinishStep,
+                    onUndoStep = onUndoStep,
                     onDone = { done, totalTime ->
                         isCelebrationVisible = done
-                        onRoutineDone(routine, totalTime)
+                        onRoutineDone(uiState.routine, totalTime)
                     })
             }
         }

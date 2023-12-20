@@ -43,7 +43,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,7 +58,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import io.github.janmalch.woroboro.R
-import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.ui.components.ExerciseListItem
@@ -70,22 +68,18 @@ import kotlin.time.Duration
 
 @Composable
 fun RoutineListMode(
-    routine: FullRoutine,
+    uiState: RoutineUiState.Success,
+    onFinishStep: (RoutineStep) -> Unit,
+    onUndoStep: (RoutineStep) -> Unit,
     onDone: (Boolean, Duration) -> Unit,
 ) {
     // FIXME: store in ViewModel!
-    val undoneExercises = remember {
-        mutableStateListOf(
-            *routine.steps.filterIsInstance<RoutineStep.ExerciseStep>().toTypedArray()
-        )
-    }
-    val doneExercises = remember { mutableStateListOf<RoutineStep.ExerciseStep>() }
     val stopwatch = remember { Stopwatch() }
 
     val stopwatchState by stopwatch.state.collectAsState()
     val passedTime by stopwatch.time.collectAsState(initial = Duration.ZERO)
 
-    val isCompletelyDone = undoneExercises.isEmpty()
+    val isCompletelyDone = uiState.unfinishedExercises.isEmpty()
     val doneHeadlineColor by animateColorAsState(
         targetValue = if (isCompletelyDone) Success else LocalContentColor.current,
         label = "DoneHeadlineColorAnimation"
@@ -93,6 +87,7 @@ fun RoutineListMode(
 
     LaunchedEffect(isCompletelyDone) {
         stopwatch.pause()
+        // FIXME: handle in ViewModel!
         onDone(isCompletelyDone, passedTime)
     }
 
@@ -100,14 +95,11 @@ fun RoutineListMode(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(undoneExercises, key = { it.sortIndex }) { exercise ->
+            items(uiState.unfinishedExercises, key = { it.sortIndex }) { exercise ->
                 ExerciseStepListItem(
                     step = exercise,
                     isDone = false,
-                    onClick = {
-                        undoneExercises.remove(exercise)
-                        doneExercises.add(exercise)
-                    },
+                    onClick = { onFinishStep(exercise) },
                     modifier = Modifier.animateItemPlacement()
                 )
             }
@@ -118,8 +110,8 @@ fun RoutineListMode(
                     else
                         stringResource(
                             id = R.string.routine_in_progress,
-                            doneExercises.size,
-                            routine.exercises.size
+                            uiState.finishedExercises.size,
+                            uiState.routine.exercises.size
                         ),
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier
@@ -129,14 +121,11 @@ fun RoutineListMode(
                 )
             }
 
-            items(doneExercises, key = { it.sortIndex }) { exercise ->
+            items(uiState.finishedExercises, key = { it.sortIndex }) { exercise ->
                 ExerciseStepListItem(
                     step = exercise,
                     isDone = true,
-                    onClick = {
-                        doneExercises.remove(exercise)
-                        undoneExercises.add(0, exercise)
-                    },
+                    onClick = { onUndoStep(exercise) },
                     modifier = Modifier.animateItemPlacement()
                 )
             }
@@ -149,7 +138,7 @@ fun RoutineListMode(
         ) {
             TimerOverlay(
                 passedTime = passedTime,
-                previousTime = routine.lastRunDuration,
+                previousTime = uiState.routine.lastRunDuration,
                 isRunning = stopwatchState == Stopwatch.State.Running,
                 onStartPauseClick = stopwatch::toggle,
             )

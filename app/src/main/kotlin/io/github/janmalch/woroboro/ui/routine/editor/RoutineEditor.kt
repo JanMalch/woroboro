@@ -452,6 +452,7 @@ fun RoutineStepEditorDialog(
                         val stepToSave = if (isExercise) {
                             selectedExercise?.let {
                                 RoutineStep.ExerciseStep(
+                                    id = step?.id ?: UUID.randomUUID(),
                                     sortIndex = -1,
                                     exercise = it,
                                     customExecution = customExecution?.asExerciseExecutionOrNull(),
@@ -460,6 +461,7 @@ fun RoutineStepEditorDialog(
                         } else {
                             pauseStep?.let {
                                 RoutineStep.PauseStep(
+                                    id = step?.id ?: UUID.randomUUID(),
                                     sortIndex = -1,
                                     duration = it,
                                 )
