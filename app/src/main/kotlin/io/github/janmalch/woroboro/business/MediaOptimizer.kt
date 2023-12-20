@@ -44,7 +44,7 @@ class OnDeviceMediaOptimizer @Inject constructor(
     }
 
     override val imageExtension = if (isWebpUsable()) ".webp" else ".png"
-    override val videoExtension = if (isWebpUsable()) ".webp" else ".png" // FIXME!
+    override val videoExtension = "" // TODO
 
 
     override suspend fun toThumb(src: Any, dest: File) {
