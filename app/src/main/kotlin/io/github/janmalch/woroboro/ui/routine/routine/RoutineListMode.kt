@@ -63,6 +63,7 @@ import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.ui.components.ExerciseListItem
 import io.github.janmalch.woroboro.ui.components.common.LinkifyText
 import io.github.janmalch.woroboro.ui.theme.Success
+import io.github.janmalch.woroboro.utils.formatForTimer
 import kotlin.time.Duration
 
 
@@ -195,10 +196,6 @@ fun TimerOverlay(
     }
 }
 
-fun formatForTimer(duration: Duration): String = duration.toComponents { minutes, seconds, _ ->
-    // TODO: i18n?
-    "${minutes.toString(10).padStart(2, '0')}:${seconds.toString(10).padStart(2, '0')}"
-}
 
 @Composable
 fun ExerciseStepListItem(

@@ -9,17 +9,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.woroboro.business.ReminderRepository
+import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.Reminder
+import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.findAvailableTags
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -29,6 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ReminderEditorViewModel @Inject constructor(
     private val reminderRepository: ReminderRepository,
+    private val routineRepository: RoutineRepository,
     tagRepository: TagRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -73,6 +79,14 @@ class ReminderEditorViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = persistentMapOf(),
+        )
+
+    val routines = routineRepository.findAll()
+        .map(List<Routine>::toImmutableList)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = persistentListOf(),
         )
 
     fun save(reminder: Reminder) {

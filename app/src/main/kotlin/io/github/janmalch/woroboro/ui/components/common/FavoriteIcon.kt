@@ -41,11 +41,13 @@ fun FavoriteIcon(
 fun OnlyFavoritesChip(
     value: Boolean,
     onValueChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
 ) {
     FilterChip(
         selected = value,
         label = { FavoriteIcon(isFavorite = value, modifier = Modifier.size(18.dp)) },
-        onClick = { onValueChange(!value) }
+        onClick = { onValueChange(!value) },
+        enabled = enabled,
     )
 }
 

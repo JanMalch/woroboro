@@ -14,42 +14,72 @@ import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.TaskStackBuilder
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.janmalch.woroboro.MainActivity
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.RoutineQuery
+import io.github.janmalch.woroboro.ui.routine.routine.ROUTINE_SCREEN_DEEPLINK
 import javax.inject.Inject
 
 
 interface ReminderNotifications {
-    fun show(reminder: Reminder, image: Bitmap? = null)
+    fun show(
+        reminder: Reminder,
+        image: Bitmap? = null,
+        content: String? = null,
+    )
 }
 
 class AndroidReminderNotifications @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : ReminderNotifications {
-    override fun show(reminder: Reminder, image: Bitmap?) {
+    override fun show(
+        reminder: Reminder,
+        image: Bitmap?,
+        content: String?,
+    ) {
         createNotificationChannel()
 
-        // TODO: if ReminderQuery.Single -> DeepLink?
-        val intent = Intent(context, MainActivity::class.java).apply {
-            // TODO: revisit flags
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(INTENT_EXTRA_FILTER, reminder.query)
+        val contentText = content ?: context.getString(R.string.reminder_notification_content)
+
+        val pendingIntent: PendingIntent? = when (reminder.query) {
+            is RoutineQuery.RoutineFilter -> {
+                val intent = Intent(context, MainActivity::class.java).apply {
+                    // TODO: revisit flags
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    putExtra(INTENT_EXTRA_FILTER, reminder.query)
+                }
+
+                PendingIntent.getActivity(
+                    context,
+                    reminder.id.hashCode(),
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            }
+
+            is RoutineQuery.Single -> {
+                val deepLinkIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    (ROUTINE_SCREEN_DEEPLINK + reminder.query.routineId).toUri(),
+                    context,
+                    MainActivity::class.java
+                )
+
+                TaskStackBuilder.create(context).run {
+                    addNextIntentWithParentStack(deepLinkIntent)
+                    getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+                }
+            }
         }
-        val pendingIntent =
-            PendingIntent.getActivity(
-                context,
-                reminder.id.hashCode(),
-                intent,
-                PendingIntent.FLAG_IMMUTABLE
-            )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(reminder.name)
-            .setContentText(context.getString(R.string.reminder_notification_content))
+            .setContentText(contentText)
             .setLargeIcon(image)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(Notification.CATEGORY_REMINDER)

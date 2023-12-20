@@ -3,6 +3,7 @@ package io.github.janmalch.woroboro.business.reminders
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -10,12 +11,15 @@ import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toFile
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.business.ReminderRepository
 import io.github.janmalch.woroboro.business.RoutineRepository
-import io.github.janmalch.woroboro.business.findByReminder
+import io.github.janmalch.woroboro.business.findByQuery
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.RoutineQuery
 import io.github.janmalch.woroboro.utils.ApplicationScope
+import io.github.janmalch.woroboro.utils.formatForTimer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -46,11 +50,11 @@ class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val reminderId = intent?.getReminderId() ?: return
         applicationScope.launch {
-            handle(reminderId)
+            handle(context, reminderId)
         }
     }
 
-    private suspend fun handle(reminderId: UUID) {
+    private suspend fun handle(context: Context?, reminderId: UUID) {
         val reminder = repository.findOne(reminderId).firstOrNull()
 
         if (reminder == null) {
@@ -64,11 +68,32 @@ class ReminderReceiver : BroadcastReceiver() {
         }
 
         if (reminder.isDueNow()) {
-            val image = try {
-                routines.findByReminder(reminder).firstOrNull()
+            var image: Bitmap? = null
+            var content: String? = null
+            try {
+                val routines = routines.findByQuery(reminder.query).firstOrNull()
                     ?.takeUnless(List<Routine>::isEmpty)
                     ?.asSequence()
-                    ?.flatMap { it.media }
+
+                if (context != null && reminder.query is RoutineQuery.Single && routines != null) {
+                    val routine = routines.firstOrNull()
+                    if (routine != null) {
+                        content = if (routine.lastRunDuration != null) {
+                            context.getString(
+                                R.string.reminder_notification_content_single,
+                                routine.name,
+                                formatForTimer(routine.lastRunDuration),
+                            )
+                        } else {
+                            context.getString(
+                                R.string.reminder_notification_content_single_no_last_run,
+                                routine.name,
+                            )
+                        }
+                    }
+                }
+
+                image = routines?.flatMap { it.media }
                     ?.shuffled()
                     ?.firstOrNull()
                     ?.thumbnail
@@ -77,12 +102,11 @@ class ReminderReceiver : BroadcastReceiver() {
             } catch (e: Exception) {
                 Log.w(
                     "ReminderReceiver",
-                    "Error while trying to create bitmap for reminder $reminderId.",
+                    "Error while trying to create image or text for reminder $reminderId.",
                     e
                 )
-                null
             }
-            notifications.show(reminder, image)
+            notifications.show(reminder, image, content)
         } else {
             Log.d(
                 "ReminderReceiver",

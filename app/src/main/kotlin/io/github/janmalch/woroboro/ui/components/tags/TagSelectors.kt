@@ -32,6 +32,7 @@ fun TagSelectors(
     value: List<Tag>,
     isCounterVisible: Boolean,
     onValueChange: (List<Tag>) -> Unit,
+    enabled: Boolean = true,
 ) {
     availableTags.forEach { (type, labels) ->
         val valuesForType = remember(type, value) {
@@ -50,7 +51,8 @@ fun TagSelectors(
                             // and append new ones
                             (newValuesForType.map { Tag(label = it, type = type) })
                 )
-            }
+            },
+            enabled = enabled,
         )
     }
 }
@@ -62,6 +64,7 @@ fun TagTypeMultiDropdown(
     value: List<String>,
     isCounterVisible: Boolean,
     onValueChange: (List<String>) -> Unit,
+    enabled: Boolean = true,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val clearFocus = rememberClearFocus()
@@ -82,7 +85,8 @@ fun TagTypeMultiDropdown(
             } else null,
             trailingIcon = {
                 Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-            }
+            },
+            enabled = enabled,
         )
 
         DropdownMenu(

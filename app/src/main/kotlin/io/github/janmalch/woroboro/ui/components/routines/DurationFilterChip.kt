@@ -29,6 +29,7 @@ import io.github.janmalch.woroboro.models.DurationFilter
 fun DurationFilterChip(
     value: DurationFilter,
     onValueChange: (DurationFilter) -> Unit,
+    enabled: Boolean = true,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val emitAndClose = remember<(DurationFilter) -> Unit>(onValueChange) {
@@ -50,7 +51,8 @@ fun DurationFilterChip(
                 )
             },
             selected = value != DurationFilter.Any,
-            onClick = { expanded = true }
+            onClick = { expanded = true },
+            enabled = enabled,
         )
 
         DropdownMenu(

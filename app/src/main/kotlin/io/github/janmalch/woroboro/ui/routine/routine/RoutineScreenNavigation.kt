@@ -14,12 +14,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.routine.isRoutineList
 import java.util.UUID
 
 const val ROUTINE_SCREEN_ARG_ID = "id"
 private const val ROUTINE_SCREEN_PATH = "$ROUTINE_GRAPH_ROUTE/routine/"
+const val ROUTINE_SCREEN_DEEPLINK = "woroboro://$ROUTINE_SCREEN_PATH"
 private const val ROUTINE_SCREEN_ROUTE = "$ROUTINE_SCREEN_PATH{$ROUTINE_SCREEN_ARG_ID}"
 
 
@@ -38,6 +40,7 @@ fun NavGraphBuilder.routineScreen(
                 type = NavType.StringType
             }
         ),
+        deepLinks = listOf(navDeepLink { uriPattern = "$ROUTINE_SCREEN_DEEPLINK{id}" }),
         enterTransition = {
             if (initialState.destination.isRoutineList) {
                 slideIntoContainer(

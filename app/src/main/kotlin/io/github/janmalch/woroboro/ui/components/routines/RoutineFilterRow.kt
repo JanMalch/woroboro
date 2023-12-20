@@ -28,7 +28,8 @@ fun RoutineFilterRow(
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
     containerColor: Color = Color.Unspecified,
-    contentPadding: PaddingValues = PaddingValues(vertical = 0.dp, horizontal = 12.dp)
+    contentPadding: PaddingValues = PaddingValues(vertical = 0.dp, horizontal = 12.dp),
+    enabled: Boolean = true,
 ) {
     Row(
         modifier = androidx.compose.ui.Modifier
@@ -41,16 +42,19 @@ fun RoutineFilterRow(
         OnlyFavoritesChip(
             value = isOnlyFavorites,
             onValueChange = onOnlyFavoritesChange,
+            enabled = enabled,
         )
         DurationFilterChip(
             value = durationFilter,
             onValueChange = onDurationFilterChange,
+            enabled = enabled,
         )
         TagSelectors(
             availableTags = availableTags,
             value = selectedTags,
             isCounterVisible = false,
             onValueChange = onSelectedTagsChange,
+            enabled = enabled,
         )
     }
 }

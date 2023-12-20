@@ -37,6 +37,8 @@
     <string name="reminder_delete_error">Fehler beim Löschen der Erinnerung.</string>
     <string name="reminder_delete_success">Erinnerung erfolgreich gelöscht.</string>
     <string name="reminder_notification_content">Es ist Zeit für eine deiner Routinen!</string>
+    <string name="reminder_notification_content_single">Es ist Zeit für deine %1$s Routine! Letztes Mal hat sie nur %2$s gedauert.</string>
+    <string name="reminder_notification_content_single_no_last_run">Es ist Zeit für deine %1$s Routine!</string>
     <string name="reminder_save_error">Fehler beim Speichern der Erinnerung.</string>
     <string name="reminder_save_success">Erinnerung erfolgreich gespeichert.</string>
     <string name="reminders">Erinnerungen</string>
@@ -47,7 +49,8 @@
     <string name="routine_delete_error">Fehler beim Löschen der Routine.</string>
     <string name="routine_delete_success">Routine erfolgreich gelöscht.</string>
     <string name="routine_done">Fertig! 🎉</string>
-    <string name="routine_filter">Routinenfilter</string>
+    <string name="routine_filters">Routinenfilter</string>
+    <string name="routine_filter_single">Routine</string>
     <string name="routine_in_progress">Erledigt (%1$d / %2$d)</string>
     <string name="routine_save_error">Fehler beim Speichern der Routine.</string>
     <string name="routine_save_success">Routine erfolgreich gespeichert.</string>
