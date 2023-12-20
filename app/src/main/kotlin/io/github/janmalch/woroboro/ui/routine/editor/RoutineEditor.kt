@@ -58,6 +58,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -496,6 +497,8 @@ fun LazyListScope.stepsItems(
         var isStepDialogOpen by remember {
             mutableStateOf(false)
         }
+        val currentStep by rememberUpdatedState(step)
+        val currentValue by rememberUpdatedState(value.toPersistentList())
         ReorderableItem(reorderableLazyColumnState, key = step.sortIndex) { isDragging ->
             val elevation by animateDpAsState(
                 if (isDragging) 4.dp else 0.dp,
@@ -505,7 +508,7 @@ fun LazyListScope.stepsItems(
             val dismissState = rememberDismissState(
                 confirmValueChange = {
                     if (!isDragging && (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd)) {
-                        onValueChange(value.toPersistentList() - step)
+                        onValueChange(currentValue - currentStep)
                         true
                     } else false
                 },
@@ -608,8 +611,8 @@ fun LazyListScope.stepsItems(
                 step = step,
                 allExercises = allExercises,
                 onSave = { updatedStep ->
-                    val steps = value.toMutableList().also {
-                        it[it.indexOf(step)] = updatedStep
+                    val steps = currentValue.toMutableList().also {
+                        it[it.indexOf(currentStep)] = updatedStep
                     }
                     onValueChange(steps)
                     isStepDialogOpen = false
