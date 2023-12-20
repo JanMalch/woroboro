@@ -42,8 +42,8 @@ fun SearchTopAppBar(
     var queryValue by remember(query) {
         mutableStateOf(query)
     }
-    var isSearchMode by remember {
-        mutableStateOf(false)
+    var isSearchMode by remember(query) {
+        mutableStateOf(query.isNotEmpty())
     }
 
     CenterAlignedTopAppBar(
