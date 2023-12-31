@@ -11,10 +11,16 @@ import kotlin.time.Duration
 fun formatDuration(duration: Duration, zero: String = seconds(0)): String {
     if (duration == Duration.ZERO) return zero
     return duration.toComponents { hours, minutes, seconds, _ ->
-        when {
-            seconds != 0 -> seconds(seconds)
-            minutes != 0 -> minutes(minutes)
-            else -> hours(hours)
+        buildString {
+            if (hours > 0) {
+                append(hours(hours))
+            }
+            if (minutes > 0) {
+                append(minutes(minutes))
+            }
+            if (seconds > 0 || isEmpty()) {
+                append(seconds(seconds))
+            }
         }
     }
 }
