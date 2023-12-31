@@ -97,7 +97,11 @@ class ExerciseRepositoryImpl @Inject constructor(
             textQuery = textQuery.trim()
         )
         else exerciseDao.findAll(tags, onlyFavorites = onlyFavorites, textQuery = textQuery.trim())
-        return flow.map { list -> list.map(ExerciseEntityWithMediaAndTags::asModel) }
+        return flow.map { list ->
+            list
+                .map(ExerciseEntityWithMediaAndTags::asModel)
+                .distinctBy(Exercise::id) // TODO: prevent duplicates via query?
+        }
     }
 
 }
