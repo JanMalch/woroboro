@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.ui.components.common.DoneCelebration
@@ -43,7 +45,7 @@ fun RoutineScreen(
                     .fillMaxSize()
             ) {
                 Text(
-                    text = "Ein unbekannter Fehler ist aufgetreten.",
+                    text = stringResource(R.string.unknown_error_message),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
