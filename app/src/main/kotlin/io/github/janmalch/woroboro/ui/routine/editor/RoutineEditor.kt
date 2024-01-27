@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,9 +37,6 @@ import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -48,11 +46,13 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -500,9 +500,9 @@ fun LazyListScope.stepsItems(
                 label = "DragElevation"
             )
 
-            val dismissState = rememberDismissState(
+            val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = {
-                    if (!isDragging && (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd)) {
+                    if (!isDragging && (it != SwipeToDismissBoxValue.Settled)) {
                         onValueChange(currentValue - currentStep)
                         true
                     } else false
@@ -514,10 +514,11 @@ fun LazyListScope.stepsItems(
                 }
             )
 
-            SwipeToDismiss(
-                state = dismissState,
-                background = { DismissBackground(dismissState) },
-                dismissContent = {
+            SwipeToDismissBox(state = dismissState,
+                backgroundContent = {
+                    DismissBackground(dismissState)
+                },
+                content = {
                     when (step) {
                         is RoutineStep.ExerciseStep -> {
                             ExerciseListItem(
@@ -596,8 +597,7 @@ fun LazyListScope.stepsItems(
                             )
                         }
                     }
-                }
-            )
+                })
         }
 
 
@@ -620,11 +620,11 @@ fun LazyListScope.stepsItems(
 
 
 @Composable
-private fun DismissBackground(dismissState: DismissState) {
-    val direction = dismissState.dismissDirection ?: return
+private fun RowScope.DismissBackground(dismissState: SwipeToDismissBoxState) {
+    val direction = dismissState.dismissDirection
     val backgroundColor by animateColorAsState(
         targetValue = when (dismissState.targetValue) {
-            DismissValue.Default -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+            SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
             else -> Color(0xFFFF1744)
         },
         label = "DismissColorAnimation",
@@ -632,7 +632,7 @@ private fun DismissBackground(dismissState: DismissState) {
     )
     val iconColor by animateColorAsState(
         targetValue = when (dismissState.targetValue) {
-            DismissValue.Default -> LocalContentColor.current.copy(alpha = 0.2f)
+            SwipeToDismissBoxValue.Settled -> LocalContentColor.current.copy(alpha = 0.2f)
             else -> LocalContentColor.current
         },
         label = "DismissIconColorAnimation",
@@ -647,13 +647,13 @@ private fun DismissBackground(dismissState: DismissState) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        if (direction == DismissDirection.StartToEnd) Icon(
+        if (direction == SwipeToDismissBoxValue.StartToEnd) Icon(
             Icons.Rounded.Delete,
             contentDescription = null,
             tint = iconColor,
         )
         Spacer(modifier = Modifier)
-        if (direction == DismissDirection.EndToStart) Icon(
+        if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
             Icons.Rounded.Delete,
             contentDescription = null,
             tint = iconColor,
