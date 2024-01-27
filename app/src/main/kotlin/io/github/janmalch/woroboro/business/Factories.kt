@@ -99,5 +99,6 @@ fun Reminder.asEntities(): Pair<ReminderEntity, List<String>> {
         filterOnlyFavorites = filter.onlyFavorites,
         filterDuration = filter.durationFilter,
         filterRoutineId = (query as? RoutineQuery.Single)?.routineId,
+        routinesOrder = filter.routinesOrder,
     ) to filter.selectedTags.map { it.label }
 }

@@ -44,6 +44,7 @@ fun NavGraphBuilder.routineListScreen(
         val textQuery by viewModel.textQuery.collectAsState()
         val durationFilter by viewModel.durationFilter.collectAsState()
         val isOnlyFavorites by viewModel.isOnlyFavorites.collectAsState()
+        val routinesOrder by viewModel.routinesOrder.collectAsState()
 
         when (val state = uiState) {
             RoutineListUiState.Failure -> {
@@ -62,6 +63,8 @@ fun NavGraphBuilder.routineListScreen(
                     isOnlyFavorites = isOnlyFavorites,
                     durationFilter = durationFilter,
                     textQuery = textQuery,
+                    routinesOrder = routinesOrder,
+                    onRoutinesOrderChange = viewModel::setRoutinesOrder,
                     onTextQueryChange = viewModel::setTextQuery,
                     onDurationFilterChange = viewModel::setDurationFilter,
                     onOnlyFavoritesChange = viewModel::setOnlyFavorites,

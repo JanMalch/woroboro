@@ -10,9 +10,10 @@ import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.business.TagRepository
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.RoutinesOrder
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.findAvailableTags
-import io.github.janmalch.woroboro.utils.Quad
+import io.github.janmalch.woroboro.utils.Quintet
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
@@ -30,6 +31,7 @@ private const val SELECTED_TAGS_SSH_KEY = "selected_tags"
 private const val ONLY_FAVORITES_SSH_KEY = "only_favorites"
 private const val DURATION_FILTER_SSH_KEY = "duration_filter"
 private const val TEXT_QUERY_SSH_KEY = "text_query"
+private const val ROUTINES_ORDER_SSH_KEY = "routines_order"
 
 @HiltViewModel
 class RoutineListViewModel @Inject constructor(
@@ -61,6 +63,12 @@ class RoutineListViewModel @Inject constructor(
             _routineFilter?.durationFilter ?: DurationFilter.Any
         )
 
+    val routinesOrder =
+        savedStateHandle.getStateFlow(
+            ROUTINES_ORDER_SSH_KEY,
+            _routineFilter?.routinesOrder ?: RoutinesOrder.NameAsc
+        )
+
     // TODO: combine tag flows?
     private val selectedTags = _selectedTagLabels.flatMapLatest {
         tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
@@ -73,13 +81,15 @@ class RoutineListViewModel @Inject constructor(
         isOnlyFavorites,
         durationFilter,
         textQuery.map(String::trim),
-        ::Quad
-    ).flatMapLatest { (selectedTags, isOnlyFavorites, durationFilter, textQuery) ->
+        routinesOrder,
+        ::Quintet
+    ).flatMapLatest { (selectedTags, isOnlyFavorites, durationFilter, textQuery, orderBy) ->
         routineRepository.findAll(
             selectedTags,
             onlyFavorites = isOnlyFavorites,
             durationFilter = durationFilter,
             textQuery = textQuery,
+            orderBy = orderBy,
         )
             .map(List<Routine>::toImmutableList)
     }
@@ -118,6 +128,10 @@ class RoutineListViewModel @Inject constructor(
 
     fun setTextQuery(query: String) {
         savedStateHandle[TEXT_QUERY_SSH_KEY] = query
+    }
+
+    fun setRoutinesOrder(order: RoutinesOrder) {
+        savedStateHandle[ROUTINES_ORDER_SSH_KEY] = order
     }
 }
 

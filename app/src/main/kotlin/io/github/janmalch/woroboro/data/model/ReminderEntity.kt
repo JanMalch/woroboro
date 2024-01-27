@@ -10,6 +10,7 @@ import androidx.room.Relation
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.RoutineQuery
+import io.github.janmalch.woroboro.models.RoutinesOrder
 import kotlinx.collections.immutable.toImmutableList
 import java.time.DayOfWeek
 import java.time.LocalTime
@@ -35,6 +36,8 @@ data class ReminderEntity(
     val filterOnlyFavorites: Boolean,
     @ColumnInfo("filter_duration")
     val filterDuration: DurationFilter,
+    @ColumnInfo("routines_order", defaultValue = "NameAsc")
+    val routinesOrder: RoutinesOrder,
 )
 
 @Entity(
@@ -95,6 +98,7 @@ fun ReminderEntityWithFilterTags.asModel() = Reminder(
             onlyFavorites = reminder.filterOnlyFavorites,
             durationFilter = reminder.filterDuration,
             selectedTags = filterTags.map(TagEntity::asModel).toImmutableList(),
+            routinesOrder = reminder.routinesOrder,
         )
     }
 )

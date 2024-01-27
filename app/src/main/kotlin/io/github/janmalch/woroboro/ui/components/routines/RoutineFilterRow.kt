@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.models.DurationFilter
+import io.github.janmalch.woroboro.models.RoutinesOrder
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.OnlyFavoritesChip
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
@@ -24,6 +26,8 @@ fun RoutineFilterRow(
     selectedTags: ImmutableList<Tag>,
     isOnlyFavorites: Boolean,
     durationFilter: DurationFilter,
+    routinesOrder: RoutinesOrder,
+    onRoutinesOrderChange: (RoutinesOrder) -> Unit,
     onDurationFilterChange: (DurationFilter) -> Unit,
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
@@ -32,7 +36,7 @@ fun RoutineFilterRow(
     enabled: Boolean = true,
 ) {
     Row(
-        modifier = androidx.compose.ui.Modifier
+        modifier = Modifier
             .background(containerColor)
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
@@ -47,6 +51,11 @@ fun RoutineFilterRow(
         DurationFilterChip(
             value = durationFilter,
             onValueChange = onDurationFilterChange,
+            enabled = enabled,
+        )
+        RoutineOrderChip(
+            value = routinesOrder,
+            onValueChange = onRoutinesOrderChange,
             enabled = enabled,
         )
         TagSelectors(

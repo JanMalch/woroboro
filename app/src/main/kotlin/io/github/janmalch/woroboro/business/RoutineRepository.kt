@@ -7,6 +7,7 @@ import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineQuery
 import io.github.janmalch.woroboro.models.RoutineStep
+import io.github.janmalch.woroboro.models.RoutinesOrder
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.models.asRoutine
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,7 @@ interface RoutineRepository {
         tags: List<String> = emptyList(),
         onlyFavorites: Boolean = false,
         durationFilter: DurationFilter = DurationFilter.Any,
+        orderBy: RoutinesOrder = RoutinesOrder.NameAsc,
         textQuery: String = "",
     ): Flow<List<Routine>>
 
@@ -43,7 +45,6 @@ interface RoutineRepository {
     suspend fun update(routine: FullRoutine): UUID
     suspend fun delete(routineId: UUID)
     suspend fun appendExerciseToRoutine(exerciseId: UUID, routineId: UUID)
-
 }
 
 fun RoutineRepository.findByQuery(query: RoutineQuery): Flow<List<Routine>> {
@@ -66,6 +67,7 @@ class RoutineRepositoryImpl @Inject constructor(
         tags: List<String>,
         onlyFavorites: Boolean,
         durationFilter: DurationFilter,
+        orderBy: RoutinesOrder,
         textQuery: String,
     ): Flow<List<Routine>> {
         // TODO: improve this, because it reruns query on every tag change ...
@@ -82,7 +84,7 @@ class RoutineRepositoryImpl @Inject constructor(
             { it.name.contains(textQuery, ignoreCase = true) }
         }
 
-        return routineDao.findAll(onlyFavorites).map { list ->
+        return routineDao.findAll(onlyFavorites, orderBy).map { list ->
             list.asSequence()
                 .filter(Routine::matchesAnyTag)
                 .filter(Routine::isWithinDurationFilter)

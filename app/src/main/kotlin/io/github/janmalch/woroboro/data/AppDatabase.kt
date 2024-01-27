@@ -35,12 +35,13 @@ import java.util.UUID
         ReminderEntity::class,
         ReminderFilterTagCrossRefEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 4, to = 5),
+        AutoMigration(from = 5, to = 6),
     ]
 )
 @TypeConverters(StandardConverters::class, DomainConverters::class)

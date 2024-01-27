@@ -54,6 +54,7 @@ import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineQuery
+import io.github.janmalch.woroboro.models.RoutinesOrder
 import io.github.janmalch.woroboro.models.asRoutineFilter
 import io.github.janmalch.woroboro.ui.components.DurationTextField
 import io.github.janmalch.woroboro.ui.components.TimeField
@@ -108,6 +109,11 @@ fun ReminderEditorScreen(
             reminder?.query?.asRoutineFilter()?.durationFilter ?: DurationFilter.Any
         )
     }
+    var routinesOrder by remember(reminder) {
+        mutableStateOf(
+            reminder?.query?.asRoutineFilter()?.routinesOrder ?: RoutinesOrder.NameAsc
+        )
+    }
     var routineIdFilter by remember(reminder) {
         mutableStateOf((reminder?.query as? RoutineQuery.Single)?.routineId)
     }
@@ -144,6 +150,7 @@ fun ReminderEditorScreen(
                                         onlyFavorites = onlyFavorites,
                                         durationFilter = durationFilter,
                                         selectedTags = selectedTags,
+                                        routinesOrder = routinesOrder,
                                     )
                                 },
                             )
@@ -284,6 +291,8 @@ fun ReminderEditorScreen(
                 selectedTags = selectedTags.toImmutableList(),
                 isOnlyFavorites = onlyFavorites,
                 durationFilter = durationFilter,
+                routinesOrder = routinesOrder,
+                onRoutinesOrderChange = { routinesOrder = it },
                 onDurationFilterChange = { durationFilter = it },
                 onOnlyFavoritesChange = { onlyFavorites = it },
                 onSelectedTagsChange = {

@@ -69,6 +69,10 @@
     <string name="unit_unknown_abbreviation">\?</string>
     <string name="unit_unknown_name">Unbekannt</string>
     <string name="unknown_error_message">Leider ist ein unbekannter Fehler aufgetreten.</string>
+    <string name="order_by_name_asc">A-Z</string>
+    <string name="order_by_name_desc">Z-A</string>
+    <string name="order_by_last_run_recently">Kürzlich geschafft</string>
+    <string name="order_by_last_run_long_ago">Lang ist\'s her</string>
 
     <plurals name="exercises_with_count">
         <item quantity="one">%1$d Übung</item>

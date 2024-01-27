@@ -16,6 +16,7 @@ import io.github.janmalch.woroboro.data.model.asModel
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineStep
+import io.github.janmalch.woroboro.models.RoutinesOrder
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -42,10 +43,17 @@ abstract class RoutineDao {
             ELSE 1
             END
         GROUP BY routine.id, routine.name, routine.is_favorite, routine.last_run_duration, routine.last_run_ended
-        ORDER BY routine.name COLLATE NOCASE ASC
+        ORDER BY
+        CASE :orderBy WHEN 'NameDesc' THEN routine.name END COLLATE NOCASE DESC,
+        CASE :orderBy WHEN 'LastRunRecently' THEN routine.last_run_ended END DESC,
+        CASE :orderBy WHEN 'LastRunLongAgo' THEN routine.last_run_ended END ASC,
+        routine.name COLLATE NOCASE ASC
     """
     )
-    protected abstract fun findAllRoutines(onlyFavorites: Boolean): Flow<List<RoutineQueryResult>>
+    protected abstract fun findAllRoutines(
+        onlyFavorites: Boolean,
+        orderBy: RoutinesOrder
+    ): Flow<List<RoutineQueryResult>>
 
     @Query(
         """
@@ -71,9 +79,9 @@ abstract class RoutineDao {
     )
     protected abstract fun findAllMedia(routineIds: List<UUID>): Flow<List<RoutineMediaQueryResult>>
 
-    open fun findAll(onlyFavorites: Boolean): Flow<List<Routine>> {
+    open fun findAll(onlyFavorites: Boolean, orderBy: RoutinesOrder): Flow<List<Routine>> {
         // TODO: see if one big query is better
-        return findAllRoutines(onlyFavorites).flatMapLatest { routines ->
+        return findAllRoutines(onlyFavorites, orderBy).flatMapLatest { routines ->
             val routineIds = routines.map { it.routine.id }
             findAllTags(routineIds).combine(findAllMedia(routineIds)) { tags, media ->
                 routines.map { routine ->

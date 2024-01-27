@@ -50,6 +50,7 @@ import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.Routine
+import io.github.janmalch.woroboro.models.RoutinesOrder
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
@@ -69,6 +70,8 @@ fun RoutineListScreen(
     isOnlyFavorites: Boolean,
     durationFilter: DurationFilter,
     textQuery: String,
+    routinesOrder: RoutinesOrder,
+    onRoutinesOrderChange: (RoutinesOrder) -> Unit,
     onTextQueryChange: (String) -> Unit,
     onDurationFilterChange: (DurationFilter) -> Unit,
     onOnlyFavoritesChange: (Boolean) -> Unit,
@@ -127,6 +130,8 @@ fun RoutineListScreen(
             isTopBarCollapsed = isTopBarCollapsed,
             isOnlyFavorites = isOnlyFavorites,
             durationFilter = durationFilter,
+            routinesOrder = routinesOrder,
+            onRoutinesOrderChange = onRoutinesOrderChange,
             onDurationFilterChange = onDurationFilterChange,
             onOnlyFavoritesChange = onOnlyFavoritesChange,
             onSelectedTagsChange = onSelectedTagsChange,
@@ -148,6 +153,8 @@ fun RoutineList(
     isTopBarCollapsed: Boolean,
     isOnlyFavorites: Boolean,
     durationFilter: DurationFilter,
+    routinesOrder: RoutinesOrder,
+    onRoutinesOrderChange: (RoutinesOrder) -> Unit,
     onDurationFilterChange: (DurationFilter) -> Unit,
     onOnlyFavoritesChange: (Boolean) -> Unit,
     onSelectedTagsChange: (List<Tag>) -> Unit,
@@ -172,6 +179,8 @@ fun RoutineList(
                 selectedTags = selectedTags,
                 isOnlyFavorites = isOnlyFavorites,
                 durationFilter = durationFilter,
+                routinesOrder = routinesOrder,
+                onRoutinesOrderChange = onRoutinesOrderChange,
                 onDurationFilterChange = onDurationFilterChange,
                 onOnlyFavoritesChange = onOnlyFavoritesChange,
                 onSelectedTagsChange = onSelectedTagsChange,

@@ -58,6 +58,7 @@ sealed interface RoutineQuery : Parcelable {
         val onlyFavorites: Boolean,
         val durationFilter: DurationFilter,
         val selectedTags: List<Tag>,
+        val routinesOrder: RoutinesOrder,
     ) : RoutineQuery
 
 }
@@ -68,5 +69,6 @@ fun RoutineQuery.asRoutineFilter(): RoutineQuery.RoutineFilter = when (this) {
         onlyFavorites = false,
         durationFilter = DurationFilter.Any,
         selectedTags = emptyList(),
+        routinesOrder = RoutinesOrder.NameAsc,
     )
 }
