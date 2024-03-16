@@ -1,5 +1,6 @@
 package io.github.janmalch.woroboro.ui.reminder
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Reminder
 import kotlinx.collections.immutable.ImmutableList
+import java.time.DayOfWeek
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -78,13 +80,7 @@ fun ReminderList(
                     headlineContent = { Text(reminder.name) },
                     supportingContent = {
                         Text(text = buildString {
-                            // TODO: be smart and join ranges
-                            val weekdays = reminder.weekdays.joinToString {
-                                it.getDisplayName(
-                                    TextStyle.SHORT,
-                                    Locale.getDefault()
-                                )
-                            }
+                            val weekdays = reminder.weekdays.joinRangesToString()
                             append(weekdays)
                             append(" · ")
                             append(
@@ -98,6 +94,34 @@ fun ReminderList(
 
                 HorizontalDivider()
             }
+        }
+    }
+}
+
+@VisibleForTesting
+fun Set<DayOfWeek>.joinRangesToString(locale: Locale = Locale.getDefault()): String {
+    if (isEmpty()) return ""
+    if (size == 1) return first().getDisplayName(TextStyle.SHORT, locale)
+
+    val sorted = sortedBy { it.value }
+    val ranges = mutableListOf(mutableListOf(sorted.first()))
+    for (next in sorted.drop(1)) {
+        val adjacent = next.value == (ranges.last().last().value + 1)
+        if (adjacent) {
+            ranges.last().add(next)
+        } else {
+            ranges.add(mutableListOf(next))
+        }
+    }
+    if (ranges.last().size == 1 && sorted.last() != ranges.last().last()) {
+        ranges.last().add(sorted.last())
+    }
+    return ranges.joinToString {
+        if (it.size == 1) {
+            it.first().getDisplayName(TextStyle.SHORT, locale)
+        } else {
+            it.first().getDisplayName(TextStyle.SHORT, locale) + " – " + it.last()
+                .getDisplayName(TextStyle.SHORT, locale)
         }
     }
 }
