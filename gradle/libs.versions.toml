@@ -5,27 +5,26 @@ core-ktx = "1.12.0"
 collections-immutable = "0.3.7"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
-compose-material = "1.2.0-rc01"
-compose-material-android = "1.2.0-rc01"
-coroutines = "1.7.3"
+compose-material = "1.2.1"
+coroutines = "1.8.0"
 androidx-core-splashscreen = "1.0.1"
 espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.8.2"
-compose-bom = "2024.01.00"
+compose-bom = "2024.02.02"
 konfetti = "2.0.4"
-coil = "2.5.0"
-hilt = "2.50"
-android-hilt = "1.1.0"
-icons = "1.6.0"
+coil = "2.6.0"
+hilt = "2.51"
+android-hilt = "1.2.0"
+icons = "1.6.3"
 ksp = "1.9.22-1.0.17"
 room = "2.6.1"
-navigation = "2.7.6"
+navigation = "2.7.7"
 google-oss = "17.0.1"
 google-oss-plugin = "0.10.6"
 material = "1.11.0"
-reorderable = "1.2.0"
-turbine = "1.0.0"
+reorderable = "1.3.3"
+turbine = "1.1.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -52,7 +51,7 @@ coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "compose-material" }
-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "compose-material-android" }
+material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "compose-material" }
 navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
