@@ -1,7 +1,6 @@
 package io.github.janmalch.woroboro.ui.routine.editor
 
 import android.util.Log
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -10,12 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,13 +27,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.DragHandle
 import androidx.compose.material.icons.rounded.Pause
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -44,6 +41,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
@@ -52,6 +50,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -64,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -92,6 +92,7 @@ import io.github.janmalch.woroboro.ui.components.common.clickableWithClearFocus
 import io.github.janmalch.woroboro.ui.components.common.formatDuration
 import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import io.github.janmalch.woroboro.ui.components.common.rememberHapticFeedback
+import io.github.janmalch.woroboro.ui.components.common.toolbarButtonSize
 import io.github.janmalch.woroboro.ui.components.exerciseExecution
 import io.github.janmalch.woroboro.ui.exercise.editor.DurationSaver
 import io.github.janmalch.woroboro.ui.theme.Success
@@ -175,10 +176,7 @@ fun RoutineEditorScreen(
                         },
                         enabled = !isLoading && name.isNotBlank() && steps.any { it is RoutineStep.ExerciseStep },
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        modifier = Modifier.defaultMinSize(
-                            minWidth = ButtonDefaults.MinWidth,
-                            minHeight = 36.dp
-                        )
+                        modifier = Modifier.toolbarButtonSize()
                     ) {
                         ButtonLoading(isVisible = isLoading)
                         Text(text = stringResource(R.string.save))
@@ -296,153 +294,47 @@ fun RoutineStepEditorDialog(
 
     val filteredExercises by remember {
         derivedStateOf {
-            if (exerciseFilterQuery.isBlank()) listOfNotNull(selectedExercise).toImmutableList()
-            else allExercises
-                .filter {
-                    it.name.contains(exerciseFilterQuery, ignoreCase = true) ||
-                            it.description.contains(exerciseFilterQuery, ignoreCase = true) ||
-                            it.tags.any { tag ->
-                                tag.label.contains(
-                                    exerciseFilterQuery,
-                                    ignoreCase = true
-                                )
-                            }
-                }
-                .toImmutableList()
+            if (exerciseFilterQuery.isBlank()) {
+                selectedExercise?.let { persistentListOf(it) } ?: allExercises
+            } else {
+                allExercises
+                    .filter {
+                        it.name.contains(exerciseFilterQuery, ignoreCase = true) ||
+                                it.description.contains(exerciseFilterQuery, ignoreCase = true) ||
+                                it.tags.any { tag ->
+                                    tag.label.contains(
+                                        exerciseFilterQuery,
+                                        ignoreCase = true
+                                    )
+                                }
+                    }
+                    .toImmutableList()
+            }
         }
     }
 
-    // FIXME: rework UI
-    AlertDialog(
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
+
+    ModalBottomSheet(
         onDismissRequest = onDismissRequest,
-        text = {
-            Column {
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Crossfade(
-                        targetState = isExercise,
-                        modifier = Modifier.weight(1F),
-                        label = "CrossfadeButtonSelection:Exercise"
-                    ) {
-                        if (it) {
-                            Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-                                Text(text = stringResource(R.string.exercise))
-                            }
-                        } else {
-
-                            TextButton(
-                                onClick = { isExercise = true },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(text = stringResource(R.string.exercise))
-                            }
-                        }
-                    }
-                    Crossfade(
-                        targetState = isExercise,
-                        modifier = Modifier.weight(1F),
-
-                        label = "CrossfadeButtonSelection:Pause"
-                    ) {
-                        if (it) {
-                            TextButton(
-                                onClick = { isExercise = false },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(text = stringResource(R.string.pause))
-                            }
-                        } else {
-
-                            Button(onClick = { }, modifier = Modifier.fillMaxWidth()) {
-                                Text(text = stringResource(R.string.pause))
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (isExercise) {
-
-                    OutlinedTextField(
-                        value = exerciseFilterQuery,
-                        onValueChange = { exerciseFilterQuery = it },
-                        singleLine = true,
-                        label = { Text(text = stringResource(R.string.exercise_search_placeholder)) },
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    HorizontalDivider()
-
-                    LazyColumn(modifier = Modifier.weight(1F)) {
-                        items(filteredExercises, key = { it.id }) { exercise ->
-                            ExerciseListItem(
-                                exercise = exercise,
-                                onClick = {
-                                    selectedExercise = exercise
-                                    customExecution = null
-                                },
-                                leadingContent = null,
-                                trailingContent = {
-                                    if (selectedExercise == exercise) {
-                                        Icon(
-                                            Icons.Rounded.CheckCircle,
-                                            tint = Success,
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .size(32.dp)
-                                                .background(Color.White, CircleShape)
-                                        )
-                                    }
-                                },
-                                supportingContent = {
-                                    Text(text = exerciseExecution(execution = exercise.execution))
-                                }
-                            )
-                        }
-                    }
-
-                    HorizontalDivider()
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = stringResource(R.string.execution_override_explanation),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-
-                    CustomExerciseExecutionEditor(
-                        value = customExecution,
-                        onValueChange = { customExecution = it },
-                        basedOn = selectedExercise?.execution,
-                        enabled = selectedExercise != null,
-                    )
-                } else {
-                    DurationTextField(
-                        value = pauseStep,
-                        onValueChange = { pauseStep = it },
-                        required = false,
-                        label = {
-                            Text(
-                                text = stringResource(R.string.pause),
-                                softWrap = false,
-                                maxLines = 1
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        imeAction = ImeAction.Done,
-                    )
-                }
+        sheetState = sheetState,
+        dragHandle = null,
+        modifier = Modifier.fillMaxSize(),
+        shape = RectangleShape,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onDismissRequest) {
+                Icon(Icons.Rounded.Close, contentDescription = null)
             }
-
-        },
-        confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     val stepToSave = if (isExercise) {
                         selectedExercise?.let {
@@ -467,12 +359,119 @@ fun RoutineStepEditorDialog(
                 enabled =
                 if (isExercise) selectedExercise != null
                 else pauseStep?.isPositive() ?: false,
+                modifier = Modifier.toolbarButtonSize(),
             ) {
                 Text(text = stringResource(R.string.save))
             }
-
         }
-    )
+
+        Text(
+            text = if (step == null) stringResource(id = R.string.new_step) else "Schritt bearbeiten",
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+            style = MaterialTheme.typography.titleLarge,
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            FilterChip(
+                onClick = { isExercise = true },
+                selected = isExercise,
+                label = { Text(stringResource(R.string.exercise)) },
+            )
+            FilterChip(
+                onClick = { isExercise = false },
+                selected = !isExercise,
+                label = { Text(stringResource(R.string.pause)) },
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
+
+        if (isExercise) {
+
+            Column(modifier = Modifier.padding(16.dp)) {
+
+
+                OutlinedTextField(
+                    value = exerciseFilterQuery,
+                    onValueChange = { exerciseFilterQuery = it },
+                    singleLine = true,
+                    label = { Text(text = stringResource(R.string.exercise_search_placeholder)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                )
+
+
+                LazyColumn(modifier = Modifier.weight(1F)) {
+                    items(filteredExercises, key = { it.id }) { exercise ->
+                        ExerciseListItem(
+                            exercise = exercise,
+                            onClick = {
+                                selectedExercise = exercise
+                                customExecution = null
+                            },
+                            leadingContent = null,
+                            trailingContent = {
+                                if (selectedExercise == exercise) {
+                                    Icon(
+                                        Icons.Rounded.CheckCircle,
+                                        tint = Success,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .background(Color.White, CircleShape)
+                                    )
+                                }
+                            },
+                            supportingContent = {
+                                Text(text = exerciseExecution(execution = exercise.execution))
+                            }
+                        )
+                    }
+                }
+
+                HorizontalDivider()
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = stringResource(R.string.execution_override_explanation),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                CustomExerciseExecutionEditor(
+                    value = customExecution,
+                    onValueChange = { customExecution = it },
+                    basedOn = selectedExercise?.execution,
+                    enabled = selectedExercise != null,
+                )
+            }
+        } else {
+            DurationTextField(
+                value = pauseStep,
+                onValueChange = { pauseStep = it },
+                required = false,
+                label = {
+                    Text(
+                        text = stringResource(R.string.pause),
+                        softWrap = false,
+                        maxLines = 1
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                imeAction = ImeAction.Done,
+            )
+        }
+    }
 }
 
 
@@ -663,7 +662,7 @@ private fun RowScope.DismissBackground(dismissState: SwipeToDismissBoxState) {
 
 
 @Composable
-fun ColumnScope.CustomExerciseExecutionEditor(
+fun CustomExerciseExecutionEditor(
     value: CustomExerciseExecution?,
     basedOn: ExerciseExecution?,
     onValueChange: (CustomExerciseExecution) -> Unit,
@@ -705,7 +704,7 @@ fun ColumnScope.CustomExerciseExecutionEditor(
     )
 
     if (basedOn?.reps != null) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         NumberTextField(
             value = reps,
             onValueChange = {
@@ -726,7 +725,7 @@ fun ColumnScope.CustomExerciseExecutionEditor(
     }
 
     if (basedOn?.hold != null) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         DurationTextField(
             value = hold,
             onValueChange = {
@@ -746,7 +745,7 @@ fun ColumnScope.CustomExerciseExecutionEditor(
         )
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(8.dp))
     DurationTextField(
         value = pause,
         onValueChange = {

@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -203,7 +202,6 @@ fun DurationTextField(
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     modifier = Modifier
-                        .fillMaxHeight()
                         .widthIn(13.dp)
                         .clickable { isDropdownOpen = true }
                         .clip(RoundedCornerShape(4.dp))

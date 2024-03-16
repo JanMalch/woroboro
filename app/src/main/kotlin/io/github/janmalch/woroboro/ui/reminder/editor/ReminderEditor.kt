@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,7 +25,6 @@ import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material.icons.rounded.HourglassEmpty
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -63,6 +61,7 @@ import io.github.janmalch.woroboro.ui.components.common.CloseIconButton
 import io.github.janmalch.woroboro.ui.components.common.MoreMenu
 import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
+import io.github.janmalch.woroboro.ui.components.common.toolbarButtonSize
 import io.github.janmalch.woroboro.ui.components.routines.RoutineFilterRow
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -163,10 +162,7 @@ fun ReminderEditorScreen(
                                 (repeatEvery?.let { it in Reminder.Repeat.VALID_REPEAT_RANGE }
                                     ?: true),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        modifier = Modifier.defaultMinSize(
-                            minWidth = ButtonDefaults.MinWidth,
-                            minHeight = 36.dp
-                        )
+                        modifier = Modifier.toolbarButtonSize()
                     ) {
                         ButtonLoading(isVisible = isLoading)
                         Text(text = stringResource(R.string.save))
