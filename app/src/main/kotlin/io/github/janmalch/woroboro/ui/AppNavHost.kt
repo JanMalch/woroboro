@@ -62,5 +62,8 @@ fun AppNavHost(
             onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
         )
+        moreGraph(
+            onShowSnackbar = onShowSnackbar,
+        )
     }
 }

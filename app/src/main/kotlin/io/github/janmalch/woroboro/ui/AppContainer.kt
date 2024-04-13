@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FitnessCenter
+import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.SportsGymnastics
+import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -33,6 +35,8 @@ import androidx.navigation.compose.rememberNavController
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.exercise.navigateToExercisesGraph
+import io.github.janmalch.woroboro.ui.more.MORE_GRAPH_ROUTE
+import io.github.janmalch.woroboro.ui.more.navigateToMoreGraph
 import io.github.janmalch.woroboro.ui.reminder.REMINDER_GRAPH_ROUTE
 import io.github.janmalch.woroboro.ui.reminder.navigateToReminderGraph
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
@@ -90,6 +94,8 @@ fun AppBottomBar(navController: NavHostController) {
         currentBackStack?.destination?.route?.startsWith(ROUTINE_GRAPH_ROUTE) ?: false
     val isRemindersTabActive =
         currentBackStack?.destination?.route?.startsWith(REMINDER_GRAPH_ROUTE) ?: false
+    val isMoreTabActive =
+        currentBackStack?.destination?.route?.startsWith(MORE_GRAPH_ROUTE) ?: false
 
     NavigationBar {
         NavigationBarItem(
@@ -121,6 +127,20 @@ fun AppBottomBar(navController: NavHostController) {
                 }
             },
             label = { Text(text = stringResource(id = R.string.reminders)) },
+        )
+        NavigationBarItem(
+            selected = isMoreTabActive,
+            onClick = {
+                navController.navigateToMoreGraph(forBackstack(navController))
+            },
+            icon = {
+                if (isRemindersTabActive) {
+                    Icon(Icons.Rounded.MoreHoriz, contentDescription = null)
+                } else {
+                    Icon(Icons.Outlined.MoreHoriz, contentDescription = null)
+                }
+            },
+            label = { Text(text = stringResource(id = R.string.more)) },
         )
     }
 }

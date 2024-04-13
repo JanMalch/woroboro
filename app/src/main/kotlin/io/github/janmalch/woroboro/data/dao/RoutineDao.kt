@@ -177,6 +177,9 @@ abstract class RoutineDao {
 
     @Query("DELETE FROM routine WHERE id = :routineId")
     abstract suspend fun delete(routineId: UUID)
+
+    @Query("UPDATE routine SET last_run_duration = NULL, last_run_ended = NULL")
+    abstract suspend fun clearLastRuns()
 }
 
 data class RoutineQueryResult(

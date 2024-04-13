@@ -1,6 +1,5 @@
 package io.github.janmalch.woroboro.ui.routine
 
-import android.content.Intent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -17,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,13 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.Media
@@ -53,8 +49,6 @@ import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutinesOrder
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.components.common.FavoriteIcon
-import io.github.janmalch.woroboro.ui.components.common.MoreMenu
-import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.SearchTopAppBar
 import io.github.janmalch.woroboro.ui.components.common.formatDuration
 import io.github.janmalch.woroboro.ui.components.routines.RoutineFilterRow
@@ -81,7 +75,6 @@ fun RoutineListScreen(
     onRoutineClick: (Routine) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val isTopBarCollapsed by remember {
         derivedStateOf {
@@ -98,21 +91,6 @@ fun RoutineListScreen(
                 placeholder = stringResource(id = R.string.routine_search_placeholder),
                 onQueryChange = onTextQueryChange,
                 scrollBehavior = scrollBehavior,
-                actions = {
-                    MoreMenu {
-                        MoreMenuItem(
-                            text = { Text(text = stringResource(id = R.string.licenses)) },
-                            icon = { Icon(Icons.Rounded.Code, contentDescription = null) },
-                            onClick = {
-                                context.startActivity(
-                                    Intent(
-                                        context,
-                                        OssLicensesMenuActivity::class.java
-                                    )
-                                )
-                            })
-                    }
-                }
             )
         },
         floatingActionButton = {

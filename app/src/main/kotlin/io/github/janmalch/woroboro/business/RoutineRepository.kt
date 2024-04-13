@@ -45,6 +45,8 @@ interface RoutineRepository {
     suspend fun update(routine: FullRoutine): UUID
     suspend fun delete(routineId: UUID)
     suspend fun appendExerciseToRoutine(exerciseId: UUID, routineId: UUID)
+
+    suspend fun clearLastRuns()
 }
 
 fun RoutineRepository.findByQuery(query: RoutineQuery): Flow<List<Routine>> {
@@ -141,5 +143,9 @@ class RoutineRepositoryImpl @Inject constructor(
             pauseStep = null,
         )
         routineDao.insertSteps(listOf(pauseStepEntity, exerciseStepEntity))
+    }
+
+    override suspend fun clearLastRuns() {
+        routineDao.clearLastRuns()
     }
 }

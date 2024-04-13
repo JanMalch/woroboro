@@ -1,6 +1,9 @@
 <resources>
     <string name="add_to_routine">Zu Routine hinzufügen</string>
     <string name="app_name">woroboro</string>
+    <string name="clear_last_runs">Ausführungen zurücksetzen</string>
+    <string name="clear_last_runs_explanation">Löscht alle Daten zu letzten Ausführungen</string>
+    <string name="clear_last_runs_confirmation">Bist du sicher, dass du die letzten Ausführungen aller Routinen löschen möchtest? Die Daten können nicht wiederhergestellt werden.</string>
     <string name="confirm">OK</string>
     <string name="delete_exercise">Übung löschen</string>
     <string name="delete_reminder">Erinnerung löschen</string>
@@ -29,7 +32,10 @@
     <string name="favorite_routine">Lieblingsroutine</string>
     <string name="hold">Halten</string>
     <string name="images_and_videos">Bilder</string>
+    <string name="last_runs_cleared_success">Letzte Ausführungen erfolgreich gelöscht.</string>
     <string name="licenses">Lizenzen</string>
+    <string name="licenses_explanation">Lizenzen von verwendeten Bibliotheken</string>
+    <string name="more">Mehr</string>
     <string name="name">Name</string>
     <string name="new_step">Neuer Schritt</string>
     <string name="pause">Pause</string>
@@ -74,6 +80,10 @@
     <string name="order_by_name_desc">Z-A</string>
     <string name="order_by_last_run_recently">Kürzlich geschafft</string>
     <string name="order_by_last_run_long_ago">Lang ist\'s her</string>
+    <string name="zip_export">ZIP-Export</string>
+    <string name="zip_export_explanation">Sichere alle Routinen und Übungen</string>
+    <string name="zip_import">ZIP-Import</string>
+    <string name="zip_import_explanation">Lade Routinen und Übungen</string>
 
     <plurals name="exercises_with_count">
         <item quantity="one">%1$d Übung</item>
