@@ -8,6 +8,7 @@ import io.github.janmalch.woroboro.data.model.RoutineEntity
 import io.github.janmalch.woroboro.data.model.RoutineStepEntity
 import io.github.janmalch.woroboro.data.model.TagEntity
 import io.github.janmalch.woroboro.models.Exercise
+import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.Reminder
@@ -102,3 +103,31 @@ fun Reminder.asEntities(): Pair<ReminderEntity, List<String>> {
         routinesOrder = filter.routinesOrder,
     ) to filter.selectedTags.map { it.label }
 }
+
+fun Exercise.asText(includeMedia: Boolean): String = """Exercise: $name
+${execution.asText()}
+${
+    media.joinToString(
+        prefix = "[",
+        separator = ",",
+        postfix = "]",
+        transform = { it.id.toString() }).takeIf { media.isNotEmpty() && includeMedia }
+}
+$description"""
+
+private fun ExerciseExecution.asText(): String = listOfNotNull(
+    sets.toString() + "x",
+    reps?.let { "Reps = $it" },
+    hold?.let { "Hold = $it" },
+    pause?.let { "Pause = $it" },
+).joinToString()
+
+/*
+fun FullRoutine.asText(): String = """Routine: $name
+${steps.joinToString(separator = "\n", transform = { it.asText() })}"""
+
+private fun RoutineStep.asText(): String =    when (this) {
+        is RoutineStep.ExerciseStep -> "Exercise: ${exercise.id} (${customExecution?.asText() ?: ""})" // FIXME: how to ref?
+        is RoutineStep.PauseStep -> "Pause: $duration"
+    }
+*/

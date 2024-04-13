@@ -15,6 +15,11 @@ enum class Outcome {
     Failure
 }
 
+sealed interface DataOutcome<T> {
+    data class Success<T>(val data: T) : DataOutcome<T>
+    class Failure<T> : DataOutcome<T>
+}
+
 @Composable
 fun <T> CollectAsEvents(
     flow: Flow<T>,

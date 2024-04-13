@@ -45,4 +45,8 @@ interface BusinessModule {
     @Singleton
     fun bindsMediaOptimizer(impl: OnDeviceMediaOptimizer): MediaOptimizer
 
+    @Binds
+    @Singleton
+    fun bindsImportExportManager(impl: ImportExportManagerImpl): ImportExportManager
+
 }

@@ -32,6 +32,7 @@ import io.github.janmalch.woroboro.R
 fun MoreScreen(
     onViewLicenses: () -> Unit,
     onClearLastRuns: () -> Unit,
+    onExport: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -78,7 +79,7 @@ fun MoreScreen(
                     supportingContent = {
                         Text(text = stringResource(R.string.zip_export_explanation))
                     },
-                    modifier = Modifier.clickable(onClick = { /* TODO */ })
+                    modifier = Modifier.clickable(onClick = onExport)
                 )
                 HorizontalDivider()
 

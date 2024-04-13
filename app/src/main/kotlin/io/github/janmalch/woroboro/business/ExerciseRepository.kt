@@ -26,7 +26,11 @@ interface ExerciseRepository {
      * Also filters the list to only include favorites, if [onlyFavorites] is set to `true`.
      * Otherwise returns both favorites and non-favorites.
      */
-    fun findAll(tags: List<String>, onlyFavorites: Boolean, textQuery: String): Flow<List<Exercise>>
+    fun findAll(
+        tags: List<String> = emptyList(),
+        onlyFavorites: Boolean = false,
+        textQuery: String = ""
+    ): Flow<List<Exercise>>
     suspend fun delete(id: UUID)
 }
 

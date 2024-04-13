@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.ui.CollectAsEvents
+import io.github.janmalch.woroboro.ui.DataOutcome
 import io.github.janmalch.woroboro.ui.Outcome
 
 
@@ -22,6 +23,7 @@ fun NavGraphBuilder.moreScreen(
     ) {
         val context = LocalContext.current
         val viewModel = hiltViewModel<MoreScreenViewModel>()
+        val share = rememberShareFunction(onResult = { viewModel.cleanExports() })
 
         CollectAsEvents(viewModel.onClearLastRunsFinished) {
             val message = when (it) {
@@ -29,6 +31,13 @@ fun NavGraphBuilder.moreScreen(
                 Outcome.Failure -> context.getString(R.string.unknown_error_message)
             }
             onShowSnackbar(message)
+        }
+
+        CollectAsEvents(viewModel.onExportFinished) {
+            when (it) {
+                is DataOutcome.Success -> share(it.data)
+                is DataOutcome.Failure -> onShowSnackbar(context.getString(R.string.unknown_error_message))
+            }
         }
 
         MoreScreen(
@@ -40,7 +49,8 @@ fun NavGraphBuilder.moreScreen(
                     )
                 )
             },
-            onClearLastRuns = { viewModel.clearLastRuns() }
+            onClearLastRuns = { viewModel.clearLastRuns() },
+            onExport = { viewModel.export() },
         )
     }
 }
