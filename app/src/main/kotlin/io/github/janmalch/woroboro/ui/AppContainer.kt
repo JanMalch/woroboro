@@ -70,6 +70,11 @@ fun AppContainer(startDestination: String) {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(message = it)
                     }
+                },
+                onShowSnackbarAction = {
+                    coroutineScope.launch {
+                        it.action(snackbarHostState.showSnackbar(it))
+                    }
                 }
             )
         }

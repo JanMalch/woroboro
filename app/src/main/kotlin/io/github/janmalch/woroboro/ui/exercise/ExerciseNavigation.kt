@@ -7,6 +7,7 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.navigation
 import io.github.janmalch.woroboro.ui.exercise.editor.exerciseEditorScreen
 import io.github.janmalch.woroboro.ui.exercise.tageditor.tagEditorScreen
+import io.github.janmalch.woroboro.utils.SnackbarAction
 import java.util.UUID
 
 
@@ -26,6 +27,7 @@ fun NavGraphBuilder.exercisesGraph(
     onExerciseClick: (UUID) -> Unit,
     onBackClick: () -> Unit,
     onShowSnackbar: (String) -> Unit,
+    onShowSnackbarAction: (SnackbarAction) -> Unit,
 ) {
     navigation(
         route = EXERCISES_GRAPH_ROUTE,
@@ -36,7 +38,12 @@ fun NavGraphBuilder.exercisesGraph(
             onExerciseClick = onExerciseClick,
             onNavigateToTagEditor = onNavigateToTagEditor,
         )
-        exerciseEditorScreen(onBackClick = onBackClick, onShowSnackbar = onShowSnackbar)
+        exerciseEditorScreen(
+            onBackClick = onBackClick,
+            onShowSnackbar = onShowSnackbar,
+            onShowSnackbarAction = onShowSnackbarAction,
+            onNavigateToExerciseEditor = onExerciseClick,
+        )
         tagEditorScreen(onBackClick = onBackClick)
     }
 

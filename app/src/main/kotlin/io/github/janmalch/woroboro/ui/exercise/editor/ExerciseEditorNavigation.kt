@@ -1,5 +1,6 @@
 package io.github.janmalch.woroboro.ui.exercise.editor
 
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -16,6 +17,7 @@ import io.github.janmalch.woroboro.ui.CollectAsEvents
 import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.components.NavigationDefaults
 import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
+import io.github.janmalch.woroboro.utils.SnackbarAction
 import java.util.UUID
 
 
@@ -45,6 +47,8 @@ fun NavController.navigateToExerciseEditor(
 fun NavGraphBuilder.exerciseEditorScreen(
     onBackClick: () -> Unit,
     onShowSnackbar: (String) -> Unit,
+    onShowSnackbarAction: (SnackbarAction) -> Unit,
+    onNavigateToExerciseEditor: (exerciseId: UUID) -> Unit,
 ) {
     composable(
         route = EXERCISE_EDITOR_ROUTE_PATTERN,
@@ -66,7 +70,21 @@ fun NavGraphBuilder.exerciseEditorScreen(
         CollectAsEvents(viewModel.onSaveFinished) {
             when (it) {
                 Outcome.Success -> {
-                    onShowSnackbar(context.getString(R.string.exercise_save_success))
+                    onShowSnackbarAction(
+                        SnackbarAction(
+                            message = context.getString(R.string.exercise_save_success),
+                            actionLabel = context.getString(R.string.exercise_save_success_action_edit),
+                        ) { res ->
+                            if (res == SnackbarResult.ActionPerformed) {
+                                val exerciseId = exercise?.id
+                                if (exerciseId != null) {
+                                    onNavigateToExerciseEditor(exerciseId)
+                                } else {
+                                    onShowSnackbar(context.getString(R.string.unknown_error_message))
+                                }
+                            }
+                        }
+                    )
                     onBackClick()
                 }
 

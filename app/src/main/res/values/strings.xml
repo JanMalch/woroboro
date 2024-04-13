@@ -22,6 +22,7 @@
     <string name="exercise_execution_with_pause">%1$s · %2$s Pause</string>
     <string name="exercise_save_error">Fehler beim Speichern der Übung.</string>
     <string name="exercise_save_success">Übung erfolgreich gespeichert.</string>
+    <string name="exercise_save_success_action_edit">Bearbeiten</string>
     <string name="exercise_search_placeholder">Nach Übungen suchen…</string>
     <string name="exercises">Übungen</string>
     <string name="favorite_exercise">Lieblingsübung</string>
