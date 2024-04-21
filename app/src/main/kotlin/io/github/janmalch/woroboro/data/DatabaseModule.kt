@@ -25,8 +25,10 @@ object DatabaseModule {
         context,
         AppDatabase::class.java,
         "app-database",
-    ).addMigrations(MIGRATION_3_4)
-        .build()
+    ).addMigrations(
+        MIGRATION_3_4,
+        MIGRATION_6_7,
+    ).build()
 
     @Provides
     fun providesExerciseDao(db: AppDatabase): ExerciseDao = db.exerciseDao()

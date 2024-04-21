@@ -1,6 +1,7 @@
 package io.github.janmalch.woroboro.data
 
 import androidx.room.TypeConverter
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.UUID
@@ -28,22 +29,33 @@ class StandardConverters {
     }
 
     @TypeConverter
-    fun fromUuid(value: String?): UUID? {
+    fun toUuid(value: String?): UUID? {
         return value?.let(UUID::fromString)
     }
 
     @TypeConverter
-    fun toUuid(uuid: UUID?): String? {
+    fun fromUuid(uuid: UUID?): String? {
         return uuid?.toString()
     }
 
     @TypeConverter
-    fun fromDuration(value: String?): Duration? {
-        return value?.let { Duration.parseIsoString(it) }
+    fun toDuration(value: String?): Duration? {
+        return value?.let(Duration.Companion::parseIsoString)
     }
 
     @TypeConverter
-    fun toDuration(value: Duration?): String? {
+    fun fromDuration(value: Duration?): String? {
         return value?.toIsoString()
+    }
+
+
+    @TypeConverter
+    fun toInstant(value: Long?): Instant? {
+        return value?.let(Instant::ofEpochMilli)
+    }
+
+    @TypeConverter
+    fun fromInstant(value: Instant?): Long? {
+        return value?.toEpochMilli()
     }
 }

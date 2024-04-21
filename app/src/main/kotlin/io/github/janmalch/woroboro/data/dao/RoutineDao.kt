@@ -95,6 +95,8 @@ abstract class RoutineDao {
                         lastRunDuration = routine.routine.lastRunDuration,
                         lastRunEnded = routine.routine.lastRunEnded,
                         exerciseCount = routine.exerciseCount,
+                        createdAt = routine.routine.createdAt,
+                        updatedAt = routine.routine.updatedAt,
                         media = mediaOfRoutine.map { it.mediaEntity.asModel() }.distinct()
                             .toImmutableList(),
                         tags = tagsOfRoutine.map { it.tagEntity.asModel() }.distinct()
@@ -141,6 +143,8 @@ abstract class RoutineDao {
                     isFavorite = routine.isFavorite,
                     lastRunDuration = routine.lastRunDuration,
                     lastRunEnded = routine.lastRunEnded,
+                    createdAt = routine.createdAt,
+                    updatedAt = routine.updatedAt,
                     steps = steps
                         .map { step -> step.asModel(exercises) }
                         .sortedBy(RoutineStep::sortIndex)

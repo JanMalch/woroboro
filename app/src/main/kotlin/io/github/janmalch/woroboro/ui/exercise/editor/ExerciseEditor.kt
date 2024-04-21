@@ -72,6 +72,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 import java.util.UUID
 import kotlin.time.Duration
 
@@ -142,6 +143,7 @@ fun ExerciseEditorScreen(
                     Button(
                         onClick = {
                             sets?.let {
+                                val now = Instant.now()
                                 val edited = EditedExercise(
                                     exercise = Exercise(
                                         id = id,
@@ -156,6 +158,8 @@ fun ExerciseEditorScreen(
                                         ),
                                         isFavorite = isFavorite,
                                         media = media.existing,
+                                        createdAt = exercise?.createdAt ?: now,
+                                        updatedAt = now,
                                     ),
                                     addedMedia = media.added,
                                 )

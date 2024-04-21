@@ -12,6 +12,7 @@ import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.Media
 import kotlinx.collections.immutable.toImmutableList
+import java.time.Instant
 import java.util.UUID
 
 @Entity(tableName = "exercise")
@@ -24,6 +25,10 @@ data class ExerciseEntity(
     val execution: ExerciseExecution,
     @ColumnInfo(name = "is_favorite")
     val isFavorite: Boolean,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Instant,
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Instant,
 )
 
 @Fts4(contentEntity = ExerciseEntity::class)
@@ -85,6 +90,8 @@ fun ExerciseEntityWithMediaAndTags.asModel() = Exercise(
     description = exercise.description,
     execution = exercise.execution,
     isFavorite = exercise.isFavorite,
+    createdAt = exercise.createdAt,
+    updatedAt = exercise.updatedAt,
     tags = tags.map(TagEntity::asModel).toImmutableList(),
     media = media.map(MediaEntity::asModel).toImmutableList(),
 )

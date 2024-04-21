@@ -11,6 +11,7 @@ import io.github.janmalch.woroboro.models.Media
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
@@ -44,9 +45,12 @@ class ExerciseRepositoryImpl @Inject constructor(
         val addedMedia = mediaFileManager.add(exercise.addedMedia).map { it.asEntity(exerciseId) }
         Log.d("ExerciseRepositoryImpl", "Optimized ${addedMedia.size} new media files: $addedMedia")
         try {
+            val now = Instant.now()
             exerciseDao.upsert(
                 exercise.exercise.copy(
                     id = exerciseId,
+                    createdAt = now,
+                    updatedAt = now,
                 ).asEntity().copy(
                     media = addedMedia,
                 )
@@ -65,7 +69,7 @@ class ExerciseRepositoryImpl @Inject constructor(
         )
         val addedMedia =
             mediaFileManager.add(exercise.addedMedia).map { it.asEntity(exercise.exercise.id) }
-        val exerciseEntity = exercise.exercise.asEntity()
+        val exerciseEntity = exercise.exercise.copy(updatedAt = Instant.now()).asEntity()
         try {
             exerciseDao.upsert(
                 exerciseEntity.copy(

@@ -103,6 +103,7 @@ import kotlinx.collections.immutable.toPersistentList
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
 import sh.calvin.reorderable.rememberReorderableLazyColumnState
+import java.time.Instant
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -164,6 +165,7 @@ fun RoutineEditorScreen(
                 actions = {
                     Button(
                         onClick = {
+                            val now = Instant.now()
                             val edited = FullRoutine(
                                 id = id,
                                 name = name.trim(),
@@ -171,6 +173,8 @@ fun RoutineEditorScreen(
                                 isFavorite = isFavorite,
                                 lastRunDuration = null,
                                 lastRunEnded = null,
+                                createdAt = routine?.createdAt ?: now,
+                                updatedAt = now,
                             )
                             onSave(edited)
                         },

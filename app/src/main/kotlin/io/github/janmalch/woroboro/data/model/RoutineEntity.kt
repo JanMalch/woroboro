@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import io.github.janmalch.woroboro.models.ExerciseExecution
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.time.Duration
@@ -22,6 +23,10 @@ data class RoutineEntity(
     val lastRunDuration: Duration?,
     @ColumnInfo(name = "last_run_ended")
     val lastRunEnded: LocalDateTime?,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Instant,
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Instant,
 )
 
 @Entity(

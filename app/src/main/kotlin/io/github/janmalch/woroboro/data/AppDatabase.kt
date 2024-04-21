@@ -21,6 +21,7 @@ import io.github.janmalch.woroboro.data.model.ReminderFilterTagCrossRefEntity
 import io.github.janmalch.woroboro.data.model.RoutineEntity
 import io.github.janmalch.woroboro.data.model.RoutineStepEntity
 import io.github.janmalch.woroboro.data.model.TagEntity
+import java.time.Instant
 import java.util.UUID
 
 @Database(
@@ -35,7 +36,7 @@ import java.util.UUID
         ReminderEntity::class,
         ReminderFilterTagCrossRefEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
@@ -126,5 +127,59 @@ VALUES      (?,
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_routine_step_routine_id` ON `routine_step` (`routine_id`)")
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_routine_step_sort_index` ON `routine_step` (`sort_index`)")
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_routine_step_exercise_id` ON `routine_step` (`exercise_id`)")
+    }
+}
+
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+CREATE TABLE IF NOT EXISTS `exercise_new`
+  (
+     `id`          TEXT NOT NULL,
+     `name`        TEXT NOT NULL,
+     `description` TEXT NOT NULL,
+     `is_favorite` INTEGER NOT NULL,
+     `sets`        INTEGER NOT NULL,
+     `reps`        INTEGER,
+     `hold`        TEXT,
+     `pause`       TEXT,
+     `created_at`  INTEGER NOT NULL,
+     `updated_at`  INTEGER NOT NULL,
+     PRIMARY KEY(`id`)
+  ) 
+"""
+        )
+        db.execSQL(
+            """
+CREATE TABLE IF NOT EXISTS `routine_new`
+  (
+     `id`                TEXT NOT NULL,
+     `name`              TEXT NOT NULL,
+     `is_favorite`       INTEGER NOT NULL,
+     `last_run_duration` TEXT,
+     `last_run_ended`    TEXT,
+     `created_at`        INTEGER NOT NULL,
+     `updated_at`        INTEGER NOT NULL,
+     PRIMARY KEY(`id`)
+  )
+        """.trimIndent()
+        )
+        val now = Instant.now().toEpochMilli()
+        db.execSQL(
+            "INSERT INTO `exercise_new` SELECT exercise.*, ? as created_at, ? as updated_at FROM `exercise`",
+            arrayOf(now, now)
+        )
+        db.execSQL(
+            "INSERT INTO `routine_new` SELECT routine.*, ? as created_at, ? as updated_at FROM `routine`",
+            arrayOf(now, now)
+        )
+
+        // Drop old tables and rename
+        db.execSQL("DROP TABLE `exercise`");
+        db.execSQL("ALTER TABLE `exercise_new` RENAME TO `exercise`");
+        db.execSQL("DROP TABLE `routine`");
+        db.execSQL("ALTER TABLE `routine_new` RENAME TO `routine`");
     }
 }

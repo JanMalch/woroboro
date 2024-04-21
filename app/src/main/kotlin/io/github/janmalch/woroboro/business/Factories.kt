@@ -29,6 +29,8 @@ fun Exercise.asEntity(): ExerciseEntityWithMediaAndTags {
             description = description.trim(),
             execution = execution,
             isFavorite = isFavorite,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
         ),
         tags = tags.map(Tag::asEntity),
         media = media.map { it.asEntity(exerciseId = id) },
@@ -56,6 +58,8 @@ fun Routine.asEntity() = RoutineEntity(
     isFavorite = isFavorite,
     lastRunDuration = lastRunDuration,
     lastRunEnded = lastRunEnded,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
 )
 
 fun RoutineStep.asEntity(routineId: UUID, stepId: UUID = id): RoutineStepEntity = when (this) {
@@ -85,6 +89,8 @@ fun FullRoutine.asEntities(overwriteStepIds: Boolean = false): Pair<RoutineEntit
         isFavorite = isFavorite,
         lastRunDuration = lastRunDuration,
         lastRunEnded = lastRunEnded,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
     ) to steps.map { it.asEntity(id, if (overwriteStepIds) UUID.randomUUID() else it.id) }
 
 

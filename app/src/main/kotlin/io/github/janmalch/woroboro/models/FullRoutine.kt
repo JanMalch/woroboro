@@ -2,6 +2,7 @@ package io.github.janmalch.woroboro.models
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.time.Duration
@@ -15,6 +16,8 @@ data class Routine(
     val isFavorite: Boolean,
     val lastRunDuration: Duration?,
     val lastRunEnded: LocalDateTime?,
+    val createdAt: Instant,
+    val updatedAt: Instant,
 )
 
 data class FullRoutine(
@@ -24,6 +27,8 @@ data class FullRoutine(
     val isFavorite: Boolean,
     val lastRunDuration: Duration?,
     val lastRunEnded: LocalDateTime?,
+    val createdAt: Instant,
+    val updatedAt: Instant,
 ) {
     val exercises: ImmutableList<Exercise> = steps
         .mapNotNull { (it as? RoutineStep.ExerciseStep)?.exercise }
@@ -38,6 +43,8 @@ fun FullRoutine.asRoutine(): Routine {
         lastRunDuration = lastRunDuration,
         lastRunEnded = lastRunEnded,
         exerciseCount = exercises.size,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
         media = exercises.flatMap { it.media }.distinct().toImmutableList(),
         tags = exercises.flatMap { it.tags }.distinct().toImmutableList(),
     )
