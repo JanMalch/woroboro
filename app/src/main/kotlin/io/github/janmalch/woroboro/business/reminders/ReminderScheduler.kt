@@ -70,6 +70,7 @@ class AndroidReminderScheduler @Inject constructor(
 
     override fun cancel(reminderId: UUID) {
         alarmManager.cancel(createPendingIntent(reminderId.hashCode()))
+        Log.d("AndroidReminderScheduler", "Cancelled reminder with ID $reminderId")
     }
 
     private fun createPendingIntent(

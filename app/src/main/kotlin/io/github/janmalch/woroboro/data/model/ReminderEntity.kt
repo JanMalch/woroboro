@@ -38,6 +38,8 @@ data class ReminderEntity(
     val filterDuration: DurationFilter,
     @ColumnInfo("routines_order", defaultValue = "NameAsc")
     val routinesOrder: RoutinesOrder,
+    @ColumnInfo("is_active", defaultValue = "1")
+    val isActive: Boolean,
 )
 
 @Entity(
@@ -85,6 +87,7 @@ fun ReminderEntityWithFilterTags.asModel() = Reminder(
     name = reminder.name,
     remindAt = reminder.remindAt,
     weekdays = reminder.weekdays,
+    isActive = reminder.isActive,
     repeat = if (reminder.repeatEvery != null && reminder.repeatUntil != null) {
         Reminder.Repeat(
             every = reminder.repeatEvery,

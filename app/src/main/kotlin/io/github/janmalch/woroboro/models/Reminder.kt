@@ -17,6 +17,7 @@ data class Reminder(
     val remindAt: LocalTime,
     val repeat: Repeat?,
     val query: RoutineQuery,
+    val isActive: Boolean,
 ) {
 
     init {

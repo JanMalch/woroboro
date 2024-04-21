@@ -32,6 +32,7 @@ fun NavGraphBuilder.remindersGraph(
         reminderListScreen(
             onNewReminder = onNewReminder,
             onGoToReminder = onGoToReminder,
+            onShowSnackbar = onShowSnackbar,
         )
         reminderEditorScreen(
             onBackClick = onBackClick,

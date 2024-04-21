@@ -6,16 +6,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.NotificationsActive
+import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -38,6 +42,7 @@ fun ReminderListScreen(
     reminders: ImmutableList<Reminder>,
     onNewReminder: () -> Unit,
     onGoToReminder: (UUID) -> Unit,
+    onToggleReminderActive: (reminderId: UUID, shouldActivate: Boolean) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -55,6 +60,7 @@ fun ReminderListScreen(
         ReminderList(
             reminders = reminders,
             onGoToReminder = onGoToReminder,
+            onToggleReminderActive = onToggleReminderActive,
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -67,6 +73,7 @@ fun ReminderListScreen(
 fun ReminderList(
     reminders: ImmutableList<Reminder>,
     onGoToReminder: (UUID) -> Unit,
+    onToggleReminderActive: (reminderId: UUID, shouldActivate: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val timeFormat = stringResource(id = R.string.time_format)
@@ -75,7 +82,9 @@ fun ReminderList(
         LazyColumn(
             contentPadding = PaddingValues(bottom = 80.dp),
         ) {
-            items(reminders, key = { it.id }) { reminder ->
+            // So reminder IDs are not stable (update generates a new ID) so we can't use that key,
+            // but indices can't change (currently), so it is a suitable key.
+            itemsIndexed(reminders, key = { idx, _ -> idx }) { _, reminder ->
                 ListItem(
                     headlineContent = { Text(reminder.name) },
                     supportingContent = {
@@ -88,6 +97,27 @@ fun ReminderList(
                             )
                         })
 
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = reminder.isActive,
+                            onCheckedChange = { onToggleReminderActive(reminder.id, it) },
+                            thumbContent = {
+                                if (reminder.isActive) {
+                                    Icon(
+                                        Icons.Rounded.NotificationsActive,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                } else {
+                                    Icon(
+                                        Icons.Rounded.NotificationsOff,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+                            }
+                        )
                     },
                     modifier = Modifier.clickable { onGoToReminder(reminder.id) }
                 )

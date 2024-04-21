@@ -8,6 +8,7 @@ import io.github.janmalch.woroboro.data.model.ReminderEntityWithFilterTags
 import io.github.janmalch.woroboro.data.model.asModel
 import io.github.janmalch.woroboro.models.Reminder
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
@@ -22,6 +23,21 @@ interface ReminderRepository {
     suspend fun update(reminder: Reminder): UUID
 
     suspend fun delete(reminderId: UUID)
+
+}
+
+suspend fun ReminderRepository.activate(reminderId: UUID) {
+    val reminder = requireNotNull(findOne(reminderId).first()) {
+        "'$reminderId' is not an ID for an existing reminder"
+    }
+    update(reminder.copy(isActive = true))
+}
+
+suspend fun ReminderRepository.deactivate(reminderId: UUID) {
+    val reminder = requireNotNull(findOne(reminderId).first()) {
+        "'$reminderId' is not an ID for an existing reminder"
+    }
+    update(reminder.copy(isActive = false))
 }
 
 class ReminderRepositoryImpl @Inject constructor(
@@ -41,7 +57,9 @@ class ReminderRepositoryImpl @Inject constructor(
         val model = reminder.copy(id = UUID.randomUUID())
         val (entity, filterTags) = model.asEntities()
         reminderDao.upsert(entity, filterTags)
-        reminderScheduler.schedule(model)
+        if (reminder.isActive) {
+            reminderScheduler.schedule(model)
+        }
         return model.id
     }
 
@@ -58,5 +76,4 @@ class ReminderRepositoryImpl @Inject constructor(
         reminderScheduler.cancel(reminderId)
         reminderDao.delete(reminderId)
     }
-
 }

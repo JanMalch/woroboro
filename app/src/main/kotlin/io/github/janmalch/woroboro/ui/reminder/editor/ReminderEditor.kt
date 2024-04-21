@@ -142,6 +142,7 @@ fun ReminderEditorScreen(
                                 repeat = if (repeatEverySnapshot != null && repeatUntilSnapshot != null)
                                     Reminder.Repeat(repeatEverySnapshot, repeatUntilSnapshot)
                                 else null,
+                                isActive = reminder?.isActive ?: true,
                                 query = if (routineIdFilterSnapshot != null) {
                                     RoutineQuery.Single(routineIdFilterSnapshot)
                                 } else {
