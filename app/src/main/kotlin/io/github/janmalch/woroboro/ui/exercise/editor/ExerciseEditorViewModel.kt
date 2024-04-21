@@ -98,7 +98,7 @@ class ExerciseEditorViewModel @Inject constructor(
         // don't reset loading, because we navigate away on success
         isLoading = true
         viewModelScope.launch(saveExceptionHandler) {
-            if (exerciseId.value == null) {
+            exerciseId.value = if (exerciseId.value == null) {
                 exerciseRepository.insert(exercise)
             } else {
                 exerciseRepository.update(exercise)
