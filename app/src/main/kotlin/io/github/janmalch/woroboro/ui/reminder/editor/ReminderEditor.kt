@@ -176,7 +176,12 @@ fun ReminderEditorScreen(
                                     contentDescription = null,
                                 )
                             },
-                            onClick = { if (reminder != null) onDelete(reminder.id) }
+                            onClick = {
+                                if (reminder != null) {
+                                    onDelete(reminder.id)
+                                    dismissMoreMenu()
+                                }
+                            }
                         )
                     }
                 }

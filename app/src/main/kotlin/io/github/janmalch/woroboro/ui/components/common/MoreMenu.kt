@@ -14,6 +14,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,11 +23,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+@Immutable
+interface MoreMenuScope : ColumnScope {
+    fun dismissMoreMenu()
+}
+
+private class MoreMenuScopeImpl(
+    private val columnScope: ColumnScope,
+    private val _dismissMoreMenu: () -> Unit,
+) : MoreMenuScope, ColumnScope by columnScope {
+    override fun dismissMoreMenu() {
+        _dismissMoreMenu()
+    }
+}
+
 @Composable
 fun MoreMenu(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable MoreMenuScope.() -> Unit,
 ) {
     val clearFocus = rememberClearFocus()
     var isOpen by remember { mutableStateOf(false) }
@@ -42,13 +57,17 @@ fun MoreMenu(
     DropdownMenu(
         expanded = isOpen,
         onDismissRequest = { isOpen = false },
-        content = content,
+        content = {
+            MoreMenuScopeImpl(this) {
+                isOpen = false
+            }.content()
+        },
         modifier = modifier,
     )
 }
 
 @Composable
-fun MoreMenuItem(
+fun MoreMenuScope.MoreMenuItem(
     text: @Composable () -> Unit,
     icon: @Composable () -> Unit,
     onClick: () -> Unit,

@@ -182,7 +182,12 @@ fun ExerciseEditorScreen(
                                     contentDescription = null,
                                 )
                             },
-                            onClick = { if (exercise != null) isAddToRoutineDialogOpen = true }
+                            onClick = {
+                                if (exercise != null) {
+                                    isAddToRoutineDialogOpen = true
+                                    dismissMoreMenu()
+                                }
+                            }
                         )
                         MoreMenuItem(
                             text = { Text(text = stringResource(R.string.delete_exercise)) },
@@ -192,7 +197,12 @@ fun ExerciseEditorScreen(
                                     contentDescription = null,
                                 )
                             },
-                            onClick = { if (exercise != null) onDelete(exercise.id) }
+                            onClick = {
+                                if (exercise != null) {
+                                    onDelete(exercise.id)
+                                    dismissMoreMenu()
+                                }
+                            }
                         )
                     }
                 },

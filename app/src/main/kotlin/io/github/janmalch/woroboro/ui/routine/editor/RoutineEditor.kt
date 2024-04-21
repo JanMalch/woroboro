@@ -194,7 +194,12 @@ fun RoutineEditorScreen(
                                     contentDescription = null,
                                 )
                             },
-                            onClick = { if (routine != null) onDelete(routine.id) }
+                            onClick = {
+                                if (routine != null) {
+                                    onDelete(routine.id)
+                                    dismissMoreMenu()
+                                }
+                            }
                         )
                     }
                 }
