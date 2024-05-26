@@ -26,7 +26,6 @@ import io.github.janmalch.woroboro.ui.components.common.DoneCelebration
 import java.util.UUID
 import kotlin.time.Duration
 
-
 @Composable
 fun RoutineScreen(
     uiState: RoutineUiState,
@@ -38,30 +37,25 @@ fun RoutineScreen(
 ) {
     when (uiState) {
         RoutineUiState.Loading -> Box(modifier = Modifier.fillMaxSize())
-
         RoutineUiState.Failure -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 Text(
                     text = stringResource(R.string.unknown_error_message),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
         }
-
-        is RoutineUiState.Success -> RoutineSuccessScreen(
-            uiState = uiState,
-            onGoToEditor = onGoToEditor,
-            onFinishStep = onFinishStep,
-            onUndoStep = onUndoStep,
-            onRoutineDone = onRoutineDone,
-            onBackClick = onBackClick,
-        )
+        is RoutineUiState.Success ->
+            RoutineSuccessScreen(
+                uiState = uiState,
+                onGoToEditor = onGoToEditor,
+                onFinishStep = onFinishStep,
+                onUndoStep = onUndoStep,
+                onRoutineDone = onRoutineDone,
+                onBackClick = onBackClick,
+            )
     }
 }
-
 
 @Composable
 fun RoutineSuccessScreen(
@@ -77,9 +71,7 @@ fun RoutineSuccessScreen(
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = {
-                        Text(text = uiState.routine.name)
-                    },
+                    title = { Text(text = uiState.routine.name) },
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
                             Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
@@ -93,11 +85,7 @@ fun RoutineSuccessScreen(
                 )
             }
         ) { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 RoutineListMode(
                     uiState = uiState,
                     onFinishStep = onFinishStep,
@@ -105,7 +93,8 @@ fun RoutineSuccessScreen(
                     onDone = { done, totalTime ->
                         isCelebrationVisible = done
                         onRoutineDone(uiState.routine, totalTime)
-                    })
+                    }
+                )
             }
         }
 

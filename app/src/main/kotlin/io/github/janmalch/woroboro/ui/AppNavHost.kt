@@ -31,12 +31,8 @@ fun AppNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier,
-        enterTransition = {
-            fadeIn(animationSpec = tween(200))
-        },
-        exitTransition = {
-            fadeOut(animationSpec = tween(200))
-        },
+        enterTransition = { fadeIn(animationSpec = tween(200)) },
+        exitTransition = { fadeOut(animationSpec = tween(200)) },
     ) {
         exercisesGraph(
             onCreateExerciseClick = navController::navigateToExerciseEditor,

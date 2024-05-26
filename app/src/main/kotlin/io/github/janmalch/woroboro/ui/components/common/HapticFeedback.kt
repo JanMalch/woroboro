@@ -12,7 +12,9 @@ import androidx.compose.ui.platform.LocalView
 @Immutable
 interface HapticFeedback {
     fun dragStart()
+
     fun gestureEnd()
+
     fun segmentFrequentTick()
 
     companion object {

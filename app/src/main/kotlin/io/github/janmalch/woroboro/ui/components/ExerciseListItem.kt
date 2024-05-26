@@ -31,14 +31,17 @@ import kotlinx.collections.immutable.ImmutableList
 
 object ExerciseListItemDefaults {
     @Stable
-    val ImageSizeTwoLines: Dp get() = 56.dp
+    val ImageSizeTwoLines: Dp
+        get() = 56.dp
 
     @Stable
-    val ImageSizeThreeLines: Dp get() = 64.dp
+    val ImageSizeThreeLines: Dp
+        get() = 64.dp
 
     /** The default corner size for images. */
     @Stable
-    val ImageCornerSize: Dp get() = 8.dp
+    val ImageCornerSize: Dp
+        get() = 8.dp
 
     @Composable
     fun ExecutionAsSupportingContent(execution: ExerciseExecution) {
@@ -68,13 +71,13 @@ object ExerciseListItemDefaults {
             model = media.firstOrNull()?.thumbnail,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(imageSize)
-                .background(
-                    MaterialTheme.colorScheme.surfaceVariant,
-                    RoundedCornerShape(ImageCornerSize)
-                )
-                .clip(RoundedCornerShape(ImageCornerSize))
+            modifier =
+                Modifier.size(imageSize)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        RoundedCornerShape(ImageCornerSize)
+                    )
+                    .clip(RoundedCornerShape(ImageCornerSize))
         )
     }
 }
@@ -84,14 +87,12 @@ fun ExerciseListItem(
     exercise: Exercise,
     modifier: Modifier = Modifier,
     execution: ExerciseExecution = exercise.execution,
-    overlineContent: @Composable (() -> Unit)? = {
-        TagsAsOverlineContent(exercise.tags)
-    },
-    supportingContent: @Composable (() -> Unit)? = {
-        ExecutionAsSupportingContent(execution)
-    },
-    imageSize: Dp = if (overlineContent != null && supportingContent != null) ExerciseListItemDefaults.ImageSizeThreeLines
-    else ExerciseListItemDefaults.ImageSizeTwoLines,
+    overlineContent: @Composable (() -> Unit)? = { TagsAsOverlineContent(exercise.tags) },
+    supportingContent: @Composable (() -> Unit)? = { ExecutionAsSupportingContent(execution) },
+    imageSize: Dp =
+        if (overlineContent != null && supportingContent != null)
+            ExerciseListItemDefaults.ImageSizeThreeLines
+        else ExerciseListItemDefaults.ImageSizeTwoLines,
     leadingContent: @Composable (() -> Unit)? = {
         ExerciseListItemDefaults.MediaAsLeadingContent(
             media = exercise.media,
@@ -99,7 +100,6 @@ fun ExerciseListItem(
         )
     },
     trailingContent: @Composable (() -> Unit)? = null,
-
     onClick: (() -> Unit)? = null,
     tonalElevation: Dp = ListItemDefaults.Elevation,
     shadowElevation: Dp = ListItemDefaults.Elevation,
@@ -107,11 +107,7 @@ fun ExerciseListItem(
     ListItem(
         leadingContent = leadingContent,
         headlineContent = {
-            Text(
-                text = exercise.name,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+            Text(text = exercise.name, maxLines = 2, overflow = TextOverflow.Ellipsis)
         },
         overlineContent = overlineContent,
         supportingContent = supportingContent,
@@ -122,26 +118,25 @@ fun ExerciseListItem(
     )
 }
 
-
 @Composable
 @ReadOnlyComposable
 fun exerciseExecution(
     execution: ExerciseExecution,
 ): String {
-    val base = when {
-        execution.reps != null -> stringResource(
-            R.string.exercise_execution_sets_reps,
-            execution.sets,
-            execution.reps
-        )
-
-        execution.hold != null -> {
-            val hold = formatDuration(execution.hold)
-            stringResource(R.string.exercise_execution_sets_hold, execution.sets, hold)
+    val base =
+        when {
+            execution.reps != null ->
+                stringResource(
+                    R.string.exercise_execution_sets_reps,
+                    execution.sets,
+                    execution.reps
+                )
+            execution.hold != null -> {
+                val hold = formatDuration(execution.hold)
+                stringResource(R.string.exercise_execution_sets_hold, execution.sets, hold)
+            }
+            else -> stringResource(R.string.exercise_execution_sets, execution.sets)
         }
-
-        else -> stringResource(R.string.exercise_execution_sets, execution.sets)
-    }
     return if (execution.pause != null) {
         val pause = formatDuration(execution.pause)
         stringResource(R.string.exercise_execution_with_pause, base, pause)
@@ -149,5 +144,3 @@ fun exerciseExecution(
         base
     }
 }
-
-

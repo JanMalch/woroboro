@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.RoutinesOrder
 
-
 @Composable
 fun RoutineOrderChip(
     value: RoutinesOrder,
@@ -34,12 +33,13 @@ fun RoutineOrderChip(
     enabled: Boolean = true,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val emitAndClose = remember<(RoutinesOrder) -> Unit>(onValueChange) {
-        {
-            onValueChange(it)
-            expanded = false
+    val emitAndClose =
+        remember<(RoutinesOrder) -> Unit>(onValueChange) {
+            {
+                onValueChange(it)
+                expanded = false
+            }
         }
-    }
 
     Box {
         FilterChip(
@@ -47,8 +47,9 @@ fun RoutineOrderChip(
                 Icon(
                     Icons.AutoMirrored.Rounded.Sort,
                     contentDescription = null,
-                    tint = if (value != RoutinesOrder.NameAsc) MaterialTheme.colorScheme.primary
-                    else LocalContentColor.current,
+                    tint =
+                        if (value != RoutinesOrder.NameAsc) MaterialTheme.colorScheme.primary
+                        else LocalContentColor.current,
                     modifier = Modifier.size(18.dp)
                 )
             },
@@ -83,7 +84,6 @@ fun RoutineOrderChip(
             )
         }
     }
-
 }
 
 @Composable
@@ -95,14 +95,15 @@ private fun RoutinesOrderItem(
     DropdownMenuItem(
         text = {
             Text(
-                text = stringResource(
-                    when (value) {
-                        RoutinesOrder.NameAsc -> R.string.order_by_name_asc
-                        RoutinesOrder.NameDesc -> R.string.order_by_name_desc
-                        RoutinesOrder.LastRunRecently -> R.string.order_by_last_run_recently
-                        RoutinesOrder.LastRunLongAgo -> R.string.order_by_last_run_long_ago
-                    }
-                )
+                text =
+                    stringResource(
+                        when (value) {
+                            RoutinesOrder.NameAsc -> R.string.order_by_name_asc
+                            RoutinesOrder.NameDesc -> R.string.order_by_name_desc
+                            RoutinesOrder.LastRunRecently -> R.string.order_by_last_run_recently
+                            RoutinesOrder.LastRunLongAgo -> R.string.order_by_last_run_long_ago
+                        }
+                    )
             )
         },
         onClick = { onValueChange(value) },

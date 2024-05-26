@@ -8,15 +8,17 @@ import io.github.janmalch.woroboro.business.ImportExportManager
 import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.ui.DataOutcome
 import io.github.janmalch.woroboro.ui.Outcome
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.io.File
-import javax.inject.Inject
 
 @HiltViewModel
-class MoreScreenViewModel @Inject constructor(
+class MoreScreenViewModel
+@Inject
+constructor(
     private val routineRepository: RoutineRepository,
     private val importExport: ImportExportManager,
 ) : ViewModel() {
@@ -26,9 +28,7 @@ class MoreScreenViewModel @Inject constructor(
 
     private val clearLastRunsExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("MoreScreenViewModel", "Error while clearing last runs.", exception)
-        viewModelScope.launch {
-            _onClearLastRunsFinished.send(Outcome.Failure)
-        }
+        viewModelScope.launch { _onClearLastRunsFinished.send(Outcome.Failure) }
     }
 
     private val _onExportFinished = Channel<DataOutcome<File>>()
@@ -36,9 +36,7 @@ class MoreScreenViewModel @Inject constructor(
 
     private val onExportFinishedExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("MoreScreenViewModel", "Error while creating export.", exception)
-        viewModelScope.launch {
-            _onExportFinished.send(DataOutcome.Failure())
-        }
+        viewModelScope.launch { _onExportFinished.send(DataOutcome.Failure()) }
     }
 
     fun clearLastRuns() {
@@ -56,9 +54,6 @@ class MoreScreenViewModel @Inject constructor(
     }
 
     fun cleanExports() {
-        viewModelScope.launch {
-            importExport.clean()
-        }
+        viewModelScope.launch { importExport.clean() }
     }
-
 }

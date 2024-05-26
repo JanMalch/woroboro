@@ -17,6 +17,7 @@ enum class Outcome {
 
 sealed interface DataOutcome<T> {
     data class Success<T>(val data: T) : DataOutcome<T>
+
     class Failure<T> : DataOutcome<T>
 }
 
@@ -25,10 +26,9 @@ fun <T> CollectAsEvents(
     flow: Flow<T>,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     onEvent: suspend (T) -> Unit
-) = LaunchedEffect(flow, lifecycleOwner.lifecycle) {
-    lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        withContext(Dispatchers.Main.immediate) {
-            flow.collect(onEvent)
+) =
+    LaunchedEffect(flow, lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            withContext(Dispatchers.Main.immediate) { flow.collect(onEvent) }
         }
     }
-}

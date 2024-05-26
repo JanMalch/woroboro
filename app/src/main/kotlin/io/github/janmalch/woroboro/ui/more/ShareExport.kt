@@ -14,11 +14,8 @@ import java.io.File
 
 class ShareExport : ActivityResultContract<File, Boolean>() {
     override fun createIntent(context: Context, input: File): Intent {
-        val uri = FileProvider.getUriForFile(
-            context,
-            "io.github.janmalch.woroboro.fileprovider",
-            input
-        )
+        val uri =
+            FileProvider.getUriForFile(context, "io.github.janmalch.woroboro.fileprovider", input)
 
         return Intent.createChooser(
             Intent(Intent.ACTION_SEND).apply {
@@ -40,10 +37,11 @@ class ShareExport : ActivityResultContract<File, Boolean>() {
 fun rememberShareFunction(
     onResult: (ok: Boolean) -> Unit,
 ): (File) -> Unit {
-    val launcher = rememberLauncherForActivityResult(
-        contract = ShareExport(),
-        onResult = onResult,
-    )
+    val launcher =
+        rememberLauncherForActivityResult(
+            contract = ShareExport(),
+            onResult = onResult,
+        )
     return remember {
         fun(file: File) {
             launcher.launch(file)

@@ -13,9 +13,7 @@ fun Modifier.clearFocusAsOutsideClick(force: Boolean = true) = composed {
     Modifier.clickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = null,
-        onClick = {
-            focusManager.clearFocus(force = force)
-        }
+        onClick = { focusManager.clearFocus(force = force) }
     )
 }
 

@@ -1,14 +1,14 @@
 package io.github.janmalch.woroboro.models
 
 import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.RawValue
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
 data class Reminder(
     val id: UUID,
@@ -21,9 +21,7 @@ data class Reminder(
 ) {
 
     init {
-        require(weekdays.isNotEmpty()) {
-            "Reminder must have at least one weekday."
-        }
+        require(weekdays.isNotEmpty()) { "Reminder must have at least one weekday." }
         if (repeat != null) {
             require(repeat.until > remindAt) {
                 "Repeat until time must be after remind at time, but ${repeat.until} < $remindAt."
@@ -61,15 +59,16 @@ sealed interface RoutineQuery : Parcelable {
         val selectedTags: List<Tag>,
         val routinesOrder: RoutinesOrder,
     ) : RoutineQuery
-
 }
 
-fun RoutineQuery.asRoutineFilter(): RoutineQuery.RoutineFilter = when (this) {
-    is RoutineQuery.RoutineFilter -> this
-    is RoutineQuery.Single -> RoutineQuery.RoutineFilter(
-        onlyFavorites = false,
-        durationFilter = DurationFilter.Any,
-        selectedTags = emptyList(),
-        routinesOrder = RoutinesOrder.NameAsc,
-    )
-}
+fun RoutineQuery.asRoutineFilter(): RoutineQuery.RoutineFilter =
+    when (this) {
+        is RoutineQuery.RoutineFilter -> this
+        is RoutineQuery.Single ->
+            RoutineQuery.RoutineFilter(
+                onlyFavorites = false,
+                durationFilter = DurationFilter.Any,
+                selectedTags = emptyList(),
+                routinesOrder = RoutinesOrder.NameAsc,
+            )
+    }

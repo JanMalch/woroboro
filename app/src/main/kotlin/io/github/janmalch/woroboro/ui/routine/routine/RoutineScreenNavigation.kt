@@ -24,7 +24,6 @@ private const val ROUTINE_SCREEN_PATH = "$ROUTINE_GRAPH_ROUTE/routine/"
 const val ROUTINE_SCREEN_DEEPLINK = "woroboro://$ROUTINE_SCREEN_PATH"
 private const val ROUTINE_SCREEN_ROUTE = "$ROUTINE_SCREEN_PATH{$ROUTINE_SCREEN_ARG_ID}"
 
-
 fun NavController.navigateToRoutineScreen(id: UUID, navOptions: NavOptions? = null) {
     this.navigate(ROUTINE_SCREEN_PATH + id, navOptions)
 }
@@ -35,11 +34,7 @@ fun NavGraphBuilder.routineScreen(
 ) {
     composable(
         route = ROUTINE_SCREEN_ROUTE,
-        arguments = listOf(
-            navArgument(ROUTINE_SCREEN_ARG_ID) {
-                type = NavType.StringType
-            }
-        ),
+        arguments = listOf(navArgument(ROUTINE_SCREEN_ARG_ID) { type = NavType.StringType }),
         deepLinks = listOf(navDeepLink { uriPattern = "$ROUTINE_SCREEN_DEEPLINK{id}" }),
         enterTransition = {
             if (initialState.destination.isRoutineList) {

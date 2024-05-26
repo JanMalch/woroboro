@@ -48,7 +48,6 @@ class StandardConverters {
         return value?.toIsoString()
     }
 
-
     @TypeConverter
     fun toInstant(value: Long?): Instant? {
         return value?.let(Instant::ofEpochMilli)

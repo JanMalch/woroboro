@@ -66,20 +66,21 @@ import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
 import io.github.janmalch.woroboro.ui.components.common.toolbarButtonSize
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
+import java.time.Instant
+import java.util.UUID
+import kotlin.time.Duration
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
-import java.time.Instant
-import java.util.UUID
-import kotlin.time.Duration
 
-val DurationSaver = Saver<Duration?, String>(
-    save = { it?.toIsoString() ?: "" },
-    restore = { it.takeUnless(String::isEmpty)?.let(Duration.Companion::parseIsoString) }
-)
+val DurationSaver =
+    Saver<Duration?, String>(
+        save = { it?.toIsoString() ?: "" },
+        restore = { it.takeUnless(String::isEmpty)?.let(Duration.Companion::parseIsoString) }
+    )
 
 @Composable
 fun ExerciseEditorScreen(
@@ -95,44 +96,32 @@ fun ExerciseEditorScreen(
 ) {
     val id: UUID = rememberSaveable(exercise) { exercise?.id ?: UUID.randomUUID() }
     var name: String by rememberSaveable(exercise) { mutableStateOf(exercise?.name ?: "") }
-    var description: String by rememberSaveable(exercise) {
-        mutableStateOf(
-            exercise?.description ?: ""
-        )
-    }
-    var tags: List<Tag> by rememberSaveable(exercise) {
-        mutableStateOf(
-            ArrayList(exercise?.tags ?: listOf())
-        )
-    }
-    var media by remember(exercise) {
-        mutableStateOf(
-            EditedMedia(
-                existing = exercise?.media?.toPersistentList() ?: persistentListOf(),
-                added = emptySet(),
+    var description: String by
+        rememberSaveable(exercise) { mutableStateOf(exercise?.description ?: "") }
+    var tags: List<Tag> by
+        rememberSaveable(exercise) { mutableStateOf(ArrayList(exercise?.tags ?: listOf())) }
+    var media by
+        remember(exercise) {
+            mutableStateOf(
+                EditedMedia(
+                    existing = exercise?.media?.toPersistentList() ?: persistentListOf(),
+                    added = emptySet(),
+                )
             )
-        )
-    }
+        }
     var sets: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.execution?.sets ?: 3) }
     var reps: Int? by rememberSaveable(exercise) { mutableStateOf(exercise?.execution?.reps) }
-    var hold: Duration? by rememberSaveable(exercise, stateSaver = DurationSaver) {
-        mutableStateOf(
-            exercise?.execution?.hold
-        )
-    }
-    var pause: Duration? by rememberSaveable(exercise, stateSaver = DurationSaver) {
-        mutableStateOf(
-            exercise?.execution?.pause
-        )
-    }
-    var isFavorite: Boolean by rememberSaveable(exercise) {
-        mutableStateOf(
-            exercise?.isFavorite ?: false
-        )
-    }
-    var isAddToRoutineDialogOpen by rememberSaveable(exercise) {
-        mutableStateOf(false)
-    }
+    var hold: Duration? by
+        rememberSaveable(exercise, stateSaver = DurationSaver) {
+            mutableStateOf(exercise?.execution?.hold)
+        }
+    var pause: Duration? by
+        rememberSaveable(exercise, stateSaver = DurationSaver) {
+            mutableStateOf(exercise?.execution?.pause)
+        }
+    var isFavorite: Boolean by
+        rememberSaveable(exercise) { mutableStateOf(exercise?.isFavorite ?: false) }
+    var isAddToRoutineDialogOpen by rememberSaveable(exercise) { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -144,25 +133,28 @@ fun ExerciseEditorScreen(
                         onClick = {
                             sets?.let {
                                 val now = Instant.now()
-                                val edited = EditedExercise(
-                                    exercise = Exercise(
-                                        id = id,
-                                        name = name.trim(),
-                                        description = description.trim(),
-                                        tags = tags.toImmutableList(),
-                                        execution = ExerciseExecution(
-                                            sets = it,
-                                            reps = reps,
-                                            hold = hold,
-                                            pause = pause,
-                                        ),
-                                        isFavorite = isFavorite,
-                                        media = media.existing,
-                                        createdAt = exercise?.createdAt ?: now,
-                                        updatedAt = now,
-                                    ),
-                                    addedMedia = media.added,
-                                )
+                                val edited =
+                                    EditedExercise(
+                                        exercise =
+                                            Exercise(
+                                                id = id,
+                                                name = name.trim(),
+                                                description = description.trim(),
+                                                tags = tags.toImmutableList(),
+                                                execution =
+                                                    ExerciseExecution(
+                                                        sets = it,
+                                                        reps = reps,
+                                                        hold = hold,
+                                                        pause = pause,
+                                                    ),
+                                                isFavorite = isFavorite,
+                                                media = media.existing,
+                                                createdAt = exercise?.createdAt ?: now,
+                                                updatedAt = now,
+                                            ),
+                                        addedMedia = media.added,
+                                    )
                                 onSave(edited)
                             }
                         },
@@ -210,19 +202,17 @@ fun ExerciseEditorScreen(
         }
     ) { padding ->
         Column(
-            modifier = modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .clearFocusAsOutsideClick()
-                .padding(padding),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .clearFocusAsOutsideClick()
+                    .padding(padding),
         ) {
-
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+                modifier =
+                    Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
             ) {
-
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -230,9 +220,10 @@ fun ExerciseEditorScreen(
                     singleLine = true,
                     // isError = name.isBlank(), // TODO: only when dirty/touched?
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                    ),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                        ),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -242,12 +233,11 @@ fun ExerciseEditorScreen(
                     label = { Text(text = stringResource(R.string.description)) },
                     leadingIcon = { Icon(Icons.Rounded.QuestionMark, contentDescription = null) },
                     singleLine = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 192.dp),
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Default, // line break
-                    ),
+                    modifier = Modifier.fillMaxWidth().heightIn(max = 192.dp),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            imeAction = ImeAction.Default, // line break
+                        ),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -281,10 +271,7 @@ fun ExerciseEditorScreen(
                             )
                         },
                         leadingIcon = {
-                            Icon(
-                                Icons.Rounded.PauseCircle,
-                                contentDescription = null
-                            )
+                            Icon(Icons.Rounded.PauseCircle, contentDescription = null)
                         },
                         modifier = Modifier.weight(1F),
                         imeAction = ImeAction.Done,
@@ -323,15 +310,11 @@ fun ExerciseEditorScreen(
                             )
                         },
                         leadingIcon = {
-                            Icon(
-                                Icons.Rounded.HourglassBottom,
-                                contentDescription = null
-                            )
+                            Icon(Icons.Rounded.HourglassBottom, contentDescription = null)
                         },
                         modifier = Modifier.weight(1F),
                     )
                 }
-
             }
 
             HorizontalDivider()
@@ -341,20 +324,13 @@ fun ExerciseEditorScreen(
                 onValueChange = { media = it },
                 title = { Text(text = stringResource(R.string.images_and_videos)) },
                 contentPadding = PaddingValues(horizontal = 24.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                 headerModifier = Modifier.padding(horizontal = 24.dp),
             )
 
             HorizontalDivider()
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
-            ) {
-
+            Column(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
                 IsFavoriteCheckbox(
                     text = stringResource(R.string.favorite_exercise),
                     value = isFavorite,
@@ -385,9 +361,7 @@ fun ExerciseEditorScreen(
                         isAddToRoutineDialogOpen = false
                     }
                 },
-                onDismissRequest = {
-                    isAddToRoutineDialogOpen = false
-                }
+                onDismissRequest = { isAddToRoutineDialogOpen = false }
             )
         }
     }
@@ -399,15 +373,13 @@ fun AddToRoutineDialog(
     onRoutineSelected: (routineId: UUID) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var filter by rememberSaveable {
-        mutableStateOf("")
-    }
+    var filter by rememberSaveable { mutableStateOf("") }
     val allRoutines by allRoutinesFlow.collectAsState(initial = persistentListOf())
     val filteredRoutines by remember {
         derivedStateOf {
             if (filter.isBlank()) persistentListOf()
-            else allRoutines.filter { it.name.contains(filter, ignoreCase = true) }
-                .toImmutableList()
+            else
+                allRoutines.filter { it.name.contains(filter, ignoreCase = true) }.toImmutableList()
         }
     }
     Dialog(onDismissRequest = onDismissRequest) {
@@ -428,9 +400,7 @@ fun AddToRoutineDialog(
                     items(filteredRoutines, key = { it.id }) { routine ->
                         ListItem(
                             headlineContent = { Text(text = routine.name) },
-                            modifier = Modifier.clickable {
-                                onRoutineSelected(routine.id)
-                            }
+                            modifier = Modifier.clickable { onRoutineSelected(routine.id) }
                         )
                     }
                 }

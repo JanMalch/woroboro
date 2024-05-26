@@ -33,7 +33,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun SimpleTextField(
     value: String,
@@ -45,9 +44,7 @@ fun SimpleTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
-    val textColor = LocalTextStyle.current.color.takeOrElse {
-        LocalContentColor.current
-    }
+    val textColor = LocalTextStyle.current.color.takeOrElse { LocalContentColor.current }
     Box(modifier = Modifier.padding(contentPadding)) {
         BasicTextField(
             value = value,
@@ -60,10 +57,7 @@ fun SimpleTextField(
             keyboardActions = keyboardActions,
         )
         if (value.isEmpty()) {
-            Text(
-                text = placeholder,
-                color = textColor.copy(alpha = 0.7f)
-            )
+            Text(text = placeholder, color = textColor.copy(alpha = 0.7f))
         }
     }
 }
@@ -78,15 +72,13 @@ fun TextWithEditSheet(
     contentPadding: PaddingValues = PaddingValues(),
     textStyle: TextStyle = LocalTextStyle.current,
 ) {
-    var isSheetVisible by remember {
-        mutableStateOf(false)
-    }
+    var isSheetVisible by remember { mutableStateOf(false) }
 
-    Text(text = value,
+    Text(
+        text = value,
         style = textStyle,
-        modifier = modifier
-            .clickable { isSheetVisible = true }
-            .padding(contentPadding))
+        modifier = modifier.clickable { isSheetVisible = true }.padding(contentPadding)
+    )
 
     if (isSheetVisible) {
         TextFieldSheet(
@@ -98,7 +90,6 @@ fun TextWithEditSheet(
         )
     }
 }
-
 
 @Composable
 fun TextFieldSheet(
@@ -112,23 +103,18 @@ fun TextFieldSheet(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
-    var textValue by remember {
-        mutableStateOf(value)
-    }
+    var textValue by remember { mutableStateOf(value) }
 
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismissRequest,
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-
             SimpleTextField(
                 value = textValue,
                 onValueChange = { textValue = it },
                 placeholder = placeholder,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
             )
 
             TextButton(
@@ -137,11 +123,13 @@ fun TextFieldSheet(
                 onClick = {
                     focusRequester.freeFocus()
                     onValueChange(textValue)
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onDismissRequest()
+                    scope
+                        .launch { sheetState.hide() }
+                        .invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                onDismissRequest()
+                            }
                         }
-                    }
                 }
             ) {
                 Text(text = buttonText)

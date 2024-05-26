@@ -14,6 +14,7 @@ import io.github.janmalch.woroboro.models.RoutinesOrder
 import io.github.janmalch.woroboro.models.Tag
 import io.github.janmalch.woroboro.ui.findAvailableTags
 import io.github.janmalch.woroboro.utils.Quintet
+import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 private const val SELECTED_TAGS_SSH_KEY = "selected_tags"
 private const val ONLY_FAVORITES_SSH_KEY = "only_favorites"
@@ -34,7 +34,9 @@ private const val TEXT_QUERY_SSH_KEY = "text_query"
 private const val ROUTINES_ORDER_SSH_KEY = "routines_order"
 
 @HiltViewModel
-class RoutineListViewModel @Inject constructor(
+class RoutineListViewModel
+@Inject
+constructor(
     private val routineRepository: RoutineRepository,
     private val tagRepository: TagRepository,
     private val savedStateHandle: SavedStateHandle,
@@ -44,12 +46,12 @@ class RoutineListViewModel @Inject constructor(
     private val _routineFilter = launchDataService.consumeRoutineFilter()
 
     private val _selectedTagLabels =
-        savedStateHandle.getStateFlow(SELECTED_TAGS_SSH_KEY,
+        savedStateHandle.getStateFlow(
+            SELECTED_TAGS_SSH_KEY,
             _routineFilter?.selectedTags?.map { it.label } ?: emptyList()
         )
 
-    val textQuery =
-        savedStateHandle.getStateFlow(TEXT_QUERY_SSH_KEY, "")
+    val textQuery = savedStateHandle.getStateFlow(TEXT_QUERY_SSH_KEY, "")
 
     val isOnlyFavorites =
         savedStateHandle.getStateFlow(
@@ -70,48 +72,51 @@ class RoutineListViewModel @Inject constructor(
         )
 
     // TODO: combine tag flows?
-    private val selectedTags = _selectedTagLabels.flatMapLatest {
-        tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
-    }
+    private val selectedTags =
+        _selectedTagLabels.flatMapLatest {
+            tagRepository.resolveAll(it).map(List<Tag>::toImmutableList)
+        }
 
     private val availableTags = tagRepository.findAvailableTags()
 
-    private val routines = combine(
-        _selectedTagLabels,
-        isOnlyFavorites,
-        durationFilter,
-        textQuery.map(String::trim),
-        routinesOrder,
-        ::Quintet
-    ).flatMapLatest { (selectedTags, isOnlyFavorites, durationFilter, textQuery, orderBy) ->
-        routineRepository.findAll(
-            selectedTags,
-            onlyFavorites = isOnlyFavorites,
-            durationFilter = durationFilter,
-            textQuery = textQuery,
-            orderBy = orderBy,
-        )
-            .map(List<Routine>::toImmutableList)
-    }
+    private val routines =
+        combine(
+                _selectedTagLabels,
+                isOnlyFavorites,
+                durationFilter,
+                textQuery.map(String::trim),
+                routinesOrder,
+                ::Quintet
+            )
+            .flatMapLatest { (selectedTags, isOnlyFavorites, durationFilter, textQuery, orderBy) ->
+                routineRepository
+                    .findAll(
+                        selectedTags,
+                        onlyFavorites = isOnlyFavorites,
+                        durationFilter = durationFilter,
+                        textQuery = textQuery,
+                        orderBy = orderBy,
+                    )
+                    .map(List<Routine>::toImmutableList)
+            }
 
-    val uiState = combine(routines, selectedTags, availableTags, RoutineListUiState::Success)
-        .widen<RoutineListUiState, RoutineListUiState.Success>()
-        .catch {
-            Log.e("RoutineListViewModel", "Error while building UI state.", it)
-            emit(RoutineListUiState.Failure)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = RoutineListUiState.Loading,
-        )
+    val uiState =
+        combine(routines, selectedTags, availableTags, RoutineListUiState::Success)
+            .widen<RoutineListUiState, RoutineListUiState.Success>()
+            .catch {
+                Log.e("RoutineListViewModel", "Error while building UI state.", it)
+                emit(RoutineListUiState.Failure)
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = RoutineListUiState.Loading,
+            )
 
     fun toggleFavorite(routine: Routine) {
         val isFavorite = routine.isFavorite
         val update = routine.copy(isFavorite = !isFavorite)
-        viewModelScope.launch {
-            routineRepository.update(update)
-        }
+        viewModelScope.launch { routineRepository.update(update) }
     }
 
     fun changeSelectedTags(tags: List<Tag>) {
@@ -143,8 +148,8 @@ sealed interface RoutineListUiState {
     ) : RoutineListUiState
 
     data object Loading : RoutineListUiState
+
     data object Failure : RoutineListUiState
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun <A, B : A> Flow<B>.widen(): Flow<A> = this
+@Suppress("NOTHING_TO_INLINE") private inline fun <A, B : A> Flow<B>.widen(): Flow<A> = this

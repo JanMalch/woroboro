@@ -10,7 +10,6 @@ import io.github.janmalch.woroboro.ui.routine.editor.routineEditorScreen
 import io.github.janmalch.woroboro.ui.routine.routine.routineScreen
 import java.util.UUID
 
-
 const val ROUTINE_GRAPH_ROUTE = "routines"
 
 fun NavController.navigateToRoutineGraph(navOptions: NavOptions? = null) {
@@ -47,5 +46,4 @@ fun NavGraphBuilder.routinesGraph(
             onShowSnackbar = onShowSnackbar,
         )
     }
-
 }

@@ -1,10 +1,10 @@
 package io.github.janmalch.woroboro.models
 
 import android.os.Parcelable
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.util.UUID
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.parcelize.Parcelize
 
 data class Exercise(
     val id: UUID,

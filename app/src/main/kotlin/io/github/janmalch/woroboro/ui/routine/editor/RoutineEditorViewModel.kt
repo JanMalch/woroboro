@@ -12,6 +12,8 @@ import io.github.janmalch.woroboro.business.ExerciseRepository
 import io.github.janmalch.woroboro.business.RoutineRepository
 import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.ui.Outcome
+import java.util.UUID
+import javax.inject.Inject
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -24,11 +26,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.UUID
-import javax.inject.Inject
 
 @HiltViewModel
-class RoutineEditorViewModel @Inject constructor(
+class RoutineEditorViewModel
+@Inject
+constructor(
     private val routineRepository: RoutineRepository,
     exerciseRepository: ExerciseRepository,
     savedStateHandle: SavedStateHandle,
@@ -44,31 +46,30 @@ class RoutineEditorViewModel @Inject constructor(
     }
     private val deleteExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("RoutineEditorViewModel", "Error while removing routine.", exception)
-        viewModelScope.launch {
-            _onDeleteFinished.send(Outcome.Failure)
-        }
+        viewModelScope.launch { _onDeleteFinished.send(Outcome.Failure) }
     }
 
     var isLoading by mutableStateOf(false)
         private set
 
-    val routineToEdit = routineId.flatMapLatest { id ->
-        if (id == null) flowOf(null)
-        else routineRepository.findOne(id)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = null,
-    )
+    val routineToEdit =
+        routineId
+            .flatMapLatest { id -> if (id == null) flowOf(null) else routineRepository.findOne(id) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = null,
+            )
 
-    val allExercises = exerciseRepository
-        .findAll(tags = emptyList(), onlyFavorites = false, textQuery = "")
-        .map { list -> list.toImmutableList() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = persistentListOf(),
-        )
+    val allExercises =
+        exerciseRepository
+            .findAll(tags = emptyList(), onlyFavorites = false, textQuery = "")
+            .map { list -> list.toImmutableList() }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = persistentListOf(),
+            )
 
     private val _onSaveFinished = Channel<Outcome>()
     val onSaveFinished = _onSaveFinished.receiveAsFlow()

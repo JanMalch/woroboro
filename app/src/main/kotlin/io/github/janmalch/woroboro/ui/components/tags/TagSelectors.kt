@@ -25,7 +25,6 @@ import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
-
 @Composable
 fun TagSelectors(
     availableTags: ImmutableMap<String, ImmutableList<String>>,
@@ -35,9 +34,8 @@ fun TagSelectors(
     enabled: Boolean = true,
 ) {
     availableTags.forEach { (type, labels) ->
-        val valuesForType = remember(type, value) {
-            value.mapNotNull { it.takeIf { it.type == type }?.label }
-        }
+        val valuesForType =
+            remember(type, value) { value.mapNotNull { it.takeIf { it.type == type }?.label } }
 
         TagTypeMultiDropdown(
             type = type,
@@ -48,8 +46,8 @@ fun TagSelectors(
                 onValueChange(
                     // remove old values for this type
                     value.filter { it.type != type } +
-                            // and append new ones
-                            (newValuesForType.map { Tag(label = it, type = type) })
+                        // and append new ones
+                        (newValuesForType.map { Tag(label = it, type = type) })
                 )
             },
             enabled = enabled,
@@ -76,16 +74,11 @@ fun TagTypeMultiDropdown(
             },
             label = { Text(text = type, maxLines = 1) },
             selected = value.isNotEmpty(),
-            leadingIcon = if (isCounterVisible && value.isNotEmpty()) {
-                {
-                    Badge {
-                        Text(text = value.size.toString())
-                    }
-                }
-            } else null,
-            trailingIcon = {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-            },
+            leadingIcon =
+                if (isCounterVisible && value.isNotEmpty()) {
+                    { Badge { Text(text = value.size.toString()) } }
+                } else null,
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
             enabled = enabled,
         )
 
@@ -114,8 +107,9 @@ fun TagTypeMultiDropdown(
                             Icon(
                                 if (it) Icons.Rounded.CheckBox
                                 else Icons.Rounded.CheckBoxOutlineBlank,
-                                tint = if (it) MaterialTheme.colorScheme.primary
-                                else LocalContentColor.current,
+                                tint =
+                                    if (it) MaterialTheme.colorScheme.primary
+                                    else LocalContentColor.current,
                                 contentDescription = null
                             )
                         }

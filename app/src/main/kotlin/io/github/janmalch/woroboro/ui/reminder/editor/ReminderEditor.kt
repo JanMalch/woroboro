@@ -63,9 +63,6 @@ import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.clearFocusAsOutsideClick
 import io.github.janmalch.woroboro.ui.components.common.toolbarButtonSize
 import io.github.janmalch.woroboro.ui.components.routines.RoutineFilterRow
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.toImmutableList
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.format.TextStyle
@@ -73,6 +70,9 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun ReminderEditorScreen(
@@ -86,77 +86,85 @@ fun ReminderEditorScreen(
 ) {
     val id = rememberSaveable(reminder) { reminder?.id ?: UUID.randomUUID() }
     var name by rememberSaveable(reminder) { mutableStateOf(reminder?.name ?: "") }
-    val weekdays = remember(reminder) {
-        mutableStateListOf(
-            *(reminder?.weekdays?.toTypedArray() ?: DayOfWeek.values())
-        )
-    }
-    var remindAt by remember(reminder) {
-        mutableStateOf(
-            reminder?.remindAt ?: LocalTime.now().truncatedTo(ChronoUnit.HOURS).plusHours(1)
-        )
-    }
+    val weekdays =
+        remember(reminder) {
+            mutableStateListOf(*(reminder?.weekdays?.toTypedArray() ?: DayOfWeek.values()))
+        }
+    var remindAt by
+        remember(reminder) {
+            mutableStateOf(
+                reminder?.remindAt ?: LocalTime.now().truncatedTo(ChronoUnit.HOURS).plusHours(1)
+            )
+        }
     var repeatUntil by remember(reminder) { mutableStateOf(reminder?.repeat?.until) }
     var repeatEvery by remember(reminder) { mutableStateOf(reminder?.repeat?.every) }
-    var onlyFavorites by rememberSaveable(reminder) {
-        mutableStateOf(
-            reminder?.query?.asRoutineFilter()?.onlyFavorites ?: false
-        )
-    }
-    var durationFilter by remember(reminder) {
-        mutableStateOf(
-            reminder?.query?.asRoutineFilter()?.durationFilter ?: DurationFilter.Any
-        )
-    }
-    var routinesOrder by remember(reminder) {
-        mutableStateOf(
-            reminder?.query?.asRoutineFilter()?.routinesOrder ?: RoutinesOrder.NameAsc
-        )
-    }
-    var routineIdFilter by remember(reminder) {
-        mutableStateOf((reminder?.query as? RoutineQuery.Single)?.routineId)
-    }
-    val selectedTags = remember(reminder) {
-        mutableStateListOf(
-            *(reminder?.query?.asRoutineFilter()?.selectedTags?.toTypedArray() ?: emptyArray())
-        )
-    }
+    var onlyFavorites by
+        rememberSaveable(reminder) {
+            mutableStateOf(reminder?.query?.asRoutineFilter()?.onlyFavorites ?: false)
+        }
+    var durationFilter by
+        remember(reminder) {
+            mutableStateOf(reminder?.query?.asRoutineFilter()?.durationFilter ?: DurationFilter.Any)
+        }
+    var routinesOrder by
+        remember(reminder) {
+            mutableStateOf(
+                reminder?.query?.asRoutineFilter()?.routinesOrder ?: RoutinesOrder.NameAsc
+            )
+        }
+    var routineIdFilter by
+        remember(reminder) { mutableStateOf((reminder?.query as? RoutineQuery.Single)?.routineId) }
+    val selectedTags =
+        remember(reminder) {
+            mutableStateListOf(
+                *(reminder?.query?.asRoutineFilter()?.selectedTags?.toTypedArray() ?: emptyArray())
+            )
+        }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = { CloseIconButton(onClick = onBackClick) },
-                title = { },
+                title = {},
                 actions = {
-
                     Button(
                         onClick = {
                             val repeatEverySnapshot = repeatEvery
                             val repeatUntilSnapshot = repeatUntil
                             val routineIdFilterSnapshot = routineIdFilter
-                            val edited = Reminder(
-                                id = id,
-                                name = name.trim(),
-                                weekdays = weekdays.toSet(),
-                                remindAt = remindAt,
-                                repeat = if (repeatEverySnapshot != null && repeatUntilSnapshot != null)
-                                    Reminder.Repeat(repeatEverySnapshot, repeatUntilSnapshot)
-                                else null,
-                                isActive = reminder?.isActive ?: true,
-                                query = if (routineIdFilterSnapshot != null) {
-                                    RoutineQuery.Single(routineIdFilterSnapshot)
-                                } else {
-                                    RoutineQuery.RoutineFilter(
-                                        onlyFavorites = onlyFavorites,
-                                        durationFilter = durationFilter,
-                                        selectedTags = selectedTags,
-                                        routinesOrder = routinesOrder,
-                                    )
-                                },
-                            )
+                            val edited =
+                                Reminder(
+                                    id = id,
+                                    name = name.trim(),
+                                    weekdays = weekdays.toSet(),
+                                    remindAt = remindAt,
+                                    repeat =
+                                        if (
+                                            repeatEverySnapshot != null &&
+                                                repeatUntilSnapshot != null
+                                        )
+                                            Reminder.Repeat(
+                                                repeatEverySnapshot,
+                                                repeatUntilSnapshot
+                                            )
+                                        else null,
+                                    isActive = reminder?.isActive ?: true,
+                                    query =
+                                        if (routineIdFilterSnapshot != null) {
+                                            RoutineQuery.Single(routineIdFilterSnapshot)
+                                        } else {
+                                            RoutineQuery.RoutineFilter(
+                                                onlyFavorites = onlyFavorites,
+                                                durationFilter = durationFilter,
+                                                selectedTags = selectedTags,
+                                                routinesOrder = routinesOrder,
+                                            )
+                                        },
+                                )
                             onSave(edited)
                         },
-                        enabled = !isLoading &&
+                        enabled =
+                            !isLoading &&
                                 name.isNotBlank() &&
                                 weekdays.isNotEmpty() &&
                                 (repeatUntil?.let { it > remindAt } ?: true) &&
@@ -190,21 +198,18 @@ fun ReminderEditorScreen(
         },
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .clearFocusAsOutsideClick()
-                .padding(padding)
+            modifier =
+                Modifier.fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .clearFocusAsOutsideClick()
+                    .padding(padding)
         ) {
-
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text(stringResource(R.string.name)) },
                 singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 24.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 24.dp),
             )
 
             Text(
@@ -214,9 +219,7 @@ fun ReminderEditorScreen(
             )
 
             FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp)
             ) {
                 DayOfWeek.entries.forEach { dow ->
                     IconToggleButton(
@@ -230,12 +233,7 @@ fun ReminderEditorScreen(
                         },
                         colors = IconButtonDefaults.filledIconToggleButtonColors()
                     ) {
-                        Text(
-                            text = dow.getDisplayName(
-                                TextStyle.NARROW,
-                                Locale.getDefault()
-                            )
-                        )
+                        Text(text = dow.getDisplayName(TextStyle.NARROW, Locale.getDefault()))
                     }
                 }
             }
@@ -244,9 +242,7 @@ fun ReminderEditorScreen(
                 value = remindAt,
                 onValueChange = { remindAt = it },
                 label = { Text(text = stringResource(R.string.remind_at_input_label)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
             )
 
             DurationTextField(
@@ -258,9 +254,7 @@ fun ReminderEditorScreen(
                     }
                 },
                 required = repeatUntil != null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
                 min = 15.minutes,
                 label = { Text(text = stringResource(R.string.repeat_every_input_label)) },
                 leadingIcon = { Icon(Icons.Rounded.HourglassEmpty, contentDescription = null) }
@@ -272,12 +266,9 @@ fun ReminderEditorScreen(
                     onValueChange = { repeatUntil = it },
                     label = { Text(text = stringResource(R.string.repeat_until_input_label)) },
                     required = repeatEvery != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
                     min = remindAt.plusMinutes(15)
                 )
-
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -311,12 +302,9 @@ fun ReminderEditorScreen(
                 routines = routines,
                 value = routineIdFilter,
                 onValueChange = { routineIdFilter = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
             )
         }
-
     }
 }
 
@@ -327,15 +315,9 @@ private fun RoutineSelect(
     onValueChange: (UUID?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isDialogOpen by rememberSaveable {
-        mutableStateOf(false)
-    }
-    val interactions = remember {
-        MutableInteractionSource()
-    }
-    var selectedValue by remember(value) {
-        mutableStateOf(value)
-    }
+    var isDialogOpen by rememberSaveable { mutableStateOf(false) }
+    val interactions = remember { MutableInteractionSource() }
+    var selectedValue by remember(value) { mutableStateOf(value) }
 
     if (interactions.collectIsPressedAsState().value) {
         isDialogOpen = true
@@ -343,77 +325,62 @@ private fun RoutineSelect(
     OutlinedTextField(
         value = routines.find { it.id == value }?.name ?: "",
         onValueChange = {},
-        label = {
-            Text(text = stringResource(R.string.routine_filter_single))
-        },
+        label = { Text(text = stringResource(R.string.routine_filter_single)) },
         singleLine = true,
         readOnly = true,
-        leadingIcon = {
-            Icon(Icons.Rounded.FitnessCenter, contentDescription = null)
-        },
-        trailingIcon = {
-            Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
-        },
+        leadingIcon = { Icon(Icons.Rounded.FitnessCenter, contentDescription = null) },
+        trailingIcon = { Icon(Icons.Rounded.ArrowDropDown, contentDescription = null) },
         interactionSource = interactions,
         modifier = modifier,
     )
 
     if (isDialogOpen) {
         AlertDialog(
-            onDismissRequest = {
-                isDialogOpen = false
-            },
-            title = {
-                Text(text = stringResource(R.string.routine_filter_single))
-            },
+            onDismissRequest = { isDialogOpen = false },
+            title = { Text(text = stringResource(R.string.routine_filter_single)) },
             text = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.5f)
-                ) {
+                Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f)) {
                     HorizontalDivider()
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1F)
-                    ) {
+                    LazyColumn(modifier = Modifier.fillMaxWidth().weight(1F)) {
                         items(routines, key = { it.id }) { routine ->
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        selectedValue = if (selectedValue == routine.id) {
-                                            null
-                                        } else {
-                                            routine.id
-                                        }
+                                modifier =
+                                    Modifier.fillMaxWidth().clickable {
+                                        selectedValue =
+                                            if (selectedValue == routine.id) {
+                                                null
+                                            } else {
+                                                routine.id
+                                            }
                                     }
                             ) {
                                 Checkbox(
                                     checked = routine.id == selectedValue,
                                     onCheckedChange = {
-                                        selectedValue = if (selectedValue == routine.id) {
-                                            null
-                                        } else {
-                                            routine.id
-                                        }
-                                    })
+                                        selectedValue =
+                                            if (selectedValue == routine.id) {
+                                                null
+                                            } else {
+                                                routine.id
+                                            }
+                                    }
+                                )
                                 Text(text = routine.name)
                             }
                         }
                     }
                     HorizontalDivider()
-
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
-                    onValueChange(selectedValue)
-                    isDialogOpen = false
-                }) {
+                TextButton(
+                    onClick = {
+                        onValueChange(selectedValue)
+                        isDialogOpen = false
+                    }
+                ) {
                     Text(text = stringResource(R.string.confirm))
                 }
             },

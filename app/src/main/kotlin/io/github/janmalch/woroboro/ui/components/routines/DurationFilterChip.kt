@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.models.DurationFilter
 
-
 @Composable
 fun DurationFilterChip(
     value: DurationFilter,
@@ -32,12 +31,13 @@ fun DurationFilterChip(
     enabled: Boolean = true,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val emitAndClose = remember<(DurationFilter) -> Unit>(onValueChange) {
-        {
-            onValueChange(it)
-            expanded = false
+    val emitAndClose =
+        remember<(DurationFilter) -> Unit>(onValueChange) {
+            {
+                onValueChange(it)
+                expanded = false
+            }
         }
-    }
 
     Box {
         FilterChip(
@@ -45,8 +45,9 @@ fun DurationFilterChip(
                 Icon(
                     Icons.Rounded.Timelapse,
                     contentDescription = null,
-                    tint = if (value != DurationFilter.Any) MaterialTheme.colorScheme.primary
-                    else LocalContentColor.current,
+                    tint =
+                        if (value != DurationFilter.Any) MaterialTheme.colorScheme.primary
+                        else LocalContentColor.current,
                     modifier = Modifier.size(18.dp)
                 )
             },
@@ -89,14 +90,14 @@ fun DurationFilterChip(
             )
         }
     }
-
 }
 
 @Composable
 private fun DurationFilterItem(
     selected: DurationFilter,
     value: DurationFilter,
-    text: String = "${value.range.start.inWholeMinutes}–${value.range.endExclusive.inWholeMinutes} Minuten",
+    text: String =
+        "${value.range.start.inWholeMinutes}–${value.range.endExclusive.inWholeMinutes} Minuten",
     onValueChange: (DurationFilter) -> Unit,
 ) {
     DropdownMenuItem(

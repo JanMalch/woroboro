@@ -8,8 +8,8 @@ import androidx.room.Upsert
 import io.github.janmalch.woroboro.data.model.ReminderEntity
 import io.github.janmalch.woroboro.data.model.ReminderEntityWithFilterTags
 import io.github.janmalch.woroboro.data.model.ReminderFilterTagCrossRefEntity
-import kotlinx.coroutines.flow.Flow
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class ReminderDao {
@@ -18,16 +18,14 @@ abstract class ReminderDao {
     open suspend fun upsert(entity: ReminderEntity, filterTags: List<String>) {
         upsert(entity)
         deleteFilterTags(entity.id)
-        insertFilterTags(filterTags.map {
-            ReminderFilterTagCrossRefEntity(
-                reminderId = entity.id,
-                tagLabel = it
-            )
-        })
+        insertFilterTags(
+            filterTags.map {
+                ReminderFilterTagCrossRefEntity(reminderId = entity.id, tagLabel = it)
+            }
+        )
     }
 
-    @Upsert
-    protected abstract suspend fun upsert(entity: ReminderEntity)
+    @Upsert protected abstract suspend fun upsert(entity: ReminderEntity)
 
     @Insert
     protected abstract suspend fun insertFilterTags(refs: List<ReminderFilterTagCrossRefEntity>)

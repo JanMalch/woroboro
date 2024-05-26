@@ -43,11 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil.compose.AsyncImage
 import io.github.janmalch.woroboro.models.Exercise
-import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.models.FullRoutine
-import kotlinx.collections.immutable.ImmutableList
+import io.github.janmalch.woroboro.models.Media
 import kotlin.math.absoluteValue
-
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun RoutinePagerMode(
@@ -57,14 +56,8 @@ fun RoutinePagerMode(
         // TODO
         mutableStateOf(true)
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 24.dp)
-    ) {
-        val pagerState = rememberPagerState(pageCount = {
-            routine.exercises.size
-        })
+    Column(modifier = Modifier.fillMaxSize().padding(vertical = 24.dp)) {
+        val pagerState = rememberPagerState(pageCount = { routine.exercises.size })
         HorizontalPager(
             state = pagerState,
             contentPadding = PaddingValues(horizontal = 32.dp),
@@ -73,32 +66,20 @@ fun RoutinePagerMode(
             userScrollEnabled = isPaused,
         ) { page ->
             Box(
-                Modifier
-                    .fillMaxWidth()
-                    .graphicsLayer {
-                        val pageOffset = (
-                                (pagerState.currentPage - page) + pagerState
-                                    .currentPageOffsetFraction
-                                ).absoluteValue
+                Modifier.fillMaxWidth().graphicsLayer {
+                    val pageOffset =
+                        ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
+                            .absoluteValue
 
-                        // We animate the alpha, between 50% and 100%
-                        alpha = lerp(
-                            start = 0.5f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                        // We animate the scale, between 90% and 100%
-                        scaleX = lerp(
-                            start = 0.9f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                        scaleY = lerp(
-                            start = 0.9f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                    }
+                    // We animate the alpha, between 50% and 100%
+                    alpha =
+                        lerp(start = 0.5f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f))
+                    // We animate the scale, between 90% and 100%
+                    scaleX =
+                        lerp(start = 0.9f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f))
+                    scaleY =
+                        lerp(start = 0.9f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f))
+                }
             ) {
                 ExerciseCard(exercise = routine.exercises[page])
             }
@@ -160,25 +141,19 @@ fun ExerciseCard(
     exercise: Exercise,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(24.dp))
+        modifier =
+            Modifier.fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(24.dp))
     ) {
-        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-
+        CompositionLocalProvider(
+            LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant
+        ) {
             ExerciseMediaPager(
                 media = exercise.media,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
-                    .clip(RoundedCornerShape(24.dp))
+                modifier =
+                    Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(24.dp))
             )
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(24.dp)
-            ) {
-
+            Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(24.dp)) {
                 Text(
                     text = exercise.name,
                     style = MaterialTheme.typography.titleLarge,
@@ -189,7 +164,6 @@ fun ExerciseCard(
                 Text(text = exercise.description)
             }
         }
-
     }
     /*Box(
         modifier = Modifier

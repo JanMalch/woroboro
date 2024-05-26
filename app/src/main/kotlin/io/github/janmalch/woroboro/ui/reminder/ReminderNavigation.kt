@@ -8,7 +8,6 @@ import androidx.navigation.navigation
 import io.github.janmalch.woroboro.ui.reminder.editor.reminderEditorScreen
 import java.util.UUID
 
-
 const val REMINDER_GRAPH_ROUTE = "reminders"
 
 fun NavController.navigateToReminderGraph(navOptions: NavOptions? = null) {
@@ -39,5 +38,4 @@ fun NavGraphBuilder.remindersGraph(
             onShowSnackbar = onShowSnackbar,
         )
     }
-
 }

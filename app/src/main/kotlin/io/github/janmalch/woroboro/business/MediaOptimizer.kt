@@ -16,24 +16,28 @@ import coil.size.Size
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.janmalch.woroboro.utils.AppDispatchers
 import io.github.janmalch.woroboro.utils.Dispatcher
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 interface MediaOptimizer {
     val imageExtension: String
     val videoExtension: String
 
     suspend fun toThumb(src: Any, dest: File)
+
     suspend fun toImage(src: Any, dest: File)
+
     suspend fun toVideo(src: Any, dest: File)
 }
 
-class OnDeviceMediaOptimizer @Inject constructor(
+class OnDeviceMediaOptimizer
+@Inject
+constructor(
     @ApplicationContext private val context: Context,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : MediaOptimizer {
@@ -46,16 +50,13 @@ class OnDeviceMediaOptimizer @Inject constructor(
     override val imageExtension = if (isWebpUsable()) ".webp" else ".png"
     override val videoExtension = "" // TODO
 
-
     override suspend fun toThumb(src: Any, dest: File) {
         withContext(ioDispatcher) {
             optimize(
                 quality = 80,
                 dest = dest,
             ) {
-                data(src)
-                    .size(thumbSize)
-                    .scale(Scale.FILL)
+                data(src).size(thumbSize).scale(Scale.FILL)
             }
         }
     }
@@ -98,42 +99,50 @@ class OnDeviceMediaOptimizer @Inject constructor(
         quality: Int,
         block: ImageRequest.Builder.() -> Unit,
     ) = suspendCancellableCoroutine { cont ->
-        val request = ImageRequest.Builder(context)
-            .apply(block)
-            .target(
-                onSuccess = { drawable ->
-                    if (!cont.isActive) {
-                        cont.cancel()
-                        return@target
-                    }
-                    val bitmap = (drawable as? BitmapDrawable)?.bitmap
-                    if (bitmap == null) {
-                        cont.resumeWithException(IllegalStateException("Drawable is not a bitmap."))
-                        return@target
-                    }
-                    dest.outputStream().use { outStream ->
-                        val success = if (isWebpUsable()) {
-                            bitmap.compress(
-                                Bitmap.CompressFormat.WEBP_LOSSY,
-                                quality,
-                                outStream,
+        val request =
+            ImageRequest.Builder(context)
+                .apply(block)
+                .target(
+                    onSuccess = { drawable ->
+                        if (!cont.isActive) {
+                            cont.cancel()
+                            return@target
+                        }
+                        val bitmap = (drawable as? BitmapDrawable)?.bitmap
+                        if (bitmap == null) {
+                            cont.resumeWithException(
+                                IllegalStateException("Drawable is not a bitmap.")
                             )
-                        } else {
-                            bitmap.compress(Bitmap.CompressFormat.PNG, quality, outStream)
+                            return@target
                         }
-                        if (success) {
-                            cont.resume(Unit)
-                        } else {
-                            dest.takeIf { it.exists() }?.delete()
-                            cont.resumeWithException(IllegalStateException("Unknown error while compressing image."))
+                        dest.outputStream().use { outStream ->
+                            val success =
+                                if (isWebpUsable()) {
+                                    bitmap.compress(
+                                        Bitmap.CompressFormat.WEBP_LOSSY,
+                                        quality,
+                                        outStream,
+                                    )
+                                } else {
+                                    bitmap.compress(Bitmap.CompressFormat.PNG, quality, outStream)
+                                }
+                            if (success) {
+                                cont.resume(Unit)
+                            } else {
+                                dest.takeIf { it.exists() }?.delete()
+                                cont.resumeWithException(
+                                    IllegalStateException("Unknown error while compressing image.")
+                                )
+                            }
                         }
-                    }
-                },
-                onError = {
-                    cont.resumeWithException(IllegalStateException("Unknown error while loading image."))
-                },
-            )
-            .build()
+                    },
+                    onError = {
+                        cont.resumeWithException(
+                            IllegalStateException("Unknown error while loading image.")
+                        )
+                    },
+                )
+                .build()
         imageLoader.enqueue(request)
     }
 
@@ -149,12 +158,8 @@ class OnDeviceMediaOptimizer @Inject constructor(
     }
 }
 
-/**
- * @author https://stackoverflow.com/a/6327095
- */
+/** @author https://stackoverflow.com/a/6327095 */
 @Px
-private fun Context.toPx(dp: Int): Int = TypedValue.applyDimension(
-    TypedValue.COMPLEX_UNIT_DIP,
-    dp.toFloat(),
-    resources.displayMetrics
-).toInt()
+private fun Context.toPx(dp: Int): Int =
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), resources.displayMetrics)
+        .toInt()

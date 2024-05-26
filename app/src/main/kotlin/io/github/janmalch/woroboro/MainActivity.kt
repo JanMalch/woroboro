@@ -16,8 +16,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var launchDataService: LaunchDataService
+    @Inject lateinit var launchDataService: LaunchDataService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -26,11 +25,6 @@ class MainActivity : ComponentActivity() {
 
         launchDataService.setRoutineFilter(intent.extras?.getRoutineFilter())
 
-        setContent {
-            WoroboroTheme {
-                AppContainer(startDestination = ROUTINE_GRAPH_ROUTE)
-            }
-        }
+        setContent { WoroboroTheme { AppContainer(startDestination = ROUTINE_GRAPH_ROUTE) } }
     }
 }
-

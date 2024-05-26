@@ -36,11 +36,11 @@ fun RoutineFilterRow(
     enabled: Boolean = true,
 ) {
     Row(
-        modifier = Modifier
-            .background(containerColor)
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-            .padding(contentPadding),
+        modifier =
+            Modifier.background(containerColor)
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(contentPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         OnlyFavoritesChip(

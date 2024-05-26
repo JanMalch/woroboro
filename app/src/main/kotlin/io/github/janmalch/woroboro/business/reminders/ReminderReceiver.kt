@@ -20,38 +20,30 @@ import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineQuery
 import io.github.janmalch.woroboro.utils.ApplicationScope
 import io.github.janmalch.woroboro.utils.formatForTimer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.UUID
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ReminderReceiver : BroadcastReceiver() {
 
-    @Inject
-    lateinit var scheduler: ReminderScheduler
+    @Inject lateinit var scheduler: ReminderScheduler
 
-    @Inject
-    lateinit var repository: ReminderRepository
+    @Inject lateinit var repository: ReminderRepository
 
-    @Inject
-    lateinit var routines: RoutineRepository
+    @Inject lateinit var routines: RoutineRepository
 
-    @Inject
-    lateinit var notifications: ReminderNotifications
+    @Inject lateinit var notifications: ReminderNotifications
 
-    @Inject
-    @ApplicationScope
-    lateinit var applicationScope: CoroutineScope
+    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val reminderId = intent?.getReminderId() ?: return
-        applicationScope.launch {
-            handle(context, reminderId)
-        }
+        applicationScope.launch { handle(context, reminderId) }
     }
 
     private suspend fun handle(context: Context?, reminderId: UUID) {
@@ -71,34 +63,40 @@ class ReminderReceiver : BroadcastReceiver() {
             var image: Bitmap? = null
             var content: String? = null
             try {
-                val routines = routines.findByQuery(reminder.query).firstOrNull()
-                    ?.takeUnless(List<Routine>::isEmpty)
-                    ?.asSequence()
+                val routines =
+                    routines
+                        .findByQuery(reminder.query)
+                        .firstOrNull()
+                        ?.takeUnless(List<Routine>::isEmpty)
+                        ?.asSequence()
 
                 if (context != null && reminder.query is RoutineQuery.Single && routines != null) {
                     val routine = routines.firstOrNull()
                     if (routine != null) {
-                        content = if (routine.lastRunDuration != null) {
-                            context.getString(
-                                R.string.reminder_notification_content_single,
-                                routine.name,
-                                formatForTimer(routine.lastRunDuration),
-                            )
-                        } else {
-                            context.getString(
-                                R.string.reminder_notification_content_single_no_last_run,
-                                routine.name,
-                            )
-                        }
+                        content =
+                            if (routine.lastRunDuration != null) {
+                                context.getString(
+                                    R.string.reminder_notification_content_single,
+                                    routine.name,
+                                    formatForTimer(routine.lastRunDuration),
+                                )
+                            } else {
+                                context.getString(
+                                    R.string.reminder_notification_content_single_no_last_run,
+                                    routine.name,
+                                )
+                            }
                     }
                 }
 
-                image = routines?.flatMap { it.media }
-                    ?.shuffled()
-                    ?.firstOrNull()
-                    ?.thumbnail
-                    ?.let { Uri.parse(it).toFile().path }
-                    ?.let(BitmapFactory::decodeFile)
+                image =
+                    routines
+                        ?.flatMap { it.media }
+                        ?.shuffled()
+                        ?.firstOrNull()
+                        ?.thumbnail
+                        ?.let { Uri.parse(it).toFile().path }
+                        ?.let(BitmapFactory::decodeFile)
             } catch (e: Exception) {
                 Log.w(
                     "ReminderReceiver",
@@ -108,10 +106,7 @@ class ReminderReceiver : BroadcastReceiver() {
             }
             notifications.show(reminder, image, content)
         } else {
-            Log.d(
-                "ReminderReceiver",
-                "Received reminder for $reminderId, but isn't due for now."
-            )
+            Log.d("ReminderReceiver", "Received reminder for $reminderId, but isn't due for now.")
         }
 
         // check if it's a repeating reminder, and if it is then check if until time is reached
@@ -130,7 +125,6 @@ class ReminderReceiver : BroadcastReceiver() {
         const val INTENT_REMINDER_ID = "reminder_id"
     }
 }
-
 
 @VisibleForTesting
 internal fun Reminder.isDueNow(now: LocalDateTime = LocalDateTime.now()): Boolean {

@@ -21,25 +21,23 @@ object DatabaseModule {
     @Singleton
     fun providesAppDatabase(
         @ApplicationContext context: Context,
-    ): AppDatabase = Room.databaseBuilder(
-        context,
-        AppDatabase::class.java,
-        "app-database",
-    ).addMigrations(
-        MIGRATION_3_4,
-        MIGRATION_6_7,
-    ).build()
+    ): AppDatabase =
+        Room.databaseBuilder(
+                context,
+                AppDatabase::class.java,
+                "app-database",
+            )
+            .addMigrations(
+                MIGRATION_3_4,
+                MIGRATION_6_7,
+            )
+            .build()
 
-    @Provides
-    fun providesExerciseDao(db: AppDatabase): ExerciseDao = db.exerciseDao()
+    @Provides fun providesExerciseDao(db: AppDatabase): ExerciseDao = db.exerciseDao()
 
-    @Provides
-    fun providesTagDao(db: AppDatabase): TagDao = db.tagDao()
+    @Provides fun providesTagDao(db: AppDatabase): TagDao = db.tagDao()
 
-    @Provides
-    fun providesRoutineDao(db: AppDatabase): RoutineDao = db.routineDao()
+    @Provides fun providesRoutineDao(db: AppDatabase): RoutineDao = db.routineDao()
 
-    @Provides
-    fun providesReminderDao(db: AppDatabase): ReminderDao = db.reminderDao()
-
+    @Provides fun providesReminderDao(db: AppDatabase): ReminderDao = db.reminderDao()
 }

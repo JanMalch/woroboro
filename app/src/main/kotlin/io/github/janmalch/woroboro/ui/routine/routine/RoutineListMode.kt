@@ -66,7 +66,6 @@ import io.github.janmalch.woroboro.ui.theme.Success
 import io.github.janmalch.woroboro.utils.formatForTimer
 import kotlin.time.Duration
 
-
 @Composable
 fun RoutineListMode(
     uiState: RoutineUiState.Success,
@@ -81,10 +80,11 @@ fun RoutineListMode(
     val passedTime by stopwatch.time.collectAsState(initial = Duration.ZERO)
 
     val isCompletelyDone = uiState.unfinishedExercises.isEmpty()
-    val doneHeadlineColor by animateColorAsState(
-        targetValue = if (isCompletelyDone) Success else LocalContentColor.current,
-        label = "DoneHeadlineColorAnimation"
-    )
+    val doneHeadlineColor by
+        animateColorAsState(
+            targetValue = if (isCompletelyDone) Success else LocalContentColor.current,
+            label = "DoneHeadlineColorAnimation"
+        )
 
     LaunchedEffect(isCompletelyDone) {
         stopwatch.pause()
@@ -106,18 +106,18 @@ fun RoutineListMode(
             }
             item {
                 Text(
-                    text = if (isCompletelyDone)
-                        stringResource(id = R.string.routine_done)
-                    else
-                        stringResource(
-                            id = R.string.routine_in_progress,
-                            uiState.finishedExercises.size,
-                            uiState.routine.exercises.size
-                        ),
+                    text =
+                        if (isCompletelyDone) stringResource(id = R.string.routine_done)
+                        else
+                            stringResource(
+                                id = R.string.routine_in_progress,
+                                uiState.finishedExercises.size,
+                                uiState.routine.exercises.size
+                            ),
                     style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
-                        .animateItemPlacement(),
+                    modifier =
+                        Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
+                            .animateItemPlacement(),
                     color = doneHeadlineColor,
                 )
             }
@@ -132,11 +132,7 @@ fun RoutineListMode(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp)
-        ) {
+        Box(modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)) {
             TimerOverlay(
                 passedTime = passedTime,
                 previousTime = uiState.routine.lastRunDuration,
@@ -144,7 +140,6 @@ fun RoutineListMode(
                 onStartPauseClick = stopwatch::toggle,
             )
         }
-
     }
 }
 
@@ -158,13 +153,14 @@ fun TimerOverlay(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .shadow(8.dp, shape = RoundedCornerShape(8.dp))
-            .background(
-                MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp),
-                RoundedCornerShape(12.dp)
-            )
-            .padding(8.dp),
+        modifier =
+            modifier
+                .shadow(8.dp, shape = RoundedCornerShape(8.dp))
+                .background(
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp),
+                    RoundedCornerShape(12.dp)
+                )
+                .padding(8.dp),
     ) {
         Spacer(modifier = Modifier.width(16.dp))
         Row(verticalAlignment = Alignment.Bottom) {
@@ -189,13 +185,12 @@ fun TimerOverlay(
 
         FloatingActionButton(onClick = onStartPauseClick) {
             Icon(
-                if (isRunning) Icons.Rounded.Pause
-                else Icons.Rounded.PlayArrow, contentDescription = null
+                if (isRunning) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                contentDescription = null
             )
         }
     }
 }
-
 
 @Composable
 fun ExerciseStepListItem(
@@ -204,15 +199,9 @@ fun ExerciseStepListItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
+    var isExpanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
+    Column(modifier = modifier.fillMaxWidth().clickable(onClick = onClick)) {
         ExerciseListItem(
             exercise = step.exercise,
             execution = step.execution,
@@ -232,7 +221,6 @@ fun ExerciseStepListItem(
 
     if (isExpanded) {
         ModalBottomSheet(onDismissRequest = { isExpanded = false }, sheetState = sheetState) {
-
             if (step.exercise.tags.isNotEmpty()) {
                 Text(
                     text = step.exercise.tags.joinToString(separator = ", ") { it.label },
@@ -240,7 +228,6 @@ fun ExerciseStepListItem(
                     style = MaterialTheme.typography.labelSmall,
                 )
             }
-
 
             Text(
                 text = step.exercise.name,
@@ -265,14 +252,15 @@ fun ExerciseStepListItem(
                             model = it.source,
                             contentDescription = null,
                             contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                // .fillMaxHeight() better UX, .fillMaxWidth() better UI
-                                .fillMaxHeight()
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant,
-                                    RoundedCornerShape(16.dp)
-                                )
-                                .clip(RoundedCornerShape(16.dp))
+                            modifier =
+                                Modifier
+                                    // .fillMaxHeight() better UX, .fillMaxWidth() better UI
+                                    .fillMaxHeight()
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceVariant,
+                                        RoundedCornerShape(16.dp)
+                                    )
+                                    .clip(RoundedCornerShape(16.dp))
                         )
                     }
                 }
@@ -289,10 +277,10 @@ fun MediaWithDoneState(
     isDone: Boolean,
 ) {
     Box(
-        modifier = Modifier
-            .size(64.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp))
+        modifier =
+            Modifier.size(64.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
     ) {
         AsyncImage(
             model = media?.thumbnail,
@@ -306,23 +294,17 @@ fun MediaWithDoneState(
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
-
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Success.copy(alpha = 0.5f),
-                        RoundedCornerShape(8.dp)
-                    ),
+                modifier =
+                    Modifier.fillMaxSize()
+                        .background(Success.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Rounded.CheckCircle,
                     tint = Success,
                     contentDescription = null,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(Color.White, CircleShape)
+                    modifier = Modifier.size(32.dp).background(Color.White, CircleShape)
                 )
             }
         }

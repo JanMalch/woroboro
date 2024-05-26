@@ -30,12 +30,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.janmalch.woroboro.R
 import io.github.janmalch.woroboro.models.Reminder
-import kotlinx.collections.immutable.ImmutableList
 import java.time.DayOfWeek
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import java.util.UUID
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun ReminderListScreen(
@@ -61,10 +61,10 @@ fun ReminderListScreen(
             reminders = reminders,
             onGoToReminder = onGoToReminder,
             onToggleReminderActive = onToggleReminderActive,
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(padding),
+            modifier =
+                Modifier.fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .padding(padding),
         )
     }
 }
@@ -88,15 +88,15 @@ fun ReminderList(
                 ListItem(
                     headlineContent = { Text(reminder.name) },
                     supportingContent = {
-                        Text(text = buildString {
-                            val weekdays = reminder.weekdays.joinRangesToString()
-                            append(weekdays)
-                            append(" · ")
-                            append(
-                                reminder.remindAt.format(dtf)
-                            )
-                        })
-
+                        Text(
+                            text =
+                                buildString {
+                                    val weekdays = reminder.weekdays.joinRangesToString()
+                                    append(weekdays)
+                                    append(" · ")
+                                    append(reminder.remindAt.format(dtf))
+                                }
+                        )
                     },
                     trailingContent = {
                         Switch(
@@ -150,8 +150,9 @@ fun Set<DayOfWeek>.joinRangesToString(locale: Locale = Locale.getDefault()): Str
         if (it.size == 1) {
             it.first().getDisplayName(TextStyle.SHORT, locale)
         } else {
-            it.first().getDisplayName(TextStyle.SHORT, locale) + " – " + it.last()
-                .getDisplayName(TextStyle.SHORT, locale)
+            it.first().getDisplayName(TextStyle.SHORT, locale) +
+                " – " +
+                it.last().getDisplayName(TextStyle.SHORT, locale)
         }
     }
 }

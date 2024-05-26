@@ -60,12 +60,8 @@ fun TimeField(
     min: LocalTime = LocalTime.MIN,
 ) {
     val defaultValue = remember { LocalTime.now().truncatedTo(ChronoUnit.HOURS) }
-    var isPickerOpen by rememberSaveable {
-        mutableStateOf(false)
-    }
-    val interactions = remember {
-        MutableInteractionSource()
-    }
+    var isPickerOpen by rememberSaveable { mutableStateOf(false) }
+    val interactions = remember { MutableInteractionSource() }
     if (interactions.collectIsPressedAsState().value) {
         isPickerOpen = true
     }
@@ -85,26 +81,26 @@ fun TimeField(
         interactionSource = interactions,
     )
 
-
     if (isPickerOpen) {
-        val state = rememberTimePickerState(
-            initialHour = value?.hour ?: defaultValue.hour,
-            initialMinute = value?.minute ?: defaultValue.minute,
-        )
+        val state =
+            rememberTimePickerState(
+                initialHour = value?.hour ?: defaultValue.hour,
+                initialMinute = value?.minute ?: defaultValue.minute,
+            )
 
         AlertDialog(
             onDismissRequest = { isPickerOpen = false },
             confirmButton = {
-                TextButton(onClick = {
-                    onValueChange(LocalTime.of(state.hour, state.minute))
-                    isPickerOpen = false
-                }) {
+                TextButton(
+                    onClick = {
+                        onValueChange(LocalTime.of(state.hour, state.minute))
+                        isPickerOpen = false
+                    }
+                ) {
                     Text(text = stringResource(R.string.confirm))
                 }
             },
-            text = {
-                TimePicker(state = state)
-            }
+            text = { TimePicker(state = state) }
         )
     }
 }
@@ -147,10 +143,11 @@ fun NumberTextField(
         prefix = prefix,
         suffix = suffix,
         supportingText = supportingText,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = imeAction,
-        )
+        keyboardOptions =
+            KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = imeAction,
+            )
     )
 }
 
@@ -170,15 +167,9 @@ fun DurationTextField(
     min: Duration = ONE_SECOND,
     imeAction: ImeAction = ImeAction.Next,
 ) {
-    var unit by remember(value) {
-        mutableStateOf(findWholeUnit(value))
-    }
-    var textValue by remember(value) {
-        mutableStateOf(value?.toLong(unit)?.coerceToInt())
-    }
-    var isDropdownOpen by remember {
-        mutableStateOf(false)
-    }
+    var unit by remember(value) { mutableStateOf(findWholeUnit(value)) }
+    var textValue by remember(value) { mutableStateOf(value?.toLong(unit)?.coerceToInt()) }
+    var isDropdownOpen by remember { mutableStateOf(false) }
 
     NumberTextField(
         value = textValue,
@@ -201,10 +192,10 @@ fun DurationTextField(
                     text = abbreviationOfDurationUnit(unit),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
-                    modifier = Modifier
-                        .widthIn(13.dp)
-                        .clickable { isDropdownOpen = true }
-                        .clip(RoundedCornerShape(4.dp))
+                    modifier =
+                        Modifier.widthIn(13.dp)
+                            .clickable { isDropdownOpen = true }
+                            .clip(RoundedCornerShape(4.dp))
                 )
 
                 DropdownMenu(
@@ -212,9 +203,7 @@ fun DurationTextField(
                     onDismissRequest = { isDropdownOpen = false },
                 ) {
                     DropdownMenuItem(
-                        text = {
-                            Text(text = nameOfDurationUnit(DurationUnit.SECONDS))
-                        },
+                        text = { Text(text = nameOfDurationUnit(DurationUnit.SECONDS)) },
                         onClick = {
                             unit = DurationUnit.SECONDS
                             onValueChange(textValue?.toDuration(unit))
@@ -222,9 +211,7 @@ fun DurationTextField(
                         },
                     )
                     DropdownMenuItem(
-                        text = {
-                            Text(text = nameOfDurationUnit(DurationUnit.MINUTES))
-                        },
+                        text = { Text(text = nameOfDurationUnit(DurationUnit.MINUTES)) },
                         onClick = {
                             unit = DurationUnit.MINUTES
                             onValueChange(textValue?.toDuration(unit))
@@ -232,9 +219,7 @@ fun DurationTextField(
                         },
                     )
                     DropdownMenuItem(
-                        text = {
-                            Text(text = nameOfDurationUnit(DurationUnit.HOURS))
-                        },
+                        text = { Text(text = nameOfDurationUnit(DurationUnit.HOURS)) },
                         onClick = {
                             unit = DurationUnit.HOURS
                             onValueChange(textValue?.toDuration(unit))
@@ -251,12 +236,13 @@ fun DurationTextField(
 @ReadOnlyComposable
 fun abbreviationOfDurationUnit(unit: DurationUnit): String {
     return stringResource(
-        id = when (unit) {
-            DurationUnit.SECONDS -> R.string.unit_seconds_abbreviation
-            DurationUnit.MINUTES -> R.string.unit_minutes_abbreviation
-            DurationUnit.HOURS -> R.string.unit_hours_abbreviation
-            else -> R.string.unit_unknown_abbreviation
-        }
+        id =
+            when (unit) {
+                DurationUnit.SECONDS -> R.string.unit_seconds_abbreviation
+                DurationUnit.MINUTES -> R.string.unit_minutes_abbreviation
+                DurationUnit.HOURS -> R.string.unit_hours_abbreviation
+                else -> R.string.unit_unknown_abbreviation
+            }
     )
 }
 
@@ -264,12 +250,13 @@ fun abbreviationOfDurationUnit(unit: DurationUnit): String {
 @ReadOnlyComposable
 fun nameOfDurationUnit(unit: DurationUnit): String {
     return stringResource(
-        id = when (unit) {
-            DurationUnit.SECONDS -> R.string.unit_seconds_name
-            DurationUnit.MINUTES -> R.string.unit_minutes_name
-            DurationUnit.HOURS -> R.string.unit_hours_name
-            else -> R.string.unit_unknown_name
-        }
+        id =
+            when (unit) {
+                DurationUnit.SECONDS -> R.string.unit_seconds_name
+                DurationUnit.MINUTES -> R.string.unit_minutes_name
+                DurationUnit.HOURS -> R.string.unit_hours_name
+                else -> R.string.unit_unknown_name
+            }
     )
 }
 

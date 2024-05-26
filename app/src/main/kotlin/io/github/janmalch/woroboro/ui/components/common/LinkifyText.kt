@@ -36,16 +36,16 @@ object LinkifyTextDefaults {
 
     @Composable
     @ReadOnlyComposable
-    fun linkStyle(
-        isDarkTheme: Boolean = isSystemInDarkTheme()
-    ): SpanStyle = SpanStyle(
-        color = if (isDarkTheme) darkThemeLinkColor else lightThemeLinkColor,
-        fontWeight = FontWeight.Medium,
-    )
+    fun linkStyle(isDarkTheme: Boolean = isSystemInDarkTheme()): SpanStyle =
+        SpanStyle(
+            color = if (isDarkTheme) darkThemeLinkColor else lightThemeLinkColor,
+            fontWeight = FontWeight.Medium,
+        )
 }
 
 /**
- * @author https://github.com/firefinchdev/linkify-text/blob/0a45dbcf9bdb7199cf3335cb03b4641ce8c67dea/linkifytext/src/main/java/com/linkifytext/LinkifyText.kt
+ * @author
+ *   https://github.com/firefinchdev/linkify-text/blob/0a45dbcf9bdb7199cf3335cb03b4641ce8c67dea/linkifytext/src/main/java/com/linkifytext/LinkifyText.kt
  */
 @Composable
 fun LinkifyText(
@@ -76,17 +76,8 @@ fun LinkifyText(
     val annotatedString = buildAnnotatedString {
         append(text)
         linkInfos.forEach {
-            addStyle(
-                style = linkStyle,
-                start = it.start,
-                end = it.end
-            )
-            addStringAnnotation(
-                tag = "tag",
-                annotation = it.url,
-                start = it.start,
-                end = it.end
-            )
+            addStyle(style = linkStyle, start = it.start, end = it.end)
+            addStringAnnotation(tag = "tag", annotation = it.url, start = it.start, end = it.end)
         }
     }
     if (clickable) {
@@ -108,17 +99,20 @@ fun LinkifyText(
             onTextLayout = onTextLayout,
             style = style,
             onClick = { offset ->
-                annotatedString.getStringAnnotations(
-                    start = offset,
-                    end = offset,
-                ).firstOrNull()?.let { result ->
-                    if (linkEntire) {
-                        onClickLink?.invoke(annotatedString.substring(result.start, result.end))
-                    } else {
-                        uriHandler.openUri(result.item)
-                        onClickLink?.invoke(annotatedString.substring(result.start, result.end))
+                annotatedString
+                    .getStringAnnotations(
+                        start = offset,
+                        end = offset,
+                    )
+                    .firstOrNull()
+                    ?.let { result ->
+                        if (linkEntire) {
+                            onClickLink?.invoke(annotatedString.substring(result.start, result.end))
+                        } else {
+                            uriHandler.openUri(result.item)
+                            onClickLink?.invoke(annotatedString.substring(result.start, result.end))
+                        }
                     }
-                }
             }
         )
     } else {
@@ -164,13 +158,14 @@ private fun ClickableText(
     onClick: (Int) -> Unit
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val pressIndicator = Modifier.pointerInput(onClick) {
-        detectTapGestures { pos ->
-            layoutResult.value?.let { layoutResult ->
-                onClick(layoutResult.getOffsetForPosition(pos))
+    val pressIndicator =
+        Modifier.pointerInput(onClick) {
+            detectTapGestures { pos ->
+                layoutResult.value?.let { layoutResult ->
+                    onClick(layoutResult.getOffsetForPosition(pos))
+                }
             }
         }
-    }
     Text(
         text = text,
         modifier = modifier.then(pressIndicator),
@@ -194,11 +189,7 @@ private fun ClickableText(
     )
 }
 
-private data class LinkInfo(
-    val url: String,
-    val start: Int,
-    val end: Int
-)
+private data class LinkInfo(val url: String, val start: Int, val end: Int)
 
 private class SpannableStr(source: CharSequence) : SpannableString(source) {
     companion object {
@@ -214,22 +205,15 @@ private class SpannableStr(source: CharSequence) : SpannableString(source) {
         }
     }
 
-    private inner class Data(
-        val what: Any?,
-        val start: Int,
-        val end: Int
-    )
+    private inner class Data(val what: Any?, val start: Int, val end: Int)
 
     private val spanList = mutableListOf<Data>()
 
     private val linkInfos: List<LinkInfo>
-        get() = spanList.filter { it.what is URLSpan }.map {
-            LinkInfo(
-                (it.what as URLSpan).url,
-                it.start,
-                it.end
-            )
-        }
+        get() =
+            spanList
+                .filter { it.what is URLSpan }
+                .map { LinkInfo((it.what as URLSpan).url, it.start, it.end) }
 
     override fun removeSpan(what: Any?) {
         super.removeSpan(what)

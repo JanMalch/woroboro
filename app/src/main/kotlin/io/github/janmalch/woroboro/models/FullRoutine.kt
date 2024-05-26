@@ -1,11 +1,11 @@
 package io.github.janmalch.woroboro.models
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.time.Duration
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 data class Routine(
     val id: UUID,
@@ -30,9 +30,8 @@ data class FullRoutine(
     val createdAt: Instant,
     val updatedAt: Instant,
 ) {
-    val exercises: ImmutableList<Exercise> = steps
-        .mapNotNull { (it as? RoutineStep.ExerciseStep)?.exercise }
-        .toImmutableList()
+    val exercises: ImmutableList<Exercise> =
+        steps.mapNotNull { (it as? RoutineStep.ExerciseStep)?.exercise }.toImmutableList()
 }
 
 fun FullRoutine.asRoutine(): Routine {
@@ -51,15 +50,10 @@ fun FullRoutine.asRoutine(): Routine {
 }
 
 sealed interface RoutineStep {
-    /**
-     * The index of this step within a routine.
-     * Guaranteed to be unique within a routine.
-     */
+    /** The index of this step within a routine. Guaranteed to be unique within a routine. */
     val sortIndex: Int
 
-    /**
-     * The id of this step within a routine.
-     */
+    /** The id of this step within a routine. */
     val id: UUID
 
     data class ExerciseStep(
@@ -69,9 +63,8 @@ sealed interface RoutineStep {
         val customExecution: ExerciseExecution?,
     ) : RoutineStep {
         /**
-         * The execution of this step, specific to this routine.
-         * Might be the same as the default in [exercise].
-         * Always use this in the context of a routine.
+         * The execution of this step, specific to this routine. Might be the same as the default in
+         * [exercise]. Always use this in the context of a routine.
          */
         val execution: ExerciseExecution = customExecution basedOn exercise.execution
     }

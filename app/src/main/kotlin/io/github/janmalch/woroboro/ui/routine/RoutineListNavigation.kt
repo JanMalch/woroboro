@@ -26,7 +26,8 @@ import io.github.janmalch.woroboro.models.Routine
 
 const val ROUTINE_LIST_ROUTE = "$ROUTINE_GRAPH_ROUTE/routine-list"
 
-val NavDestination.isRoutineList: Boolean get() = route == ROUTINE_LIST_ROUTE
+val NavDestination.isRoutineList: Boolean
+    get() = route == ROUTINE_LIST_ROUTE
 
 fun NavController.navigateToRoutineList(navOptions: NavOptions? = null) {
     this.navigate(ROUTINE_LIST_ROUTE, navOptions)
@@ -50,11 +51,9 @@ fun NavGraphBuilder.routineListScreen(
             RoutineListUiState.Failure -> {
                 RoutineListErrorScreen()
             }
-
             RoutineListUiState.Loading -> {
                 // Loading should be extremely fast, so don't show a spinner for like 10ms
             }
-
             is RoutineListUiState.Success -> {
                 RoutineListScreen(
                     routines = state.routines,
@@ -89,12 +88,9 @@ private fun RoutineListErrorScreen() {
             )
         },
     ) { padding ->
-
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize().padding(padding),
         ) {
             Text(
                 text = stringResource(R.string.unknown_error_message),

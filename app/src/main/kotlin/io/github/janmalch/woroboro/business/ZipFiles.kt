@@ -10,6 +10,7 @@ import java.util.zip.ZipOutputStream
 
 sealed interface ZipContent {
     data class TextFile(val name: String, val content: String) : ZipContent
+
     data class MediaFile(val file: File) : ZipContent
 }
 
@@ -30,7 +31,6 @@ fun writeZip(
                         }
                     }
                 }
-
                 is ZipContent.TextFile -> {
                     val entry = ZipEntry(content.name)
                     out.putNextEntry(entry)

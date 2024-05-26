@@ -13,7 +13,6 @@ import io.github.janmalch.woroboro.ui.CollectAsEvents
 import io.github.janmalch.woroboro.ui.Outcome
 import java.util.UUID
 
-
 const val REMINDER_LIST_ROUTE = "$REMINDER_GRAPH_ROUTE/reminder-list"
 
 fun NavController.navigateToReminderList(navOptions: NavOptions? = null) {

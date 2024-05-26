@@ -4,22 +4,25 @@ import io.github.janmalch.woroboro.data.dao.TagDao
 import io.github.janmalch.woroboro.data.model.TagEntity
 import io.github.janmalch.woroboro.data.model.asModel
 import io.github.janmalch.woroboro.models.Tag
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 interface TagRepository {
     suspend fun insert(tag: Tag)
+
     suspend fun update(tag: Tag, oldLabel: String)
+
     suspend fun delete(label: String)
+
     suspend fun renameType(from: String, to: String)
+
     fun findAllGrouped(): Flow<Map<String, List<String>>>
+
     fun resolveAll(labels: List<String>): Flow<List<Tag>>
 }
 
-class TagRepositoryImpl @Inject constructor(
-    private val tagDao: TagDao
-) : TagRepository {
+class TagRepositoryImpl @Inject constructor(private val tagDao: TagDao) : TagRepository {
 
     override suspend fun insert(tag: Tag) {
         tagDao.insert(tag.asEntity())
@@ -38,16 +41,14 @@ class TagRepositoryImpl @Inject constructor(
     }
 
     override fun findAllGrouped(): Flow<Map<String, List<String>>> {
-        return tagDao.findAll()
-            .map { tags ->
-                tags.groupBy(keySelector = { it.type }, valueTransform = { it.label })
-                    .mapValues { it.value.sorted() }
+        return tagDao.findAll().map { tags ->
+            tags.groupBy(keySelector = { it.type }, valueTransform = { it.label }).mapValues {
+                it.value.sorted()
             }
-
+        }
     }
 
     override fun resolveAll(labels: List<String>): Flow<List<Tag>> {
         return tagDao.resolve(labels).map { list -> list.map(TagEntity::asModel) }
     }
-
 }

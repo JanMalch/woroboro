@@ -66,9 +66,7 @@ fun TagEditorScreen(
     val newTypes = remember { mutableStateListOf<String>() }
     var isSheetVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(value) {
-        newTypes.removeIf { it in value }
-    }
+    LaunchedEffect(value) { newTypes.removeIf { it in value } }
 
     Scaffold(
         topBar = {
@@ -91,12 +89,8 @@ fun TagEditorScreen(
             onUpdateTag = onUpdateTag,
             onDeleteTag = onDeleteTag,
             onRenameType = onRenameType,
-            modifier = modifier
-                .fillMaxSize()
-                .clearFocusAsOutsideClick()
-                .padding(padding),
+            modifier = modifier.fillMaxSize().clearFocusAsOutsideClick().padding(padding),
         )
-
 
         if (isSheetVisible) {
             TextFieldSheet(
@@ -105,11 +99,10 @@ fun TagEditorScreen(
                 buttonText = "Erstellen",
                 onValueChange = {
                     newTypes.add(it.trim())
-                    coroutineScope.launch {
-                        listState.scrollToItem(0)
-                    }
+                    coroutineScope.launch { listState.scrollToItem(0) }
                 },
-                onDismissRequest = { isSheetVisible = false })
+                onDismissRequest = { isSheetVisible = false }
+            )
         }
     }
 }
@@ -146,10 +139,8 @@ fun TagEditor(
             item(key = "Divider", contentType = "Divider") { HorizontalDivider() }
         }
 
-        items(
-            value.entries.toList(),
-            key = { it.key },
-            contentType = { "TypeCard" }) { (type, tags) ->
+        items(value.entries.toList(), key = { it.key }, contentType = { "TypeCard" }) { (type, tags)
+            ->
             TypeCard(
                 type = type,
                 tags = tags,
@@ -175,18 +166,11 @@ fun TypeCard(
     onRenameType: (Pair<String, String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var labelInputValue by rememberSaveable {
-        mutableStateOf("")
-    }
-    var editedType by remember(type) {
-        mutableStateOf(type)
-    }
-    var editingLabel by remember {
-        mutableStateOf<String?>(null)
-    }
+    var labelInputValue by rememberSaveable { mutableStateOf("") }
+    var editedType by remember(type) { mutableStateOf(type) }
+    var editingLabel by remember { mutableStateOf<String?>(null) }
 
     OutlinedCard(modifier = modifier.fillMaxWidth()) {
-
         TextField(
             value = editedType,
             onValueChange = { editedType = it },
@@ -220,38 +204,40 @@ fun TypeCard(
                         label = { Text(text = tag.label) },
                         trailingIcon = {
                             Icon(
-                                Icons.Rounded.Close, contentDescription = null,
+                                Icons.Rounded.Close,
+                                contentDescription = null,
                                 modifier = Modifier.clickable { onDeleteTag(tag) },
                             )
                         }
                     )
                 }
             }
-
         }
 
         SimpleTextField(
             value = labelInputValue,
             onValueChange = { labelInputValue = it },
-            placeholder = if (editingLabel == null) "Neuer Tag für $type…" else "$editingLabel umbenennen…",
+            placeholder =
+                if (editingLabel == null) "Neuer Tag für $type…" else "$editingLabel umbenennen…",
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    val tag = Tag(label = labelInputValue.trim(), type = type)
-                    val currentEditingLabel = editingLabel
-                    if (currentEditingLabel == null) {
-                        onAddTag(tag)
-                    } else {
-                        onUpdateTag(tag, currentEditingLabel)
+            keyboardOptions =
+                KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        val tag = Tag(label = labelInputValue.trim(), type = type)
+                        val currentEditingLabel = editingLabel
+                        if (currentEditingLabel == null) {
+                            onAddTag(tag)
+                        } else {
+                            onUpdateTag(tag, currentEditingLabel)
+                        }
+                        labelInputValue = ""
                     }
-                    labelInputValue = ""
-                }
-            )
+                )
         )
-        }
+    }
 }
-

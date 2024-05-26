@@ -10,7 +10,6 @@ import io.github.janmalch.woroboro.ui.exercise.tageditor.tagEditorScreen
 import io.github.janmalch.woroboro.utils.SnackbarAction
 import java.util.UUID
 
-
 const val EXERCISES_GRAPH_ROUTE = "exercises"
 
 fun NavController.navigateToExercisesGraph(navOptions: NavOptions? = null) {
@@ -46,5 +45,4 @@ fun NavGraphBuilder.exercisesGraph(
         )
         tagEditorScreen(onBackClick = onBackClick)
     }
-
 }

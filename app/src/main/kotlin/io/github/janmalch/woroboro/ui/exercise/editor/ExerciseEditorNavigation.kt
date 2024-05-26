@@ -20,17 +20,14 @@ import io.github.janmalch.woroboro.ui.exercise.EXERCISES_GRAPH_ROUTE
 import io.github.janmalch.woroboro.utils.SnackbarAction
 import java.util.UUID
 
-
 private const val ARGUMENT = "exerciseId"
 const val EXERCISE_EDITOR_ROUTE = "$EXERCISES_GRAPH_ROUTE/exercise-editor"
 private const val EXERCISE_EDITOR_ROUTE_PATTERN = "$EXERCISE_EDITOR_ROUTE?$ARGUMENT={$ARGUMENT}"
 
-data class ExerciseEditorArgs(
-    val exerciseId: UUID?
-) {
-    constructor(savedStateHandle: SavedStateHandle) : this(
-        exerciseId = savedStateHandle.get<String?>(ARGUMENT)?.let(UUID::fromString)
-    )
+data class ExerciseEditorArgs(val exerciseId: UUID?) {
+    constructor(
+        savedStateHandle: SavedStateHandle
+    ) : this(exerciseId = savedStateHandle.get<String?>(ARGUMENT)?.let(UUID::fromString))
 }
 
 fun NavController.navigateToExerciseEditor(
@@ -52,12 +49,13 @@ fun NavGraphBuilder.exerciseEditorScreen(
 ) {
     composable(
         route = EXERCISE_EDITOR_ROUTE_PATTERN,
-        arguments = listOf(
-            navArgument(ARGUMENT) {
-                type = NavType.StringType
-                nullable = true
-            }
-        ),
+        arguments =
+            listOf(
+                navArgument(ARGUMENT) {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            ),
         enterTransition = NavigationDefaults.enterEditorTransition,
         exitTransition = NavigationDefaults.exitEditorTransition,
     ) {
@@ -73,21 +71,23 @@ fun NavGraphBuilder.exerciseEditorScreen(
                     onShowSnackbarAction(
                         SnackbarAction(
                             message = context.getString(R.string.exercise_save_success),
-                            actionLabel = context.getString(R.string.exercise_save_success_action_edit),
+                            actionLabel =
+                                context.getString(R.string.exercise_save_success_action_edit),
                         ) { res ->
                             if (res == SnackbarResult.ActionPerformed) {
                                 val exerciseId = exercise?.id
                                 if (exerciseId != null) {
                                     onNavigateToExerciseEditor(exerciseId)
                                 } else {
-                                    onShowSnackbar(context.getString(R.string.unknown_error_message))
+                                    onShowSnackbar(
+                                        context.getString(R.string.unknown_error_message)
+                                    )
                                 }
                             }
                         }
                     )
                     onBackClick()
                 }
-
                 Outcome.Failure -> {
                     onShowSnackbar(context.getString(R.string.exercise_save_error))
                 }
@@ -100,7 +100,6 @@ fun NavGraphBuilder.exerciseEditorScreen(
                     onShowSnackbar(context.getString(R.string.exercise_delete_success))
                     onBackClick()
                 }
-
                 Outcome.Failure -> {
                     onShowSnackbar(context.getString(R.string.exercise_delete_error))
                 }
@@ -112,7 +111,6 @@ fun NavGraphBuilder.exerciseEditorScreen(
                 Outcome.Success -> {
                     onShowSnackbar(context.getString(R.string.exercise_add_to_routine_success))
                 }
-
                 Outcome.Failure -> {
                     onShowSnackbar(context.getString(R.string.exercise_add_to_routine_error))
                 }

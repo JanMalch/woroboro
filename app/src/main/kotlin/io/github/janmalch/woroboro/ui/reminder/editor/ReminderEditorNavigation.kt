@@ -18,18 +18,14 @@ import io.github.janmalch.woroboro.ui.components.NavigationDefaults
 import io.github.janmalch.woroboro.ui.reminder.REMINDER_GRAPH_ROUTE
 import java.util.UUID
 
-
 private const val ARGUMENT = "routineId"
 const val REMINDER_EDITOR_ROUTE = "$REMINDER_GRAPH_ROUTE/reminder-editor"
 private const val REMINDER_EDITOR_ROUTE_PATTERN = "$REMINDER_EDITOR_ROUTE?${ARGUMENT}={${ARGUMENT}}"
 
-
-data class RoutineEditorArgs(
-    val reminderId: UUID?
-) {
-    constructor(savedStateHandle: SavedStateHandle) : this(
-        reminderId = savedStateHandle.get<String?>(ARGUMENT)?.let(UUID::fromString)
-    )
+data class RoutineEditorArgs(val reminderId: UUID?) {
+    constructor(
+        savedStateHandle: SavedStateHandle
+    ) : this(reminderId = savedStateHandle.get<String?>(ARGUMENT)?.let(UUID::fromString))
 }
 
 fun NavController.navigateToReminderEditor(
@@ -49,12 +45,13 @@ fun NavGraphBuilder.reminderEditorScreen(
 ) {
     composable(
         route = REMINDER_EDITOR_ROUTE_PATTERN,
-        arguments = listOf(
-            navArgument(ARGUMENT) {
-                type = NavType.StringType
-                nullable = true
-            }
-        ),
+        arguments =
+            listOf(
+                navArgument(ARGUMENT) {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            ),
         enterTransition = NavigationDefaults.enterEditorTransition,
         exitTransition = NavigationDefaults.exitEditorTransition,
     ) {
@@ -71,7 +68,6 @@ fun NavGraphBuilder.reminderEditorScreen(
                     onShowSnackbar(context.getString(R.string.reminder_save_success))
                     onBackClick()
                 }
-
                 Outcome.Failure -> {
                     onShowSnackbar(context.getString(R.string.reminder_save_error))
                 }
@@ -84,7 +80,6 @@ fun NavGraphBuilder.reminderEditorScreen(
                     onShowSnackbar(context.getString(R.string.reminder_delete_success))
                     onBackClick()
                 }
-
                 Outcome.Failure -> {
                     onShowSnackbar(context.getString(R.string.reminder_delete_error))
                 }

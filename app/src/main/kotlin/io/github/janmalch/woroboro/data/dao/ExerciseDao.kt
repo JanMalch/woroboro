@@ -10,8 +10,8 @@ import io.github.janmalch.woroboro.data.model.ExerciseEntityWithMediaAndTags
 import io.github.janmalch.woroboro.data.model.ExerciseTagCrossRefEntity
 import io.github.janmalch.woroboro.data.model.MediaEntity
 import io.github.janmalch.woroboro.data.model.TagEntity
-import kotlinx.coroutines.flow.Flow
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class ExerciseDao {
@@ -23,25 +23,26 @@ abstract class ExerciseDao {
         upsertMedia(entity.media)
         upsertTags(entity.tags)
         deleteTagRefsOfExercise(entity.exercise.id)
-        upsertCrossRefs(entity.tags.map {
-            ExerciseTagCrossRefEntity(
-                exerciseId = entity.exercise.id,
-                tagLabel = it.label,
-            )
-        })
+        upsertCrossRefs(
+            entity.tags.map {
+                ExerciseTagCrossRefEntity(
+                    exerciseId = entity.exercise.id,
+                    tagLabel = it.label,
+                )
+            }
+        )
     }
 
     @Upsert
-    protected abstract suspend fun upsertCrossRefs(crossRefEntities: List<ExerciseTagCrossRefEntity>)
+    protected abstract suspend fun upsertCrossRefs(
+        crossRefEntities: List<ExerciseTagCrossRefEntity>
+    )
 
-    @Upsert
-    protected abstract suspend fun insertExercise(entity: ExerciseEntity)
+    @Upsert protected abstract suspend fun insertExercise(entity: ExerciseEntity)
 
-    @Upsert
-    protected abstract suspend fun upsertTags(tags: List<TagEntity>)
+    @Upsert protected abstract suspend fun upsertTags(tags: List<TagEntity>)
 
-    @Upsert
-    protected abstract suspend fun upsertMedia(media: List<MediaEntity>)
+    @Upsert protected abstract suspend fun upsertMedia(media: List<MediaEntity>)
 
     @Query("DELETE FROM exercise_tag_cross_ref WHERE exercise_id = :exerciseId")
     protected abstract suspend fun deleteTagRefsOfExercise(exerciseId: UUID)

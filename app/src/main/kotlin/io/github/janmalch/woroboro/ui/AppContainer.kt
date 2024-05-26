@@ -51,14 +51,11 @@ fun AppContainer(startDestination: String) {
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        bottomBar = {
-            AppBottomBar(navController)
-        },
+        bottomBar = { AppBottomBar(navController) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Box(
-            Modifier
-                .fillMaxSize()
+            Modifier.fillMaxSize()
                 .padding(padding)
                 .consumeWindowInsets(padding)
                 .windowInsetsPadding(
@@ -71,14 +68,10 @@ fun AppContainer(startDestination: String) {
                 navController = navController,
                 startDestination = startDestination,
                 onShowSnackbar = {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(message = it)
-                    }
+                    coroutineScope.launch { snackbarHostState.showSnackbar(message = it) }
                 },
                 onShowSnackbarAction = {
-                    coroutineScope.launch {
-                        it.action(snackbarHostState.showSnackbar(it))
-                    }
+                    coroutineScope.launch { it.action(snackbarHostState.showSnackbar(it)) }
                 }
             )
         }
@@ -100,25 +93,19 @@ fun AppBottomBar(navController: NavHostController) {
     NavigationBar {
         NavigationBarItem(
             selected = isRoutineTabActive,
-            onClick = {
-                navController.navigateToRoutineGraph(forBackstack(navController))
-            },
+            onClick = { navController.navigateToRoutineGraph(forBackstack(navController)) },
             icon = { Icon(Icons.Outlined.FitnessCenter, contentDescription = null) },
             label = { Text(text = stringResource(id = R.string.routines)) },
         )
         NavigationBarItem(
             selected = isExerciseTabActive,
-            onClick = {
-                navController.navigateToExercisesGraph(forBackstack(navController))
-            },
+            onClick = { navController.navigateToExercisesGraph(forBackstack(navController)) },
             icon = { Icon(Icons.Outlined.SportsGymnastics, contentDescription = null) },
             label = { Text(text = stringResource(id = R.string.exercises)) },
         )
         NavigationBarItem(
             selected = isRemindersTabActive,
-            onClick = {
-                navController.navigateToReminderGraph(forBackstack(navController))
-            },
+            onClick = { navController.navigateToReminderGraph(forBackstack(navController)) },
             icon = {
                 if (isRemindersTabActive) {
                     Icon(Icons.Rounded.Notifications, contentDescription = null)
@@ -130,9 +117,7 @@ fun AppBottomBar(navController: NavHostController) {
         )
         NavigationBarItem(
             selected = isMoreTabActive,
-            onClick = {
-                navController.navigateToMoreGraph(forBackstack(navController))
-            },
+            onClick = { navController.navigateToMoreGraph(forBackstack(navController)) },
             icon = {
                 if (isRemindersTabActive) {
                     Icon(Icons.Rounded.MoreHoriz, contentDescription = null)

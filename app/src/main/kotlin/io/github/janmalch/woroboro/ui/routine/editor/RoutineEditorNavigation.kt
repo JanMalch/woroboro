@@ -18,17 +18,14 @@ import io.github.janmalch.woroboro.ui.components.NavigationDefaults
 import io.github.janmalch.woroboro.ui.routine.ROUTINE_GRAPH_ROUTE
 import java.util.UUID
 
-
 private const val ARGUMENT = "routineId"
 const val ROUTINE_EDITOR_ROUTE = "$ROUTINE_GRAPH_ROUTE/routine-editor"
 private const val ROUTINE_EDITOR_ROUTE_PATTERN = "$ROUTINE_EDITOR_ROUTE?$ARGUMENT={$ARGUMENT}"
 
-data class RoutineEditorArgs(
-    val routineId: UUID?
-) {
-    constructor(savedStateHandle: SavedStateHandle) : this(
-        routineId = savedStateHandle.get<String?>(ARGUMENT)?.let(UUID::fromString)
-    )
+data class RoutineEditorArgs(val routineId: UUID?) {
+    constructor(
+        savedStateHandle: SavedStateHandle
+    ) : this(routineId = savedStateHandle.get<String?>(ARGUMENT)?.let(UUID::fromString))
 }
 
 fun NavController.navigateToRoutineEditor(
@@ -49,12 +46,13 @@ fun NavGraphBuilder.routineEditorScreen(
 ) {
     composable(
         route = ROUTINE_EDITOR_ROUTE_PATTERN,
-        arguments = listOf(
-            navArgument(ARGUMENT) {
-                type = NavType.StringType
-                nullable = true
-            }
-        ),
+        arguments =
+            listOf(
+                navArgument(ARGUMENT) {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            ),
         enterTransition = NavigationDefaults.enterEditorTransition,
         exitTransition = NavigationDefaults.exitEditorTransition,
     ) {
@@ -70,7 +68,6 @@ fun NavGraphBuilder.routineEditorScreen(
                     onShowSnackbar(context.getString(R.string.routine_save_success))
                     onBackClick()
                 }
-
                 Outcome.Failure -> {
                     onShowSnackbar(context.getString(R.string.routine_save_error))
                 }
@@ -83,7 +80,6 @@ fun NavGraphBuilder.routineEditorScreen(
                     onShowSnackbar(context.getString(R.string.routine_delete_success))
                     onBackToRoutineList()
                 }
-
                 Outcome.Failure -> {
                     onShowSnackbar(context.getString(R.string.routine_delete_error))
                 }

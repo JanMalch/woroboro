@@ -14,8 +14,8 @@ fun findWholeUnit(duration: Duration?, default: DurationUnit = DurationUnit.SECO
     }
 }
 
-
-fun formatForTimer(duration: Duration): String = duration.toComponents { minutes, seconds, _ ->
-    // TODO: i18n?
-    "${minutes.toString(10).padStart(2, '0')}:${seconds.toString(10).padStart(2, '0')}"
-}
+fun formatForTimer(duration: Duration): String =
+    duration.toComponents { minutes, seconds, _ ->
+        // TODO: i18n?
+        "${minutes.toString(10).padStart(2, '0')}:${seconds.toString(10).padStart(2, '0')}"
+    }

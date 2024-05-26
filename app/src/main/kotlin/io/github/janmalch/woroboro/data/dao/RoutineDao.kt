@@ -17,17 +17,16 @@ import io.github.janmalch.woroboro.models.FullRoutine
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.models.RoutineStep
 import io.github.janmalch.woroboro.models.RoutinesOrder
+import java.util.UUID
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import java.util.UUID
 
 @Dao
 abstract class RoutineDao {
-
 
     @Query(
         """
@@ -97,10 +96,16 @@ abstract class RoutineDao {
                         exerciseCount = routine.exerciseCount,
                         createdAt = routine.routine.createdAt,
                         updatedAt = routine.routine.updatedAt,
-                        media = mediaOfRoutine.map { it.mediaEntity.asModel() }.distinct()
-                            .toImmutableList(),
-                        tags = tagsOfRoutine.map { it.tagEntity.asModel() }.distinct()
-                            .toImmutableList(),
+                        media =
+                            mediaOfRoutine
+                                .map { it.mediaEntity.asModel() }
+                                .distinct()
+                                .toImmutableList(),
+                        tags =
+                            tagsOfRoutine
+                                .map { it.tagEntity.asModel() }
+                                .distinct()
+                                .toImmutableList(),
                     )
                 }
             }
@@ -116,7 +121,9 @@ abstract class RoutineDao {
         WHERE routine.id = :routineId
     """
     )
-    protected abstract fun resolveWithSteps(routineId: UUID): Flow<Map<RoutineEntity, List<RoutineStepEntity>>>
+    protected abstract fun resolveWithSteps(
+        routineId: UUID
+    ): Flow<Map<RoutineEntity, List<RoutineStepEntity>>>
 
     @Transaction
     @Query(
@@ -129,13 +136,14 @@ abstract class RoutineDao {
         ORDER BY step.sort_index ASC
     """
     )
-    protected abstract fun findExercises(routineId: UUID): Flow<List<ExerciseEntityWithMediaAndTags>>
+    protected abstract fun findExercises(
+        routineId: UUID
+    ): Flow<List<ExerciseEntityWithMediaAndTags>>
 
     open fun findOneFull(id: UUID): Flow<FullRoutine?> {
         return resolveWithSteps(id).flatMapLatest { routines ->
-            val (routine, steps) = routines.entries.firstOrNull() ?: return@flatMapLatest flowOf(
-                null
-            )
+            val (routine, steps) =
+                routines.entries.firstOrNull() ?: return@flatMapLatest flowOf(null)
             findExercises(routine.id).map { exercises ->
                 FullRoutine(
                     id = routine.id,
@@ -145,23 +153,21 @@ abstract class RoutineDao {
                     lastRunEnded = routine.lastRunEnded,
                     createdAt = routine.createdAt,
                     updatedAt = routine.updatedAt,
-                    steps = steps
-                        .map { step -> step.asModel(exercises) }
-                        .sortedBy(RoutineStep::sortIndex)
-                        .toImmutableList(),
+                    steps =
+                        steps
+                            .map { step -> step.asModel(exercises) }
+                            .sortedBy(RoutineStep::sortIndex)
+                            .toImmutableList(),
                 )
             }
         }
     }
 
-    @Update
-    abstract suspend fun update(routineEntity: RoutineEntity)
+    @Update abstract suspend fun update(routineEntity: RoutineEntity)
 
-    @Insert
-    protected abstract suspend fun insertRoutine(routineEntity: RoutineEntity)
+    @Insert protected abstract suspend fun insertRoutine(routineEntity: RoutineEntity)
 
-    @Insert
-    abstract suspend fun insertSteps(steps: List<RoutineStepEntity>)
+    @Insert abstract suspend fun insertSteps(steps: List<RoutineStepEntity>)
 
     @Transaction
     open suspend fun insert(routineEntity: RoutineEntity, steps: List<RoutineStepEntity>) {
@@ -179,40 +185,37 @@ abstract class RoutineDao {
         insertSteps(steps)
     }
 
-    @Query("DELETE FROM routine WHERE id = :routineId")
-    abstract suspend fun delete(routineId: UUID)
+    @Query("DELETE FROM routine WHERE id = :routineId") abstract suspend fun delete(routineId: UUID)
 
     @Query("UPDATE routine SET last_run_duration = NULL, last_run_ended = NULL")
     abstract suspend fun clearLastRuns()
 }
 
 data class RoutineQueryResult(
-    @Embedded
-    val routine: RoutineEntity,
-    @ColumnInfo("exercise_count")
-    val exerciseCount: Int,
+    @Embedded val routine: RoutineEntity,
+    @ColumnInfo("exercise_count") val exerciseCount: Int,
 )
 
 data class RoutineTagsQueryResult(
-    @ColumnInfo("routine_id")
-    val routineId: UUID,
-    @Embedded
-    val tagEntity: TagEntity,
+    @ColumnInfo("routine_id") val routineId: UUID,
+    @Embedded val tagEntity: TagEntity,
 )
 
 data class RoutineMediaQueryResult(
-    @ColumnInfo("routine_id")
-    val routineId: UUID,
-    @Embedded
-    val mediaEntity: MediaEntity,
+    @ColumnInfo("routine_id") val routineId: UUID,
+    @Embedded val mediaEntity: MediaEntity,
 )
 
-fun RoutineStepEntity.asModel(exerciseLookup: Collection<ExerciseEntityWithMediaAndTags>): RoutineStep {
+fun RoutineStepEntity.asModel(
+    exerciseLookup: Collection<ExerciseEntityWithMediaAndTags>
+): RoutineStep {
     if (pauseStep != null) {
         return RoutineStep.PauseStep(id = id, sortIndex = sortIndex, duration = pauseStep)
     }
     val exercise = exerciseLookup.firstOrNull { it.exercise.id == exerciseId }
-    checkNotNull(exercise) { "Failed to find exercise $exerciseId for routine $routineId at step index ${sortIndex}." }
+    checkNotNull(exercise) {
+        "Failed to find exercise $exerciseId for routine $routineId at step index ${sortIndex}."
+    }
     return RoutineStep.ExerciseStep(
         id = id,
         sortIndex = sortIndex,

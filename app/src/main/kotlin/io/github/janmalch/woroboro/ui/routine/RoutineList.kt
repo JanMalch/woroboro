@@ -94,9 +94,7 @@ fun RoutineListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onCreateRoutineClick
-            ) {
+            FloatingActionButton(onClick = onCreateRoutineClick) {
                 Icon(Icons.Rounded.Add, contentDescription = null)
             }
         }
@@ -115,10 +113,11 @@ fun RoutineListScreen(
             onSelectedTagsChange = onSelectedTagsChange,
             onToggleFavorite = onToggleFavorite,
             onRoutineClick = onRoutineClick,
-            modifier = modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(padding),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .padding(padding),
         )
     }
 }
@@ -145,13 +144,15 @@ fun RoutineList(
         contentPadding = PaddingValues(bottom = 88.dp), // FAB Spacing
     ) {
         stickyHeader(key = "Filters", contentType = "Filters") {
-            val containerColor by animateColorAsState(
-                targetValue = TopAppBarDefaults
-                    .centerAlignedTopAppBarColors()
-                    .let { if (isTopBarCollapsed) it.scrolledContainerColor else it.containerColor },
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                label = "Color:Filters"
-            )
+            val containerColor by
+                animateColorAsState(
+                    targetValue =
+                        TopAppBarDefaults.centerAlignedTopAppBarColors().let {
+                            if (isTopBarCollapsed) it.scrolledContainerColor else it.containerColor
+                        },
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                    label = "Color:Filters"
+                )
             RoutineFilterRow(
                 availableTags = availableTags,
                 selectedTags = selectedTags,
@@ -193,18 +194,20 @@ fun RoutineListItem(
             Text(text = routine.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
         supportingContent = {
-            val fmtExercises = pluralStringResource(
-                id = R.plurals.exercises_with_count,
-                count = routine.exerciseCount,
-                routine.exerciseCount
-            )
-            val text = if (routine.lastRunDuration != null) {
-                stringResource(
-                    id = R.string.routine_summary_with_duration,
-                    fmtExercises,
-                    formatDuration(duration = routine.lastRunDuration),
+            val fmtExercises =
+                pluralStringResource(
+                    id = R.plurals.exercises_with_count,
+                    count = routine.exerciseCount,
+                    routine.exerciseCount
                 )
-            } else fmtExercises
+            val text =
+                if (routine.lastRunDuration != null) {
+                    stringResource(
+                        id = R.string.routine_summary_with_duration,
+                        fmtExercises,
+                        formatDuration(duration = routine.lastRunDuration),
+                    )
+                } else fmtExercises
             Text(text = text)
         },
         overlineContent = {
@@ -217,24 +220,19 @@ fun RoutineListItem(
             }
         },
         trailingContent = {
-            IconButton(onClick = onToggleFavorite) {
-                FavoriteIcon(isFavorite = routine.isFavorite)
-            }
+            IconButton(onClick = onToggleFavorite) { FavoriteIcon(isFavorite = routine.isFavorite) }
         },
         modifier = modifier.clickable(onClick = onClick),
     )
     HorizontalDivider()
 }
 
-
 @Composable
 fun RoutinePreview(
     media: ImmutableList<Media>,
 ) {
     val currentMediaList by rememberUpdatedState(media)
-    var currentImage by remember {
-        mutableStateOf(media.randomOrNull())
-    }
+    var currentImage by remember { mutableStateOf(media.randomOrNull()) }
 
     Crossfade(
         targetState = currentImage?.thumbnail,
@@ -245,10 +243,10 @@ fun RoutinePreview(
             model = it,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-                .clip(RoundedCornerShape(8.dp))
+            modifier =
+                Modifier.size(64.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(8.dp))
         )
     }
 
@@ -262,5 +260,4 @@ fun RoutinePreview(
             currentImage = next
         }
     }
-
 }

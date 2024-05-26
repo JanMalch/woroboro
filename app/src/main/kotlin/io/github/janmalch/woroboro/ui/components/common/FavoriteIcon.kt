@@ -28,8 +28,7 @@ fun FavoriteIcon(
         label = crossfadeLabel,
     ) {
         Icon(
-            if (it) Icons.Rounded.Favorite
-            else Icons.Rounded.FavoriteBorder,
+            if (it) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
             contentDescription = null,
             tint = if (it) LoveRed else LocalContentColor.current,
             modifier = modifier,
@@ -70,5 +69,3 @@ fun IsFavoriteCheckbox(
         Text(text = text)
     }
 }
-
-

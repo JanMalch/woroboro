@@ -41,15 +41,9 @@ fun MoreScreen(
         },
         modifier = modifier,
     ) { padding ->
-        var isClearLastRunsConfirmationVisible by remember {
-            mutableStateOf(false)
-        }
+        var isClearLastRunsConfirmationVisible by remember { mutableStateOf(false) }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             Column(modifier = Modifier.fillMaxSize()) {
                 ListItem(
                     leadingContent = {
@@ -62,9 +56,8 @@ fun MoreScreen(
                     supportingContent = {
                         Text(text = stringResource(R.string.clear_last_runs_explanation))
                     },
-                    modifier = Modifier.clickable(onClick = {
-                        isClearLastRunsConfirmationVisible = true
-                    })
+                    modifier =
+                        Modifier.clickable(onClick = { isClearLastRunsConfirmationVisible = true })
                 )
                 HorizontalDivider()
 
@@ -129,15 +122,15 @@ fun MoreScreen(
                         textAlign = TextAlign.Center
                     )
                 },
-                text = {
-                    Text(text = stringResource(id = R.string.clear_last_runs_confirmation))
-                },
+                text = { Text(text = stringResource(id = R.string.clear_last_runs_confirmation)) },
                 onDismissRequest = { isClearLastRunsConfirmationVisible = false },
                 confirmButton = {
-                    TextButton(onClick = {
-                        onClearLastRuns()
-                        isClearLastRunsConfirmationVisible = false
-                    }) {
+                    TextButton(
+                        onClick = {
+                            onClearLastRuns()
+                            isClearLastRunsConfirmationVisible = false
+                        }
+                    ) {
                         Text(text = stringResource(id = R.string.confirm))
                     }
                 }

@@ -1,5 +1,7 @@
 package io.github.janmalch.woroboro.ui.routine.routine
 
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -12,17 +14,19 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * @author https://github.com/nihk/stopwatch-fun/blob/6c8e8c70d6215931fae97f637ea9670cca00c5f5/app/src/main/java/com/example/stopwatch_fun/Stopwatch.kt
+ * @author
+ *   https://github.com/nihk/stopwatch-fun/blob/6c8e8c70d6215931fae97f637ea9670cca00c5f5/app/src/main/java/com/example/stopwatch_fun/Stopwatch.kt
  */
 interface Stopwatch {
     val state: StateFlow<State>
     val time: Flow<Duration>
+
     fun start()
+
     fun pause()
+
     fun reset()
 
     enum class State {
@@ -43,27 +47,29 @@ interface Stopwatch {
         private val _state = MutableStateFlow(State.Reset)
 
         override val state = _state.asStateFlow()
-        override val time: Flow<Duration> = _state.flatMapLatest { action ->
-            when (action) {
-                State.Running -> {
-                    val time = flow {
-                        val initial = currentTime() - elapsedTime
-                        while (currentCoroutineContext().isActive) {
-                            elapsedTime = currentTime() - initial
-                            emit(elapsedTime)
-                            delay(tick)
+        override val time: Flow<Duration> =
+            _state
+                .flatMapLatest { action ->
+                    when (action) {
+                        State.Running -> {
+                            val time = flow {
+                                val initial = currentTime() - elapsedTime
+                                while (currentCoroutineContext().isActive) {
+                                    elapsedTime = currentTime() - initial
+                                    emit(elapsedTime)
+                                    delay(tick)
+                                }
+                            }
+                            time.conflate()
+                        }
+                        State.Paused -> flowOf(elapsedTime)
+                        State.Reset -> {
+                            elapsedTime = 0L
+                            flowOf(elapsedTime)
                         }
                     }
-                    time.conflate()
                 }
-
-                State.Paused -> flowOf(elapsedTime)
-                State.Reset -> {
-                    elapsedTime = 0L
-                    flowOf(elapsedTime)
-                }
-            }
-        }.map { it.milliseconds }
+                .map { it.milliseconds }
 
         override fun start() {
             _state.value = State.Running

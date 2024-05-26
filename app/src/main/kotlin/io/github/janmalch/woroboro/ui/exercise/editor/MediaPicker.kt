@@ -39,7 +39,6 @@ import io.github.janmalch.woroboro.ui.components.common.rememberClearFocus
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 
-
 @Composable
 fun MediaPicker(
     value: EditedMedia,
@@ -52,11 +51,7 @@ fun MediaPicker(
     val clearFocus = rememberClearFocus()
     val currentValue by rememberUpdatedState(value)
     val pickMedia = rememberMediaPicker { uris ->
-        onValueChange(
-            currentValue.copy(
-                added = (uris + currentValue.added).toSet()
-            )
-        )
+        onValueChange(currentValue.copy(added = (uris + currentValue.added).toSet()))
     }
 
     Column(modifier = modifier) {
@@ -66,16 +61,17 @@ fun MediaPicker(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             title()
-            IconButton(onClick = {
-                clearFocus()
-                pickMedia()
-            }) {
+            IconButton(
+                onClick = {
+                    clearFocus()
+                    pickMedia()
+                }
+            ) {
                 Icon(Icons.Rounded.Add, contentDescription = null)
             }
         }
 
         AnimatedVisibility(visible = !value.isEmpty()) {
-
             Spacer(modifier = Modifier.height(24.dp))
 
             LazyRow(
@@ -92,46 +88,41 @@ fun MediaPicker(
                         model = uri,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(
-                                MaterialTheme.colorScheme.surfaceVariant,
-                                RoundedCornerShape(8.dp)
-                            )
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickableWithClearFocus {
-                                onValueChange(
-                                    currentValue.copy(
-                                        added = currentValue.added - uri
-                                    )
+                        modifier =
+                            Modifier.size(100.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceVariant,
+                                    RoundedCornerShape(8.dp)
                                 )
-                            },
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickableWithClearFocus {
+                                    onValueChange(
+                                        currentValue.copy(added = currentValue.added - uri)
+                                    )
+                                },
                     )
                 }
 
-                items(
-                    items = value.existing,
-                    key = { it },
-                    contentType = { "Existing" }
-                ) { uri ->
+                items(items = value.existing, key = { it }, contentType = { "Existing" }) { uri ->
                     AsyncImage(
                         model = uri.thumbnail,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(
-                                MaterialTheme.colorScheme.surfaceVariant,
-                                RoundedCornerShape(8.dp)
-                            )
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickableWithClearFocus {
-                                onValueChange(
-                                    currentValue.copy(
-                                        existing = (currentValue.existing - uri).toPersistentList()
-                                    )
+                        modifier =
+                            Modifier.size(100.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceVariant,
+                                    RoundedCornerShape(8.dp)
                                 )
-                            },
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickableWithClearFocus {
+                                    onValueChange(
+                                        currentValue.copy(
+                                            existing =
+                                                (currentValue.existing - uri).toPersistentList()
+                                        )
+                                    )
+                                },
                     )
                 }
             }
@@ -142,7 +133,8 @@ fun MediaPicker(
 @Composable
 private fun rememberMediaPicker(onMediaSelected: (List<Uri>) -> Unit): () -> Unit {
     val pickMultipleMedia =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris
+            ->
             if (uris.isNotEmpty()) {
                 onMediaSelected(uris)
             }
@@ -150,6 +142,8 @@ private fun rememberMediaPicker(onMediaSelected: (List<Uri>) -> Unit): () -> Uni
 
     return {
         // TODO: support video
-        pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        pickMultipleMedia.launch(
+            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        )
     }
 }

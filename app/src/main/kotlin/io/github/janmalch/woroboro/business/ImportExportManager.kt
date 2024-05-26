@@ -6,12 +6,12 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.janmalch.woroboro.models.Exercise
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 
 interface ImportExportManager {
 
@@ -20,8 +20,9 @@ interface ImportExportManager {
     suspend fun clean()
 }
 
-
-class ImportExportManagerImpl @Inject constructor(
+class ImportExportManagerImpl
+@Inject
+constructor(
     private val exerciseRepository: ExerciseRepository,
     private val routineRepository: RoutineRepository,
     @ApplicationContext private val context: Context,
@@ -34,27 +35,28 @@ class ImportExportManagerImpl @Inject constructor(
         val routines = routineRepository.findAll().first()
 
         return withContext(Dispatchers.IO) {
-            val exportFile = File(
-                exportsDir,
-                "woroboro-${
+            val exportFile =
+                File(
+                    exportsDir,
+                    "woroboro-${
                     LocalDateTime.now().toString().replace('T', '_').replace('.', '-')
                         .replace(':', '-')
                 }.zip"
-            )
+                )
             exportFile.createNewFile()
-            writeZip(exportFile,
+            writeZip(
+                exportFile,
                 exercises.map<Exercise, ZipContent> {
                     ZipContent.TextFile(
                         name = it.name + ".woroboro.txt",
                         content = it.asText(includeMedia = true)
                     )
-                } + exercises.flatMap {
-                    it.media.map { media ->
-                        ZipContent.MediaFile(
-                            file = media.source.toUri().toFile()
-                        )
+                } +
+                    exercises.flatMap {
+                        it.media.map { media ->
+                            ZipContent.MediaFile(file = media.source.toUri().toFile())
+                        }
                     }
-                }
             )
             exportFile
         }
@@ -65,12 +67,9 @@ class ImportExportManagerImpl @Inject constructor(
             exportsDir.listFiles()?.forEach { file ->
                 runCatching { file.delete() }
                     .onFailure { tr ->
-                        Log.e(
-                            "ImportExportManagerImpl",
-                            "Error while deleting export file.",
-                            tr
-                        )
-                    }.onSuccess { deleted ->
+                        Log.e("ImportExportManagerImpl", "Error while deleting export file.", tr)
+                    }
+                    .onSuccess { deleted ->
                         if (deleted) {
                             Log.d(
                                 "ImportExportManagerImpl",
@@ -81,11 +80,9 @@ class ImportExportManagerImpl @Inject constructor(
                                 "ImportExportManagerImpl",
                                 "Export file '${file.name}' has not been deleted."
                             )
-
                         }
                     }
             }
         }
     }
-
 }

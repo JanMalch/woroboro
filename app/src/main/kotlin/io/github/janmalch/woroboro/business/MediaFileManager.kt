@@ -9,18 +9,21 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.janmalch.woroboro.models.Media
 import io.github.janmalch.woroboro.utils.AppDispatchers.IO
 import io.github.janmalch.woroboro.utils.Dispatcher
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
 interface MediaFileManager {
     suspend fun add(uris: Collection<Uri>): List<Media>
+
     suspend fun delete(mediaIds: Collection<UUID>)
 }
 
-class MediaFileManagerImpl @Inject constructor(
+class MediaFileManagerImpl
+@Inject
+constructor(
     @ApplicationContext private val context: Context,
     private val mediaOptimizer: MediaOptimizer,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
@@ -48,11 +51,12 @@ class MediaFileManagerImpl @Inject constructor(
                 val image = imageOf(mediaId)
                 mediaOptimizer.toImage(uri, image)
 
-                created += Media.Image(
-                    id = mediaId,
-                    source = image.toUri().toString(),
-                    thumbnail = thumbnail.toUri().toString(),
-                )
+                created +=
+                    Media.Image(
+                        id = mediaId,
+                        source = image.toUri().toString(),
+                        thumbnail = thumbnail.toUri().toString(),
+                    )
             }
         } catch (e: Exception) {
             delete(created.map(Media::id))
@@ -79,9 +83,7 @@ class MediaFileManagerImpl @Inject constructor(
 
     private fun videoOf(id: UUID): File =
         File(videosDir, id.toString() + mediaOptimizer.videoExtension)
-
 }
-
 
 private fun File.deleteSafely() {
     try {

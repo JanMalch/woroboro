@@ -57,11 +57,7 @@ fun MoreMenu(
     DropdownMenu(
         expanded = isOpen,
         onDismissRequest = { isOpen = false },
-        content = {
-            MoreMenuScopeImpl(this) {
-                isOpen = false
-            }.content()
-        },
+        content = { MoreMenuScopeImpl(this) { isOpen = false }.content() },
         modifier = modifier,
     )
 }

@@ -15,6 +15,8 @@ import io.github.janmalch.woroboro.models.DurationFilter
 import io.github.janmalch.woroboro.models.EditedExercise
 import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.findAvailableTags
+import java.util.UUID
+import javax.inject.Inject
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -27,11 +29,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.UUID
-import javax.inject.Inject
 
 @HiltViewModel
-class ExerciseEditorViewModel @Inject constructor(
+class ExerciseEditorViewModel
+@Inject
+constructor(
     private val exerciseRepository: ExerciseRepository,
     private val routineRepository: RoutineRepository,
     tagRepository: TagRepository,
@@ -48,42 +50,45 @@ class ExerciseEditorViewModel @Inject constructor(
     }
     private val deleteExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("ExerciseEditorViewModel", "Error while removing exercise.", exception)
-        viewModelScope.launch {
-            _onDeleteFinished.send(Outcome.Failure)
-        }
+        viewModelScope.launch { _onDeleteFinished.send(Outcome.Failure) }
     }
     private val addToRoutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("ExerciseEditorViewModel", "Error while adding exercise to routine.", exception)
-        viewModelScope.launch {
-            _onAddToRoutineFinished.send(Outcome.Failure)
-        }
+        viewModelScope.launch { _onAddToRoutineFinished.send(Outcome.Failure) }
     }
 
     var isLoading by mutableStateOf(false)
         private set
 
-    val exerciseToEdit = exerciseId.flatMapLatest { id ->
-        if (id == null) flowOf(null)
-        else exerciseRepository.resolve(id)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = null,
-    )
+    val exerciseToEdit =
+        exerciseId
+            .flatMapLatest { id ->
+                if (id == null) flowOf(null) else exerciseRepository.resolve(id)
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null,
+            )
 
-    val availableTags = tagRepository.findAvailableTags()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = persistentMapOf(),
-        )
+    val availableTags =
+        tagRepository
+            .findAvailableTags()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = persistentMapOf(),
+            )
 
-    val allRoutines = routineRepository.findAll(
-        tags = emptyList(),
-        onlyFavorites = false,
-        durationFilter = DurationFilter.Any,
-        textQuery = "",
-    ).map { list -> list.toImmutableList() }
+    val allRoutines =
+        routineRepository
+            .findAll(
+                tags = emptyList(),
+                onlyFavorites = false,
+                durationFilter = DurationFilter.Any,
+                textQuery = "",
+            )
+            .map { list -> list.toImmutableList() }
 
     private val _onSaveFinished = Channel<Outcome>()
     val onSaveFinished = _onSaveFinished.receiveAsFlow()
@@ -98,11 +103,12 @@ class ExerciseEditorViewModel @Inject constructor(
         // don't reset loading, because we navigate away on success
         isLoading = true
         viewModelScope.launch(saveExceptionHandler) {
-            exerciseId.value = if (exerciseId.value == null) {
-                exerciseRepository.insert(exercise)
-            } else {
-                exerciseRepository.update(exercise)
-            }
+            exerciseId.value =
+                if (exerciseId.value == null) {
+                    exerciseRepository.insert(exercise)
+                } else {
+                    exerciseRepository.update(exercise)
+                }
             _onSaveFinished.send(Outcome.Success)
         }
     }

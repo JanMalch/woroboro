@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class TagDao {
 
-    @Insert
-    abstract suspend fun insert(tagEntity: TagEntity)
+    @Insert abstract suspend fun insert(tagEntity: TagEntity)
 
     @Query(
         """
@@ -29,8 +28,7 @@ abstract class TagDao {
         delete(oldLabel)
     }
 
-    @Query("DELETE FROM tag WHERE label = :label")
-    abstract suspend fun delete(label: String)
+    @Query("DELETE FROM tag WHERE label = :label") abstract suspend fun delete(label: String)
 
     @Query("UPDATE tag SET type = :to WHERE type = :from")
     abstract suspend fun renameType(from: String, to: String)
@@ -40,5 +38,4 @@ abstract class TagDao {
 
     @Query("SELECT * FROM tag WHERE label in (:labels) ORDER BY type COLLATE NOCASE ASC")
     abstract fun resolve(labels: List<String>): Flow<List<TagEntity>>
-
 }

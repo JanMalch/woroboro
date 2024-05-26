@@ -39,12 +39,8 @@ fun SearchTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
 ) {
     val searchFocusRequester = remember { FocusRequester() }
-    var queryValue by remember(query) {
-        mutableStateOf(query)
-    }
-    var isSearchMode by remember(query) {
-        mutableStateOf(query.isNotEmpty())
-    }
+    var queryValue by remember(query) { mutableStateOf(query) }
+    var isSearchMode by remember(query) { mutableStateOf(query.isNotEmpty()) }
 
     CenterAlignedTopAppBar(
         navigationIcon = {
@@ -53,18 +49,22 @@ fun SearchTopAppBar(
                 enter = fadeIn() + slideInHorizontally(),
                 exit = fadeOut() + slideOutHorizontally(),
             ) {
-                IconButton(onClick = {
-                    queryValue = ""
-                    onQueryChange("")
-                    isSearchMode = false
-                }) {
+                IconButton(
+                    onClick = {
+                        queryValue = ""
+                        onQueryChange("")
+                        isSearchMode = false
+                    }
+                ) {
                     Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
                 }
             }
         },
         title = {
             if (isSearchMode) {
-                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
+                CompositionLocalProvider(
+                    LocalTextStyle provides MaterialTheme.typography.bodyLarge
+                ) {
                     SimpleTextField(
                         value = queryValue,
                         onValueChange = {
@@ -72,14 +72,10 @@ fun SearchTopAppBar(
                             onQueryChange(it)
                         },
                         placeholder = placeholder,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(searchFocusRequester),
+                        modifier = Modifier.fillMaxWidth().focusRequester(searchFocusRequester),
                     )
 
-                    LaunchedEffect(Unit) {
-                        searchFocusRequester.requestFocus()
-                    }
+                    LaunchedEffect(Unit) { searchFocusRequester.requestFocus() }
                 }
             } else {
                 title()
@@ -88,17 +84,17 @@ fun SearchTopAppBar(
         actions = {
             Crossfade(isSearchMode, label = "SearchTopAppBar:Actions:SearchModeChange") {
                 if (it) {
-                    IconButton(onClick = {
-                        queryValue = ""
-                        onQueryChange("")
-                        searchFocusRequester.requestFocus()
-                    }) {
+                    IconButton(
+                        onClick = {
+                            queryValue = ""
+                            onQueryChange("")
+                            searchFocusRequester.requestFocus()
+                        }
+                    ) {
                         Icon(Icons.Rounded.Cancel, contentDescription = null)
                     }
                 } else {
-                    IconButton(onClick = {
-                        isSearchMode = true
-                    }) {
+                    IconButton(onClick = { isSearchMode = true }) {
                         Icon(Icons.Rounded.Search, contentDescription = null)
                     }
                 }

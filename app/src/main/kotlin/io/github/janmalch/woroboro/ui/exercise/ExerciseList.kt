@@ -40,9 +40,9 @@ import io.github.janmalch.woroboro.ui.components.common.MoreMenuItem
 import io.github.janmalch.woroboro.ui.components.common.OnlyFavoritesChip
 import io.github.janmalch.woroboro.ui.components.common.SearchTopAppBar
 import io.github.janmalch.woroboro.ui.components.tags.TagSelectors
+import java.util.UUID
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-import java.util.UUID
 
 @Composable
 fun ExerciseListScreen(
@@ -78,9 +78,7 @@ fun ExerciseListScreen(
                     MoreMenu {
                         MoreMenuItem(
                             text = { Text(text = stringResource(R.string.edit_tags)) },
-                            icon = {
-                                Icon(Icons.Rounded.Edit, contentDescription = null)
-                            },
+                            icon = { Icon(Icons.Rounded.Edit, contentDescription = null) },
                             onClick = onNavigateToTagEditor
                         )
                     }
@@ -89,9 +87,7 @@ fun ExerciseListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onCreateExerciseClick
-            ) {
+            FloatingActionButton(onClick = onCreateExerciseClick) {
                 Icon(Icons.Rounded.Add, contentDescription = null)
             }
         }
@@ -106,10 +102,11 @@ fun ExerciseListScreen(
             onSelectedTagsChange = onSelectedTagsChange,
             onToggleFavorite = onToggleFavorite,
             onExerciseClick = onExerciseClick,
-            modifier = modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(padding),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .padding(padding),
         )
     }
 }
@@ -132,18 +129,20 @@ fun ExerciseList(
         contentPadding = PaddingValues(bottom = 88.dp), // FAB Spacing
     ) {
         stickyHeader(key = "Filters", contentType = "Filters") {
-            val containerColor by animateColorAsState(
-                targetValue = TopAppBarDefaults
-                    .centerAlignedTopAppBarColors()
-                    .let { if (isTopBarCollapsed) it.scrolledContainerColor else it.containerColor },
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                label = "Color:Filters"
-            )
+            val containerColor by
+                animateColorAsState(
+                    targetValue =
+                        TopAppBarDefaults.centerAlignedTopAppBarColors().let {
+                            if (isTopBarCollapsed) it.scrolledContainerColor else it.containerColor
+                        },
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                    label = "Color:Filters"
+                )
             Row(
-                modifier = Modifier
-                    .background(containerColor)
-                    .horizontalScroll(rememberScrollState())
-                    .padding(vertical = 0.dp, horizontal = 12.dp),
+                modifier =
+                    Modifier.background(containerColor)
+                        .horizontalScroll(rememberScrollState())
+                        .padding(vertical = 0.dp, horizontal = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OnlyFavoritesChip(

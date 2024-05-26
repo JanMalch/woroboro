@@ -13,5 +13,4 @@ class DomainConverters {
     fun fromSetOfDayOfWeek(value: Set<DayOfWeek>): String {
         return value.joinToString(",", transform = DayOfWeek::name)
     }
-
 }

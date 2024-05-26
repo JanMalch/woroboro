@@ -16,9 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RowScope.ButtonLoading(
-    isVisible: Boolean
-) {
+fun RowScope.ButtonLoading(isVisible: Boolean) {
     AnimatedVisibility(
         visible = isVisible,
         enter = fadeIn() + expandHorizontally(),

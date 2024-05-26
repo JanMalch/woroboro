@@ -19,22 +19,25 @@ import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-
 interface ReminderScheduler {
     fun schedule(reminder: Reminder)
+
     fun cancel(reminderId: UUID)
 }
 
-class AndroidReminderScheduler @Inject constructor(
+class AndroidReminderScheduler
+@Inject
+constructor(
     @ApplicationContext private val context: Context,
 ) : ReminderScheduler {
 
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
 
     override fun schedule(reminder: Reminder) {
-        val intent = Intent(context, ReminderReceiver::class.java).apply {
-            putExtra(ReminderReceiver.INTENT_REMINDER_ID, reminder.id)
-        }
+        val intent =
+            Intent(context, ReminderReceiver::class.java).apply {
+                putExtra(ReminderReceiver.INTENT_REMINDER_ID, reminder.id)
+            }
 
         val next = closestInstantBy(reminder.weekdays, time = reminder.remindAt)
         Log.d(
@@ -76,32 +79,29 @@ class AndroidReminderScheduler @Inject constructor(
     private fun createPendingIntent(
         requestCode: Int,
         intent: Intent = Intent(context, ReminderReceiver::class.java),
-    ) = PendingIntent.getBroadcast(
-        context,
-        requestCode,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
+    ) =
+        PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
     private val Reminder.requestCode
         get() = id.hashCode()
 }
 
-
 @VisibleForTesting
 internal fun shortestDurationBetween(
     weekdays: Set<DayOfWeek>,
 ): Duration {
-    require(weekdays.isNotEmpty()) {
-        "At least one weekday must be provided."
-    }
+    require(weekdays.isNotEmpty()) { "At least one weekday must be provided." }
     if (weekdays.size == 1) {
         return 7.days
     }
     // TODO: make this smarter
     return 1.days
 }
-
 
 @VisibleForTesting
 internal fun closestInstantBy(
@@ -127,14 +127,10 @@ internal fun nextInstantOf(
         .with(TemporalAdjusters.nextOrSame(dayOfWeek))
         .toInstantWithTime(time, zoneId)
         .takeIf { it > now }
-        ?: nowLdt
-            .with(TemporalAdjusters.next(dayOfWeek))
-            .toInstantWithTime(time, zoneId)
+        ?: nowLdt.with(TemporalAdjusters.next(dayOfWeek)).toInstantWithTime(time, zoneId)
 }
 
 private fun LocalDateTime.toInstantWithTime(
     time: LocalTime,
     zoneId: ZoneId,
-): Instant = with(time)
-    .atZone(zoneId)
-    .toInstant()
+): Instant = with(time).atZone(zoneId).toInstant()

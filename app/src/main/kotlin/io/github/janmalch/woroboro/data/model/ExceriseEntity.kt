@@ -11,24 +11,19 @@ import androidx.room.Relation
 import io.github.janmalch.woroboro.models.Exercise
 import io.github.janmalch.woroboro.models.ExerciseExecution
 import io.github.janmalch.woroboro.models.Media
-import kotlinx.collections.immutable.toImmutableList
 import java.time.Instant
 import java.util.UUID
+import kotlinx.collections.immutable.toImmutableList
 
 @Entity(tableName = "exercise")
 data class ExerciseEntity(
-    @PrimaryKey
-    val id: UUID,
+    @PrimaryKey val id: UUID,
     val name: String,
     val description: String,
-    @Embedded
-    val execution: ExerciseExecution,
-    @ColumnInfo(name = "is_favorite")
-    val isFavorite: Boolean,
-    @ColumnInfo(name = "created_at")
-    val createdAt: Instant,
-    @ColumnInfo(name = "updated_at")
-    val updatedAt: Instant,
+    @Embedded val execution: ExerciseExecution,
+    @ColumnInfo(name = "is_favorite") val isFavorite: Boolean,
+    @ColumnInfo(name = "created_at") val createdAt: Instant,
+    @ColumnInfo(name = "updated_at") val updatedAt: Instant,
 )
 
 @Fts4(contentEntity = ExerciseEntity::class)
@@ -41,57 +36,56 @@ data class ExerciseFtsEntity(
 
 @Entity(
     tableName = "media",
-    foreignKeys = [ForeignKey(
-        entity = ExerciseEntity::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("exercise_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = ExerciseEntity::class,
+                parentColumns = arrayOf("id"),
+                childColumns = arrayOf("exercise_id"),
+                onDelete = ForeignKey.CASCADE
+            )
+        ]
 )
 data class MediaEntity(
-    @PrimaryKey
-    val id: UUID,
-    @ColumnInfo(name = "exercise_id", index = true)
-    val exerciseId: UUID,
+    @PrimaryKey val id: UUID,
+    @ColumnInfo(name = "exercise_id", index = true) val exerciseId: UUID,
     val thumbnail: String,
     val source: String,
-    @ColumnInfo(name = "is_video")
-    val isVideo: Boolean,
+    @ColumnInfo(name = "is_video") val isVideo: Boolean,
 )
 
 data class ExerciseEntityWithMediaAndTags(
     @Embedded val exercise: ExerciseEntity,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "exercise_id"
-    )
-    val media: List<MediaEntity>,
+    @Relation(parentColumn = "id", entityColumn = "exercise_id") val media: List<MediaEntity>,
     @Relation(
         parentColumn = "id",
         entityColumn = "label",
-        associateBy = Junction(
-            value = ExerciseTagCrossRefEntity::class,
-            parentColumn = "exercise_id",
-            entityColumn = "tag_label",
-        )
+        associateBy =
+            Junction(
+                value = ExerciseTagCrossRefEntity::class,
+                parentColumn = "exercise_id",
+                entityColumn = "tag_label",
+            )
     )
     val tags: List<TagEntity>
 )
 
-fun MediaEntity.asModel(): Media = if (isVideo) {
-    Media.Video(id = id, source = source, thumbnail = thumbnail)
-} else {
-    Media.Image(id = id, source = source, thumbnail = thumbnail)
-}
+fun MediaEntity.asModel(): Media =
+    if (isVideo) {
+        Media.Video(id = id, source = source, thumbnail = thumbnail)
+    } else {
+        Media.Image(id = id, source = source, thumbnail = thumbnail)
+    }
 
-fun ExerciseEntityWithMediaAndTags.asModel() = Exercise(
-    id = exercise.id,
-    name = exercise.name,
-    description = exercise.description,
-    execution = exercise.execution,
-    isFavorite = exercise.isFavorite,
-    createdAt = exercise.createdAt,
-    updatedAt = exercise.updatedAt,
-    tags = tags.map(TagEntity::asModel).toImmutableList(),
-    media = media.map(MediaEntity::asModel).toImmutableList(),
-)
+fun ExerciseEntityWithMediaAndTags.asModel() =
+    Exercise(
+        id = exercise.id,
+        name = exercise.name,
+        description = exercise.description,
+        execution = exercise.execution,
+        isFavorite = exercise.isFavorite,
+        createdAt = exercise.createdAt,
+        updatedAt = exercise.updatedAt,
+        tags = tags.map(TagEntity::asModel).toImmutableList(),
+        media = media.map(MediaEntity::asModel).toImmutableList(),
+    )

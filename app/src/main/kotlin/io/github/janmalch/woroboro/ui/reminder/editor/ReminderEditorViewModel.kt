@@ -15,6 +15,8 @@ import io.github.janmalch.woroboro.models.Reminder
 import io.github.janmalch.woroboro.models.Routine
 import io.github.janmalch.woroboro.ui.Outcome
 import io.github.janmalch.woroboro.ui.findAvailableTags
+import java.util.UUID
+import javax.inject.Inject
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
@@ -28,17 +30,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.UUID
-import javax.inject.Inject
 
 @HiltViewModel
-class ReminderEditorViewModel @Inject constructor(
+class ReminderEditorViewModel
+@Inject
+constructor(
     private val reminderRepository: ReminderRepository,
     private val routineRepository: RoutineRepository,
     tagRepository: TagRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
 
     private val reminderId = MutableStateFlow(RoutineEditorArgs(savedStateHandle).reminderId)
 
@@ -48,14 +49,16 @@ class ReminderEditorViewModel @Inject constructor(
     private val _onDeleteFinished = Channel<Outcome>()
     val onDeleteFinished = _onDeleteFinished.receiveAsFlow()
 
-    val reminderToEdit = reminderId.flatMapLatest { id ->
-        if (id == null) flowOf(null)
-        else reminderRepository.findOne(id)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = null,
-    )
+    val reminderToEdit =
+        reminderId
+            .flatMapLatest { id ->
+                if (id == null) flowOf(null) else reminderRepository.findOne(id)
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null,
+            )
 
     private val saveExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("ReminderEditorViewModel", "Error while saving reminder.", exception)
@@ -66,28 +69,30 @@ class ReminderEditorViewModel @Inject constructor(
     }
     private val deleteExceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("ReminderEditorViewModel", "Error while removing reminder.", exception)
-        viewModelScope.launch {
-            _onDeleteFinished.send(Outcome.Failure)
-        }
+        viewModelScope.launch { _onDeleteFinished.send(Outcome.Failure) }
     }
 
     var isLoading by mutableStateOf(false)
         private set
 
-    val availableTags = tagRepository.findAvailableTags()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = persistentMapOf(),
-        )
+    val availableTags =
+        tagRepository
+            .findAvailableTags()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = persistentMapOf(),
+            )
 
-    val routines = routineRepository.findAll()
-        .map(List<Routine>::toImmutableList)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = persistentListOf(),
-        )
+    val routines =
+        routineRepository
+            .findAll()
+            .map(List<Routine>::toImmutableList)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = persistentListOf(),
+            )
 
     fun save(reminder: Reminder) {
         // don't reset loading, because we navigate away on success

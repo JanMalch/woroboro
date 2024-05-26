@@ -96,6 +96,10 @@ import io.github.janmalch.woroboro.ui.components.common.toolbarButtonSize
 import io.github.janmalch.woroboro.ui.components.exerciseExecution
 import io.github.janmalch.woroboro.ui.exercise.editor.DurationSaver
 import io.github.janmalch.woroboro.ui.theme.Success
+import java.time.Instant
+import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -103,18 +107,15 @@ import kotlinx.collections.immutable.toPersistentList
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
 import sh.calvin.reorderable.rememberReorderableLazyColumnState
-import java.time.Instant
-import java.util.UUID
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 fun List<RoutineStep>.updateSortIndices(): ImmutableList<RoutineStep> =
     mapIndexed { index, routineStep ->
-        when (routineStep) {
-            is RoutineStep.ExerciseStep -> routineStep.copy(sortIndex = index)
-            is RoutineStep.PauseStep -> routineStep.copy(sortIndex = index)
+            when (routineStep) {
+                is RoutineStep.ExerciseStep -> routineStep.copy(sortIndex = index)
+                is RoutineStep.PauseStep -> routineStep.copy(sortIndex = index)
+            }
         }
-    }.toImmutableList()
+        .toImmutableList()
 
 @Composable
 fun RoutineEditorScreen(
@@ -127,30 +128,22 @@ fun RoutineEditorScreen(
 ) {
     val clearFocus = rememberClearFocus()
     val id = rememberSaveable(routine) { routine?.id ?: UUID.randomUUID() }
-    var name by rememberSaveable(routine) {
-        mutableStateOf(routine?.name ?: "")
-    }
-    var isFavorite by rememberSaveable(routine) {
-        mutableStateOf(
-            routine?.isFavorite ?: false
-        )
-    }
-    var steps by remember(routine) {
-        mutableStateOf(routine?.steps ?: persistentListOf())
-    }
+    var name by rememberSaveable(routine) { mutableStateOf(routine?.name ?: "") }
+    var isFavorite by rememberSaveable(routine) { mutableStateOf(routine?.isFavorite ?: false) }
+    var steps by remember(routine) { mutableStateOf(routine?.steps ?: persistentListOf()) }
 
-    var isNewStepDialogOpen by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var isNewStepDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     val lazyListState = rememberLazyListState()
     val hapticFeedback = rememberHapticFeedback()
     val reorderableLazyColumnState: ReorderableLazyListState =
         rememberReorderableLazyColumnState(lazyListState) { from, to ->
             try {
-                steps = steps.toMutableList().apply {
-                    add(to.index, removeAt(from.index))
-                }.toImmutableList()
+                steps =
+                    steps
+                        .toMutableList()
+                        .apply { add(to.index, removeAt(from.index)) }
+                        .toImmutableList()
                 hapticFeedback.segmentFrequentTick()
             } catch (e: IndexOutOfBoundsException) {
                 Log.e("RoutineEditorScreen", "Unexpected error while reordering.", e)
@@ -166,19 +159,23 @@ fun RoutineEditorScreen(
                     Button(
                         onClick = {
                             val now = Instant.now()
-                            val edited = FullRoutine(
-                                id = id,
-                                name = name.trim(),
-                                steps = steps.updateSortIndices(),
-                                isFavorite = isFavorite,
-                                lastRunDuration = null,
-                                lastRunEnded = null,
-                                createdAt = routine?.createdAt ?: now,
-                                updatedAt = now,
-                            )
+                            val edited =
+                                FullRoutine(
+                                    id = id,
+                                    name = name.trim(),
+                                    steps = steps.updateSortIndices(),
+                                    isFavorite = isFavorite,
+                                    lastRunDuration = null,
+                                    lastRunEnded = null,
+                                    createdAt = routine?.createdAt ?: now,
+                                    updatedAt = now,
+                                )
                             onSave(edited)
                         },
-                        enabled = !isLoading && name.isNotBlank() && steps.any { it is RoutineStep.ExerciseStep },
+                        enabled =
+                            !isLoading &&
+                                name.isNotBlank() &&
+                                steps.any { it is RoutineStep.ExerciseStep },
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         modifier = Modifier.toolbarButtonSize()
                     ) {
@@ -207,31 +204,23 @@ fun RoutineEditorScreen(
         }
     ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .clearFocusAsOutsideClick()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize().clearFocusAsOutsideClick().padding(padding),
         ) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text(text = stringResource(R.string.name)) },
                 singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                ),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                keyboardOptions =
+                    KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                    ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            ) {
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
                 IsFavoriteCheckbox(
                     text = stringResource(R.string.favorite_routine),
                     value = isFavorite,
@@ -247,9 +236,7 @@ fun RoutineEditorScreen(
                     clearFocus()
                     isNewStepDialogOpen = true
                 },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(horizontal = 16.dp),
+                modifier = Modifier.align(Alignment.End).padding(horizontal = 16.dp),
             ) {
                 Text(text = stringResource(R.string.new_step))
             }
@@ -288,16 +275,19 @@ fun RoutineStepEditorDialog(
     onSave: (RoutineStep) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var isExercise by rememberSaveable(step) { mutableStateOf(step == null || step is RoutineStep.ExerciseStep) }
+    var isExercise by
+        rememberSaveable(step) { mutableStateOf(step == null || step is RoutineStep.ExerciseStep) }
 
     var pauseStep by remember {
-        mutableStateOf<Duration?>(
-            (step as? RoutineStep.PauseStep)?.duration ?: 1.minutes
-        )
+        mutableStateOf<Duration?>((step as? RoutineStep.PauseStep)?.duration ?: 1.minutes)
     }
 
-    var selectedExercise by remember { mutableStateOf((step as? RoutineStep.ExerciseStep)?.exercise) }
-    var customExecution by remember { mutableStateOf((step as? RoutineStep.ExerciseStep)?.customExecution?.asCustomExecution()) }
+    var selectedExercise by remember {
+        mutableStateOf((step as? RoutineStep.ExerciseStep)?.exercise)
+    }
+    var customExecution by remember {
+        mutableStateOf((step as? RoutineStep.ExerciseStep)?.customExecution?.asCustomExecution())
+    }
 
     var exerciseFilterQuery by rememberSaveable { mutableStateOf("") }
 
@@ -309,22 +299,20 @@ fun RoutineStepEditorDialog(
                 allExercises
                     .filter {
                         it.name.contains(exerciseFilterQuery, ignoreCase = true) ||
-                                it.description.contains(exerciseFilterQuery, ignoreCase = true) ||
-                                it.tags.any { tag ->
-                                    tag.label.contains(
-                                        exerciseFilterQuery,
-                                        ignoreCase = true
-                                    )
-                                }
+                            it.description.contains(exerciseFilterQuery, ignoreCase = true) ||
+                            it.tags.any { tag ->
+                                tag.label.contains(exerciseFilterQuery, ignoreCase = true)
+                            }
                     }
                     .toImmutableList()
             }
         }
     }
 
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-    )
+    val sheetState =
+        rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+        )
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -334,9 +322,7 @@ fun RoutineStepEditorDialog(
         shape = RectangleShape,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, end = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, end = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -345,29 +331,29 @@ fun RoutineStepEditorDialog(
             }
             Button(
                 onClick = {
-                    val stepToSave = if (isExercise) {
-                        selectedExercise?.let {
-                            RoutineStep.ExerciseStep(
-                                id = step?.id ?: UUID.randomUUID(),
-                                sortIndex = -1,
-                                exercise = it,
-                                customExecution = customExecution?.asExerciseExecutionOrNull(),
-                            )
+                    val stepToSave =
+                        if (isExercise) {
+                            selectedExercise?.let {
+                                RoutineStep.ExerciseStep(
+                                    id = step?.id ?: UUID.randomUUID(),
+                                    sortIndex = -1,
+                                    exercise = it,
+                                    customExecution = customExecution?.asExerciseExecutionOrNull(),
+                                )
+                            }
+                        } else {
+                            pauseStep?.let {
+                                RoutineStep.PauseStep(
+                                    id = step?.id ?: UUID.randomUUID(),
+                                    sortIndex = -1,
+                                    duration = it,
+                                )
+                            }
                         }
-                    } else {
-                        pauseStep?.let {
-                            RoutineStep.PauseStep(
-                                id = step?.id ?: UUID.randomUUID(),
-                                sortIndex = -1,
-                                duration = it,
-                            )
-                        }
-                    }
                     if (stepToSave != null) onSave(stepToSave)
                 },
                 enabled =
-                if (isExercise) selectedExercise != null
-                else pauseStep?.isPositive() ?: false,
+                    if (isExercise) selectedExercise != null else pauseStep?.isPositive() ?: false,
                 modifier = Modifier.toolbarButtonSize(),
             ) {
                 Text(text = stringResource(R.string.save))
@@ -375,15 +361,14 @@ fun RoutineStepEditorDialog(
         }
 
         Text(
-            text = if (step == null) stringResource(id = R.string.new_step) else "Schritt bearbeiten",
+            text =
+                if (step == null) stringResource(id = R.string.new_step) else "Schritt bearbeiten",
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
             style = MaterialTheme.typography.titleLarge,
         )
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -404,18 +389,13 @@ fun RoutineStepEditorDialog(
         if (isExercise) {
 
             Column(modifier = Modifier.padding(16.dp)) {
-
-
                 OutlinedTextField(
                     value = exerciseFilterQuery,
                     onValueChange = { exerciseFilterQuery = it },
                     singleLine = true,
                     label = { Text(text = stringResource(R.string.exercise_search_placeholder)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                 )
-
 
                 LazyColumn(modifier = Modifier.weight(1F)) {
                     items(filteredExercises, key = { it.id }) { exercise ->
@@ -432,9 +412,9 @@ fun RoutineStepEditorDialog(
                                         Icons.Rounded.CheckCircle,
                                         tint = Success,
                                         contentDescription = null,
-                                        modifier = Modifier
-                                            .size(32.dp)
-                                            .background(Color.White, CircleShape)
+                                        modifier =
+                                            Modifier.size(32.dp)
+                                                .background(Color.White, CircleShape)
                                     )
                                 }
                             },
@@ -468,21 +448,14 @@ fun RoutineStepEditorDialog(
                 onValueChange = { pauseStep = it },
                 required = false,
                 label = {
-                    Text(
-                        text = stringResource(R.string.pause),
-                        softWrap = false,
-                        maxLines = 1
-                    )
+                    Text(text = stringResource(R.string.pause), softWrap = false, maxLines = 1)
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 imeAction = ImeAction.Done,
             )
         }
     }
 }
-
 
 fun LazyListScope.stepsItems(
     reorderableLazyColumnState: ReorderableLazyListState,
@@ -491,41 +464,37 @@ fun LazyListScope.stepsItems(
     value: ImmutableList<RoutineStep>,
     onValueChange: (List<RoutineStep>) -> Unit,
 ) {
-    items(value, key = { it.sortIndex }, contentType = {
-        when (it) {
-            is RoutineStep.ExerciseStep -> "ExerciseStep"
-            is RoutineStep.PauseStep -> "PauseStep"
+    items(
+        value,
+        key = { it.sortIndex },
+        contentType = {
+            when (it) {
+                is RoutineStep.ExerciseStep -> "ExerciseStep"
+                is RoutineStep.PauseStep -> "PauseStep"
+            }
         }
-    }) { step ->
-        var isStepDialogOpen by remember {
-            mutableStateOf(false)
-        }
+    ) { step ->
+        var isStepDialogOpen by remember { mutableStateOf(false) }
         val currentStep by rememberUpdatedState(step)
         val currentValue by rememberUpdatedState(value.toPersistentList())
         ReorderableItem(reorderableLazyColumnState, key = step.sortIndex) { isDragging ->
-            val elevation by animateDpAsState(
-                if (isDragging) 4.dp else 0.dp,
-                label = "DragElevation"
-            )
+            val elevation by
+                animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "DragElevation")
 
-            val dismissState = rememberSwipeToDismissBoxState(
-                confirmValueChange = {
-                    if (!isDragging && (it != SwipeToDismissBoxValue.Settled)) {
-                        onValueChange(currentValue - currentStep)
-                        true
-                    } else false
-                },
-                positionalThreshold = with(LocalDensity.current) {
-                    {
-                        112.dp.toPx()
-                    }
-                }
-            )
+            val dismissState =
+                rememberSwipeToDismissBoxState(
+                    confirmValueChange = {
+                        if (!isDragging && (it != SwipeToDismissBoxValue.Settled)) {
+                            onValueChange(currentValue - currentStep)
+                            true
+                        } else false
+                    },
+                    positionalThreshold = with(LocalDensity.current) { { 112.dp.toPx() } }
+                )
 
-            SwipeToDismissBox(state = dismissState,
-                backgroundContent = {
-                    DismissBackground(dismissState)
-                },
+            SwipeToDismissBox(
+                state = dismissState,
+                backgroundContent = { DismissBackground(dismissState) },
                 content = {
                     when (step) {
                         is RoutineStep.ExerciseStep -> {
@@ -534,14 +503,10 @@ fun LazyListScope.stepsItems(
                                 execution = step.execution,
                                 trailingContent = {
                                     IconButton(
-                                        modifier = Modifier
-                                            .draggableHandle(
-                                                onDragStarted = {
-                                                    hapticFeedback.dragStart()
-                                                },
-                                                onDragStopped = {
-                                                    hapticFeedback.gestureEnd()
-                                                },
+                                        modifier =
+                                            Modifier.draggableHandle(
+                                                onDragStarted = { hapticFeedback.dragStart() },
+                                                onDragStopped = { hapticFeedback.gestureEnd() },
                                             ),
                                         onClick = {},
                                     ) {
@@ -554,17 +519,19 @@ fun LazyListScope.stepsItems(
                                 onClick = { isStepDialogOpen = true },
                             )
                         }
-
                         is RoutineStep.PauseStep -> {
                             ListItem(
                                 leadingContent = {
                                     Box(
-                                        modifier = Modifier
-                                            .size(ExerciseListItemDefaults.ImageSizeTwoLines)
-                                            .background(
-                                                color = FloatingActionButtonDefaults.containerColor,
-                                                shape = RoundedCornerShape(ImageCornerSize),
-                                            )
+                                        modifier =
+                                            Modifier.size(
+                                                    ExerciseListItemDefaults.ImageSizeTwoLines
+                                                )
+                                                .background(
+                                                    color =
+                                                        FloatingActionButtonDefaults.containerColor,
+                                                    shape = RoundedCornerShape(ImageCornerSize),
+                                                )
                                     ) {
                                         Icon(
                                             Icons.Rounded.Pause,
@@ -575,22 +542,19 @@ fun LazyListScope.stepsItems(
                                 },
                                 headlineContent = {
                                     Text(
-                                        text = stringResource(
-                                            id = R.string.pause_value,
-                                            formatDuration(duration = step.duration)
-                                        )
+                                        text =
+                                            stringResource(
+                                                id = R.string.pause_value,
+                                                formatDuration(duration = step.duration)
+                                            )
                                     )
                                 },
                                 trailingContent = {
                                     IconButton(
-                                        modifier = Modifier
-                                            .draggableHandle(
-                                                onDragStarted = {
-                                                    hapticFeedback.dragStart()
-                                                },
-                                                onDragStopped = {
-                                                    hapticFeedback.gestureEnd()
-                                                },
+                                        modifier =
+                                            Modifier.draggableHandle(
+                                                onDragStarted = { hapticFeedback.dragStart() },
+                                                onDragStopped = { hapticFeedback.gestureEnd() },
                                             ),
                                         onClick = {},
                                     ) {
@@ -599,24 +563,24 @@ fun LazyListScope.stepsItems(
                                 },
                                 tonalElevation = elevation,
                                 shadowElevation = elevation,
-                                modifier = Modifier.clickableWithClearFocus {
-                                    isStepDialogOpen = true
-                                },
+                                modifier =
+                                    Modifier.clickableWithClearFocus { isStepDialogOpen = true },
                             )
                         }
                     }
-                })
+                }
+            )
         }
-
 
         if (isStepDialogOpen) {
             RoutineStepEditorDialog(
                 step = step,
                 allExercises = allExercises,
                 onSave = { updatedStep ->
-                    val steps = currentValue.toMutableList().also {
-                        it[it.indexOf(currentStep)] = updatedStep
-                    }
+                    val steps =
+                        currentValue.toMutableList().also {
+                            it[it.indexOf(currentStep)] = updatedStep
+                        }
                     onValueChange(steps)
                     isStepDialogOpen = false
                 },
@@ -626,49 +590,51 @@ fun LazyListScope.stepsItems(
     }
 }
 
-
 @Composable
 private fun RowScope.DismissBackground(dismissState: SwipeToDismissBoxState) {
     val direction = dismissState.dismissDirection
-    val backgroundColor by animateColorAsState(
-        targetValue = when (dismissState.targetValue) {
-            SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
-            else -> Color(0xFFFF1744)
-        },
-        label = "DismissColorAnimation",
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-    )
-    val iconColor by animateColorAsState(
-        targetValue = when (dismissState.targetValue) {
-            SwipeToDismissBoxValue.Settled -> LocalContentColor.current.copy(alpha = 0.2f)
-            else -> LocalContentColor.current
-        },
-        label = "DismissIconColorAnimation",
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-    )
+    val backgroundColor by
+        animateColorAsState(
+            targetValue =
+                when (dismissState.targetValue) {
+                    SwipeToDismissBoxValue.Settled ->
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+                    else -> Color(0xFFFF1744)
+                },
+            label = "DismissColorAnimation",
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+        )
+    val iconColor by
+        animateColorAsState(
+            targetValue =
+                when (dismissState.targetValue) {
+                    SwipeToDismissBoxValue.Settled -> LocalContentColor.current.copy(alpha = 0.2f)
+                    else -> LocalContentColor.current
+                },
+            label = "DismissIconColorAnimation",
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+        )
 
     Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(12.dp, 8.dp),
+        modifier = Modifier.fillMaxSize().background(backgroundColor).padding(12.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        if (direction == SwipeToDismissBoxValue.StartToEnd) Icon(
-            Icons.Rounded.Delete,
-            contentDescription = null,
-            tint = iconColor,
-        )
+        if (direction == SwipeToDismissBoxValue.StartToEnd)
+            Icon(
+                Icons.Rounded.Delete,
+                contentDescription = null,
+                tint = iconColor,
+            )
         Spacer(modifier = Modifier)
-        if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
-            Icons.Rounded.Delete,
-            contentDescription = null,
-            tint = iconColor,
-        )
+        if (direction == SwipeToDismissBoxValue.EndToStart)
+            Icon(
+                Icons.Rounded.Delete,
+                contentDescription = null,
+                tint = iconColor,
+            )
     }
 }
-
 
 @Composable
 fun CustomExerciseExecutionEditor(
@@ -679,19 +645,13 @@ fun CustomExerciseExecutionEditor(
 ) {
     var sets: Int? by rememberSaveable(value) { mutableStateOf(value?.sets) }
     var reps: Int? by rememberSaveable(value) { mutableStateOf(value?.reps) }
-    var hold: Duration? by rememberSaveable(value, stateSaver = DurationSaver) {
-        mutableStateOf(value?.hold)
-    }
-    var pause: Duration? by rememberSaveable(value, stateSaver = DurationSaver) {
-        mutableStateOf(value?.pause)
-    }
+    var hold: Duration? by
+        rememberSaveable(value, stateSaver = DurationSaver) { mutableStateOf(value?.hold) }
+    var pause: Duration? by
+        rememberSaveable(value, stateSaver = DurationSaver) { mutableStateOf(value?.pause) }
 
     fun emitChange() {
-        onValueChange(
-            CustomExerciseExecution(
-                sets ?: basedOn?.sets, reps, hold, pause
-            )
-        )
+        onValueChange(CustomExerciseExecution(sets ?: basedOn?.sets, reps, hold, pause))
     }
 
     NumberTextField(
@@ -701,13 +661,7 @@ fun CustomExerciseExecutionEditor(
             emitChange()
         },
         required = value != null,
-        label = {
-            Text(
-                text = stringResource(id = R.string.sets),
-                softWrap = false,
-                maxLines = 1
-            )
-        },
+        label = { Text(text = stringResource(id = R.string.sets), softWrap = false, maxLines = 1) },
         modifier = Modifier.fillMaxWidth(),
         enabled = enabled,
     )
@@ -722,11 +676,7 @@ fun CustomExerciseExecutionEditor(
             },
             required = false,
             label = {
-                Text(
-                    text = stringResource(id = R.string.reps),
-                    softWrap = false,
-                    maxLines = 1
-                )
+                Text(text = stringResource(id = R.string.reps), softWrap = false, maxLines = 1)
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = enabled,
@@ -743,11 +693,7 @@ fun CustomExerciseExecutionEditor(
             },
             required = false,
             label = {
-                Text(
-                    text = stringResource(id = R.string.hold),
-                    softWrap = false,
-                    maxLines = 1
-                )
+                Text(text = stringResource(id = R.string.hold), softWrap = false, maxLines = 1)
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = enabled,
@@ -763,11 +709,7 @@ fun CustomExerciseExecutionEditor(
         },
         required = false,
         label = {
-            Text(
-                text = stringResource(id = R.string.pause),
-                softWrap = false,
-                maxLines = 1
-            )
+            Text(text = stringResource(id = R.string.pause), softWrap = false, maxLines = 1)
         },
         modifier = Modifier.fillMaxWidth(),
         imeAction = ImeAction.Done,

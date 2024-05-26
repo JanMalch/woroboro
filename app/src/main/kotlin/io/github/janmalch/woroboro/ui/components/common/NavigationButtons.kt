@@ -20,7 +20,5 @@ fun BackIconButton(
 fun CloseIconButton(
     onClick: () -> Unit,
 ) {
-    IconButton(onClick = onClick) {
-        Icon(Icons.Rounded.Close, contentDescription = null)
-    }
+    IconButton(onClick = onClick) { Icon(Icons.Rounded.Close, contentDescription = null) }
 }

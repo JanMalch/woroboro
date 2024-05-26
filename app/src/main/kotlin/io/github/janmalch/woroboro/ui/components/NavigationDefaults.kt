@@ -11,12 +11,17 @@ import androidx.navigation.NavBackStackEntry
 
 object NavigationDefaults {
 
-    val enterEditorTransition: (@JvmSuppressWildcards
-    AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?) =
-        { fadeIn() + slideInVertically { it / 2 } }
+    val enterEditorTransition:
+        (@JvmSuppressWildcards
+        AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?) =
+        {
+            fadeIn() + slideInVertically { it / 2 }
+        }
 
-    val exitEditorTransition: (@JvmSuppressWildcards
-    AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?) =
-        { fadeOut() + slideOutVertically { it / 2 } }
-
+    val exitEditorTransition:
+        (@JvmSuppressWildcards
+        AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?) =
+        {
+            fadeOut() + slideOutVertically { it / 2 }
+        }
 }

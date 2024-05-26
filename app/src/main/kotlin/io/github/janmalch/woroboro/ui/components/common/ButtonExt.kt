@@ -7,7 +7,5 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Stable
-fun Modifier.toolbarButtonSize() = this.defaultMinSize(
-    minWidth = ButtonDefaults.MinWidth,
-    minHeight = 36.dp
-)
+fun Modifier.toolbarButtonSize() =
+    this.defaultMinSize(minWidth = ButtonDefaults.MinWidth, minHeight = 36.dp)
