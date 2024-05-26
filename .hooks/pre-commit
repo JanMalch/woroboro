@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Store staged files for re-adding them later
+STAGED_FILES=$(git diff --staged --name-only)
+
+./gradlew spotlessApply
+
+# Capture the exit code of the gradlew command
+EXIT_CODE=$?
+
+# If the gradlew command fails, exit with the same code
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "spotlessApply failed. Please fix the issues and stage the changes before committing."
+  exit $EXIT_CODE
+fi
+
+# Add changes from spotlessApply
+for file in $STAGED_FILES; do
+  if test -f "$file"; then
+    git add $file
+  fi
+done
+
+# Check if there are any staged files after formatting
+git diff --cached --exit-code
+EXIT_CODE=$?
+
+# If there are no staged files, then there is nothing to commit
+if [ $EXIT_CODE -eq 0 ]; then
+  echo "No changes after formatting has been applied."
+  exit 1
+fi
+
+exit 0
