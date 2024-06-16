@@ -1,28 +1,28 @@
 [versions]
-agp = "8.3.2"
-org-jetbrains-kotlin-android = "1.9.22"
-core-ktx = "1.12.0"
+agp = "8.5.0"
+kotlin = "2.0.0"
+core-ktx = "1.13.1"
 collections-immutable = "0.3.7"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 compose-material = "1.2.1"
-coroutines = "1.8.0"
+coroutines = "1.8.1"
 androidx-core-splashscreen = "1.0.1"
 espresso-core = "3.5.1"
-lifecycle-runtime-ktx = "2.7.0"
-activity-compose = "1.8.2"
-compose-bom = "2024.04.00"
+lifecycle-runtime-ktx = "2.8.2"
+activity-compose = "1.9.0"
+compose-bom = "2024.06.00"
 konfetti = "2.0.4"
 coil = "2.6.0"
 hilt = "2.51"
 android-hilt = "1.2.0"
-icons = "1.6.5"
-ksp = "1.9.22-1.0.17"
+icons = "1.6.8"
+ksp = "2.0.0-1.0.22"
 room = "2.6.1"
 navigation = "2.7.7"
-google-oss = "17.0.1"
+google-oss = "17.1.0"
 google-oss-plugin = "0.10.6"
-material = "1.11.0"
+material = "1.12.0"
 reorderable = "1.3.3"
 turbine = "1.1.0"
 ktfmt = "0.49"
@@ -70,9 +70,10 @@ hilt-viewmodel = { group = "androidx.hilt", name = "hilt-navigation-compose", ve
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
-org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 [bundles]
