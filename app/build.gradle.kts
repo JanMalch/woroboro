@@ -75,6 +75,10 @@ android {
     }
 }
 
+composeCompiler {
+    enableStrongSkippingMode = true
+}
+
 extensions.configure<com.google.devtools.ksp.gradle.KspExtension> {
     arg("room.schemaLocation", File(projectDir, "schemas").path)
     arg("room.generateKotlin", "true")
