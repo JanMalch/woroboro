@@ -172,6 +172,7 @@ fun RoutineList(
                 routine = routine,
                 onToggleFavorite = { onToggleFavorite(routine) },
                 onClick = { onRoutineClick(routine) },
+                modifier = Modifier.animateItemPlacement(),
             )
         }
     }

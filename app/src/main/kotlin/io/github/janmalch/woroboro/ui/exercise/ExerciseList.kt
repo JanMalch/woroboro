@@ -170,6 +170,7 @@ fun ExerciseList(
                     }
                 },
                 onClick = { onExerciseClick(exercise.id) },
+                modifier = Modifier.animateItemPlacement(),
             )
         }
     }
