@@ -84,6 +84,9 @@
     <string name="zip_export_explanation">Sichere alle Routinen und Übungen</string>
     <string name="zip_import">ZIP-Import</string>
     <string name="zip_import_explanation">Lade Routinen und Übungen</string>
+    <string name="close">Schließen</string>
+    <string name="order">Sortierung</string>
+    <string name="duration">Dauer</string>
 
     <plurals name="exercises_with_count">
         <item quantity="one">%1$d Übung</item>
